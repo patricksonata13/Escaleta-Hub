@@ -1,124 +1,87 @@
-// Salvar no localStorage do navegador
-function saveText() {
-  const text = document.getElementById("editor").innerHTML;
-  localStorage.setItem("roteiro", text);
-  alert("✅ Roteiro salvo localmente!");
+// Alternar abas
+function openTab(evt, tabId) {
+  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+  document.getElementById(tabId).classList.add("active");
+  evt.currentTarget.classList.add("active");
 }
 
-// Carregar do localStorage
+// Inserir elementos no editor
+function insertElement(type) {
+  const editor = document.getElementById('editor');
+  let el = document.createElement('div');
+  switch(type) {
+    case 'scene': el.className='scene-heading'; el.textContent='INT. LOCAL - DIA'; break;
+    case 'character': el.className='character'; el.textContent='PERSONAGEM'; break;
+    case 'dialogue': el.className='dialogue'; el.textContent='Fala do personagem'; break;
+    case 'action': el.className='action'; el.textContent='Descrição da ação'; break;
+    case 'transition': el.className='transition'; el.textContent='CORTE PARA:'; break;
+  }
+  editor.appendChild(el);
+  el.focus();
+}
+
+// Salvar e carregar (localStorage)
+function saveText() {
+  localStorage.setItem("roteiro", document.getElementById("editor").innerHTML);
+  alert("Roteiro salvo!");
+}
 function loadText() {
   const saved = localStorage.getItem("roteiro");
-  if (saved) {
-    document.getElementById("editor").innerHTML = saved;
-    alert("📂 Roteiro carregado!");
-  } else {
-    alert("Nenhum roteiro salvo ainda.");
-  }
+  if (saved) document.getElementById("editor").innerHTML = saved;
+  else alert("Nenhum roteiro salvo!");
 }
 
-// Exportar para PDF
-function exportPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
-
-  const roteiro = document.getElementById("editor").innerText;
-
-  doc.setFont("courier", "normal");
-  doc.setFontSize(12);
-
-  const marginLeft = 80;
-  const marginTop = 60;
-  const lineHeight = 20;
-  let y = marginTop;
-
-  roteiro.split("\n").forEach(line => {
-    if (y > 700) { // Nova página se chegar no final
-      doc.addPage();
-      y = marginTop;
-    }
-    
-    if (line.trim() === "") {
-      y += lineHeight;
-    } else {
-      doc.text(line, marginLeft, y);
-      y += lineHeight;
-    }
-  });
-
-  doc.save("roteiro_scriptflow.pdf");
-}
-
-// Exportar para FDX (Final Draft) - SIMPLIFICADO
+// Exportar FDX
 function exportFDX() {
-  const content = document.getElementById("editor").innerText;
-  const lines = content.split('\n');
-  
-  let fdxContent = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<FinalDraft documentType="Script" template="No" version="1">
-  <Content>`;
+  const roteiro = document.getElementById("editor").innerText.split("\n");
+  let fdx = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<FinalDraft DocumentType="Script" Version="1">
+  <Content>\n`;
 
-  lines.forEach(line => {
-    if (line.trim() === '') return;
-    
-    // Detectar tipo de elemento (simplificado)
-    if (line.toUpperCase() === line && line.trim().length > 0) {
-      fdxContent += `\n    <Paragraph Type="Scene Heading">\n      <Text>${line.trim()}</Text>\n    </Paragraph>`;
-    } else if (line.trim().length < 30 && line === line.toUpperCase()) {
-      fdxContent += `\n    <Paragraph Type="Character">\n      <Text>${line.trim()}</Text>\n    </Paragraph>`;
-    } else {
-      fdxContent += `\n    <Paragraph Type="Action">\n      <Text>${line.trim()}</Text>\n    </Paragraph>`;
-    }
+  roteiro.forEach(line => {
+    if (line.trim()==="") fdx+=`<Paragraph Type="Action"></Paragraph>\n`;
+    else if (line.startsWith("INT.")||line.startsWith("EXT.")) fdx+=`<Paragraph Type="Scene Heading"><Text>${line}</Text></Paragraph>\n`;
+    else if (line===line.toUpperCase()) fdx+=`<Paragraph Type="Character"><Text>${line}</Text></Paragraph>\n`;
+    else if (line.endsWith(":")) fdx+=`<Paragraph Type="Transition"><Text>${line}</Text></Paragraph>\n`;
+    else fdx+=`<Paragraph Type="Action"><Text>${line}</Text></Paragraph>\n`;
   });
 
-  fdxContent += '\n  </Content>\n</FinalDraft>';
-
-  // Criar download do arquivo
-  const blob = new Blob([fdxContent], { type: 'application/xml' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'roteiro.fdx';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  fdx+=`</Content></FinalDraft>`;
+  const blob=new Blob([fdx],{type:"application/xml"});
+  const link=document.createElement("a");
+  link.href=URL.createObjectURL(blob);
+  link.download="roteiro.fdx";
+  link.click();
 }
 
-// Adicionar formatação de roteiro
-function formatText(type) {
-  const editor = document.getElementById("editor");
-  const selection = window.getSelection();
-  
-  if (selection.rangeCount > 0) {
-    const range = selection.getRangeAt(0);
-    const selectedText = range.toString();
-    
-    let formattedText = selectedText;
-    
-    switch(type) {
-      case 'cena':
-        formattedText = `<div class="cena-heading">${selectedText.toUpperCase()}</div>`;
-        break;
-      case 'acao':
-        formattedText = `<div class="acao">${selectedText}</div>`;
-        break;
-      case 'personagem':
-        formattedText = `<div class="personagem">${selectedText.toUpperCase()}</div>`;
-        break;
-      case 'dialogo':
-        formattedText = `<div class="dialogo">${selectedText}</div>`;
-        break;
-    }
-    
-    editor.innerHTML = editor.innerHTML.replace(selectedText, formattedText);
-  }
+// Exportar PDF
+async function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFont("courier","normal");
+  const text = document.getElementById("editor").innerText;
+  doc.text(text, 10, 10);
+  doc.save("roteiro.pdf");
 }
 
-// Carregar dados ao iniciar a página
-document.addEventListener('DOMContentLoaded', function() {
-  // Verificar se há roteiro salvo
-  const saved = localStorage.getItem("roteiro");
-  if (saved) {
-    document.getElementById("editor").innerHTML = saved;
+// Storyboard
+function addStoryboard() {
+  const sb = document.getElementById("storyboard");
+  const card=document.createElement("div");
+  card.className="storyboard-card";
+  card.innerHTML=`
+    <input type="file" accept="image/*" onchange="previewImage(event,this)">
+    <img style="display:none">
+    <textarea placeholder="Descrição da cena"></textarea>`;
+  sb.appendChild(card);
+}
+function previewImage(event,input) {
+  const img=input.nextElementSibling;
+  const file=event.target.files[0];
+  if(file){
+    img.src=URL.createObjectURL(file);
+    img.style.display="block";
   }
-});
+}
+function showHelp(){alert("Bem-vindo ao ScriptFlow! Use os botões para inserir elementos e exportar seu roteiro.");}
