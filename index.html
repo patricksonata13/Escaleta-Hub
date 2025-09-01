@@ -3,8 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Pages - Root vs Docs</title>
+    <title>ScriptFlow - Verificador de Configuração</title>
     <style>
+        :root {
+            --primary: #0366d6;
+            --secondary: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --dark: #24292e;
+            --light: #f8f9fa;
+        }
+        
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,6 +25,7 @@
             line-height: 1.6;
             color: #333;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
             padding: 20px;
         }
         
@@ -29,14 +39,20 @@
         }
         
         header {
-            background: #24292e;
+            background: var(--dark);
             color: white;
             padding: 30px;
             text-align: center;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: 2rem;
             margin-bottom: 10px;
         }
         
@@ -45,59 +61,84 @@
             opacity: 0.8;
         }
         
+        .status-card {
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .status-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .status-success {
+            color: var(--secondary);
+        }
+        
+        .status-warning {
+            color: var(--warning);
+        }
+        
+        .status-error {
+            color: var(--danger);
+        }
+        
+        .status-message {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .status-details {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
         .content {
             padding: 30px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
         }
         
-        .option {
-            flex: 1;
-            min-width: 300px;
-            background: #f9f9f9;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        .section {
+            margin-bottom: 30px;
         }
         
-        .option h2 {
-            color: #0366d6;
+        .section h2 {
+            color: var(--primary);
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #0366d6;
+            border-bottom: 2px solid var(--primary);
         }
         
-        .option ul {
+        .steps {
             list-style-type: none;
-            margin: 20px 0;
+            counter-reset: step-counter;
         }
         
-        .option li {
-            margin-bottom: 12px;
-            padding-left: 25px;
+        .steps li {
+            margin-bottom: 20px;
+            padding-left: 60px;
             position: relative;
+            min-height: 40px;
         }
         
-        .option li:before {
-            content: "•";
-            color: #0366d6;
-            font-weight: bold;
+        .steps li:before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
             position: absolute;
             left: 0;
-        }
-        
-        .pros-cons {
-            background: #fff;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            border-left: 4px solid #28a745;
-        }
-        
-        .pros-cons h3 {
-            margin-bottom: 10px;
-            color: #28a745;
+            top: 0;
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
         }
         
         .code-block {
@@ -118,49 +159,61 @@
             color: #6a9955;
         }
         
-        .recommendation {
-            text-align: center;
-            padding: 30px;
-            background: #e6f7ff;
-            border-top: 2px solid #91d5ff;
-            margin-top: 20px;
-        }
-        
-        .recommendation h2 {
-            color: #1890ff;
-            margin-bottom: 15px;
-        }
-        
         .btn {
             display: inline-block;
-            background: #0366d6;
+            background: var(--primary);
             color: white;
             padding: 12px 25px;
             border-radius: 5px;
             text-decoration: none;
             font-weight: bold;
-            margin-top: 15px;
-            transition: background 0.3s;
+            margin: 10px 5px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
         }
         
         .btn:hover {
             background: #0250b6;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--secondary);
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .actions {
+            text-align: center;
+            margin: 30px 0;
         }
         
         footer {
             text-align: center;
             padding: 20px;
-            background: #24292e;
+            background: var(--dark);
             color: white;
         }
         
         @media (max-width: 768px) {
-            .content {
-                flex-direction: column;
+            .steps li {
+                padding-left: 50px;
             }
             
-            .option {
-                min-width: 100%;
+            .steps li:before {
+                width: 35px;
+                height: 35px;
             }
         }
     </style>
@@ -168,112 +221,102 @@
 <body>
     <div class="container">
         <header>
-            <h1>GitHub Pages: Root vs Docs</h1>
-            <p class="subtitle">Entenda as duas formas de publicar seu site no GitHub</p>
+            <div class="logo">🎬</div>
+            <h1>ScriptFlow - Verificador de Configuração</h1>
+            <p class="subtitle">Verificando a configuração do GitHub Pages para seu repositório</p>
         </header>
         
-        <div class="content">
-            <div class="option">
-                <h2>Opção 1: Pasta Root (/)</h2>
-                <p>Seus arquivos ficam na raiz do repositório.</p>
-                
-                <h3>Como configurar:</h3>
-                <ul>
-                    <li>Seu arquivo principal deve se chamar <strong>index.html</strong></li>
-                    <li>Coloque todos os arquivos na raiz do repositório</li>
-                    <li>Vá em Settings → Pages → Branch: main → Save</li>
-                </ul>
-                
-                <div class="pros-cons">
-                    <h3>Vantagens:</h3>
-                    <ul>
-                        <li>Mais simples para projetos pequenos</li>
-                        <li>Todos os arquivos visíveis na raiz</li>
-                        <li>Fácil de configurar</li>
-                    </ul>
-                    
-                    <h3>Desvantagens:</h3>
-                    <ul>
-                        <li>Pode poluir o repositório</li>
-                        <li>Mistura código e arquivos públicos</li>
-                    </ul>
-                </div>
-                
-                <div class="code-block">
-                    <span class="comment"># Estrutura do repositório:</span><br>
-                    scriptflow-platform.github.io/<br>
-                    ├── <span class="command">index.html</span><br>
-                    ├── <span class="command">style.css</span><br>
-                    ├── <span class="command">script.js</span><br>
-                    └── <span class="command">README.md</span>
-                </div>
+        <div class="status-card">
+            <div class="status-icon status-warning">⚠️</div>
+            <div class="status-message">Configuração do GitHub Pages não detectada</div>
+            <div class="status-details">
+                <p>O repositório <strong>patricksonata13/scriptflow-platform.github.io</strong> existe, mas o GitHub Pages parece não estar configurado corretamente.</p>
+                <p>URL esperada: <code>https://patricksonata13.github.io/scriptflow-platform.github.io/</code></p>
             </div>
-            
-            <div class="option">
-                <h2>Opção 2: Pasta /docs</h2>
-                <p>Seus arquivos ficam em uma pasta chamada "docs" na raiz.</p>
-                
-                <h3>Como configurar:</h3>
-                <ul>
-                    <li>Crie uma pasta chamada <strong>docs</strong> no repositório</li>
-                    <li>Coloque todos os arquivos do site dentro dela</li>
-                    <li>Vá em Settings → Pages → Branch: main → /docs → Save</li>
-                </ul>
-                
-                <div class="pros-cons">
-                    <h3>Vantagens:</h3>
-                    <ul>
-                        <li>Mantém o repositório organizado</li>
-                        <li>Separa código e arquivos públicos</li>
-                        <li>Permite versionamento do site separadamente</li>
-                    </ul>
-                    
-                    <h3>Desvantagens:</h3>
-                    <ul>
-                        <li>Configuração um pouco mais complexa</li>
-                        <li>URLs ficam mais longas (ex: seu-site.com/docs)</li>
-                    </ul>
-                </div>
-                
-                <div class="code-block">
-                    <span class="comment"># Estrutura do repositório:</span><br>
-                    scriptflow-platform.github.io/<br>
-                    ├── <span class="command">docs/</span><br>
-                    │   ├── <span class="command">index.html</span><br>
-                    │   ├── <span class="command">style.css</span><br>
-                    │   └── <span class="command">script.js</span><br>
-                    ├── <span class="command">src/</span><br>
-                    └── <span class="command">README.md</span>
-                </div>
+            <div class="actions">
+                <a href="https://github.com/patricksonata13/scriptflow-platform.github.io/settings/pages" class="btn" target="_blank">Configurar GitHub Pages</a>
+                <a href="https://patricksonata13.github.io/scriptflow-platform.github.io/" class="btn btn-success" target="_blank">Testar URL</a>
             </div>
         </div>
         
-        <div class="recommendation">
-            <h2>✅ Recomendação para Iniciantes</h2>
-            <p>Use a <strong>pasta Root (/)</strong> para projetos simples como o ScriptFlow.</p>
-            <p>É mais fácil de configurar e manter para sites menores.</p>
-            <a href="https://github.com/patricksonata13/scriptflow-platform.github.io/settings/pages" class="btn" target="_blank">Configurar GitHub Pages</a>
+        <div class="content">
+            <div class="section">
+                <h2>Como configurar o GitHub Pages</h2>
+                <ol class="steps">
+                    <li>Acesse seu repositório no GitHub: <code>patricksonata13/scriptflow-platform.github.io</code></li>
+                    <li>Clique na aba <strong>"Settings"</strong> (no menu superior)</li>
+                    <li>No menu lateral, clique em <strong>"Pages"</strong></li>
+                    <li>Em <strong>"Source"</strong>, selecione a branch <strong>"main"</strong></li>
+                    <li>Se estiver usando a pasta <strong>"/docs"</strong>, selecione-a (caso contrário, deixe como <strong>"/ (root)"</strong>)</li>
+                    <li>Clique em <strong>"Save"</strong></li>
+                    <li>Aguarde alguns minutos (até 10 minutos) para o GitHub publicar seu site</li>
+                </ol>
+            </div>
+            
+            <div class="section">
+                <h2>Estrutura do seu repositório</h2>
+                <p>Seu repositório atual contém:</p>
+                <div class="code-block">
+                    scriptflow-platform.github.io/<br>
+                    └── <span class="command">index.html</span> <span class="comment"># Sua página atual sobre GitHub Pages</span>
+                </div>
+                
+                <p>Para o ScriptFlow funcionar, você precisa substituir o conteúdo do index.html pelo código do editor de roteiros.</p>
+                
+                <div class="actions">
+                    <a href="https://github.com/patricksonata13/scriptflow-platform.github.io" class="btn" target="_blank">Acessar Repositório</a>
+                    <a href="https://github.com/patricksonata13/scriptflow-platform.github.io/edit/main/index.html" class="btn btn-success" target="_blank">Editar index.html</a>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Solução de problemas</h2>
+                <ol class="steps">
+                    <li>Verifique se o repositório é <strong>público</strong> (não privado)</li>
+                    <li>Certifique-se de que o arquivo principal se chama <strong>index.html</strong></li>
+                    <li>Confirme que você selecionou a branch <strong>main</strong> nas configurações</li>
+                    <li>Aguarde tempo suficiente (às vezes leva alguns minutos para o site ficar disponível)</li>
+                    <li>Limpe o cache do seu navegador ou teste em uma janela anônima</li>
+                </ol>
+            </div>
+            
+            <div class="actions">
+                <button onclick="window.location.reload()" class="btn">🔄 Verificar Novamente</button>
+                <a href="https://docs.github.com/pt/pages" class="btn btn-success" target="_blank">Documentação do GitHub Pages</a>
+            </div>
         </div>
         
         <footer>
             <p>Patrick Sonata © 2025 - ScriptFlow Platform</p>
+            <p>Última verificação: <span id="current-date"></span></p>
         </footer>
     </div>
 
     <script>
-        // Adicionando data atual dinamicamente
+        // Adicionando data atual
         document.addEventListener('DOMContentLoaded', function() {
             const date = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
             const currentDate = date.toLocaleDateString('pt-BR', options);
             
-            const dateElement = document.createElement('p');
-            dateElement.textContent = `Página gerada em: ${currentDate}`;
-            dateElement.style.textAlign = 'center';
-            dateElement.style.marginTop = '10px';
-            dateElement.style.color = '#6c757d';
+            document.getElementById('current-date').textContent = currentDate;
             
-            document.querySelector('footer').appendChild(dateElement);
+            // Verificação simples se o site está no GitHub Pages
+            if (window.location.hostname.includes('github.io')) {
+                document.querySelector('.status-icon').className = 'status-icon status-success';
+                document.querySelector('.status-icon').textContent = '✅';
+                document.querySelector('.status-message').textContent = 'GitHub Pages configurado com sucesso!';
+                document.querySelector('.status-details').innerHTML = `
+                    <p>Seu GitHub Pages está funcionando corretamente!</p>
+                    <p>URL atual: <code>${window.location.href}</code></p>
+                `;
+            }
         });
     </script>
 </body>
