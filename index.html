@@ -6,31 +6,455 @@
   <title>ScriptFlow - Plataforma de Roteiros</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Variáveis e reset */
+    :root {
+      --primary: #2c3e50;
+      --secondary: #e74c3c;
+      --accent: #3498db;
+      --light: #ecf0f1;
+      --dark: #2c3e50;
+      --success: #2ecc71;
+      --warning: #f39c12;
+      --text: #333;
+      --text-light: #777;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f7fa;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    
+    /* Header */
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    
+    header h1 {
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    nav {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    nav button {
+      background-color: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    nav button:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background-color: white;
+      box-shadow: var(--shadow);
+    }
+    
+    .tabs button {
+      padding: 1rem 1.5rem;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text-light);
+      transition: var(--transition);
+      border-bottom: 3px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .tabs button:hover {
+      color: var(--primary);
+    }
+    
+    .tabs button.active {
+      color: var(--primary);
+      border-bottom: 3px solid var(--secondary);
+    }
+    
+    /* Tab content */
+    .tab-content {
+      display: none;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Editor */
+    .toolbar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .toolbar button {
+      padding: 0.5rem 1rem;
+      border: 1px solid #ddd;
+      background-color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .toolbar button:hover {
+      background-color: var(--light);
+    }
+    
+    #editor {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 2rem;
+      min-height: 500px;
+      box-shadow: var(--shadow);
+      margin-bottom: 1rem;
+    }
+    
+    /* Elementos do roteiro */
+    .scene-heading {
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      padding: 0.5rem;
+      border-left: 3px solid var(--secondary);
+    }
+    
+    .action {
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border-left: 3px solid var(--accent);
+    }
+    
+    .character {
+      font-weight: bold;
+      margin: 1rem 0 0.5rem 0;
+      padding-left: 2rem;
+      text-transform: uppercase;
+      color: var(--dark);
+    }
+    
+    .dialogue {
+      margin-bottom: 1rem;
+      padding-left: 3rem;
+      padding-right: 2rem;
+    }
+    
+    .transition {
+      text-align: right;
+      text-transform: uppercase;
+      margin: 1rem 0;
+      padding: 0.5rem;
+      color: var(--text-light);
+    }
+    
+    /* Botões de exportação */
+    .export-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+    
+    .export-buttons button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .export-buttons button:first-child {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .export-buttons button:last-child {
+      background-color: var(--secondary);
+      color: white;
+    }
+    
+    .export-buttons button:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    /* Storyboard */
+    #storyboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .storyboard-frame {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    
+    .frame-image {
+      height: 150px;
+      background-color: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+    }
+    
+    .frame-content {
+      padding: 1rem;
+    }
+    
+    .frame-content h3 {
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+    
+    .frame-actions {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0.5rem;
+      gap: 0.5rem;
+    }
+    
+    .frame-actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-light);
+      transition: var(--transition);
+    }
+    
+    .frame-actions button:hover {
+      color: var(--primary);
+    }
+    
+    #storyboard-tab button {
+      padding: 0.75rem 1.5rem;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    #storyboard-tab button:hover {
+      background-color: var(--primary);
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background-color: white;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-header h2 {
+      color: var(--primary);
+    }
+    
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-light);
+    }
+    
+    .modal-content > p, .modal-content h3 {
+      padding: 0 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .help-list {
+      padding: 0 1.5rem 1rem 2.5rem;
+    }
+    
+    .help-list li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .modal-content > button {
+      margin: 0 1.5rem 1.5rem;
+      padding: 0.75rem 1.5rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      background-color: var(--dark);
+      color: white;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+      }
+      
+      nav {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      
+      .tab-content {
+        padding: 1rem;
+      }
+      
+      #editor {
+        padding: 1rem;
+      }
+      
+      .character, .dialogue {
+        padding-left: 1rem;
+      }
+      
+      .export-buttons {
+        flex-direction: column;
+      }
+      
+      #storyboard {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Elementos editáveis com foco */
+    [contenteditable="true"]:focus {
+      outline: 2px solid var(--accent);
+      border-radius: 4px;
+    }
+    
+    /* Animações */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .tab-content.active {
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .storyboard-frame {
+      animation: fadeIn 0.5s ease;
+    }
+  </style>
 </head>
 <body>
   <header>
     <h1>🎬 ScriptFlow</h1>
     <nav>
-      <button onclick="saveText()">💾 Salvar</button>
-      <button onclick="loadText()">📂 Abrir</button>
-      <button onclick="showHelp()">❓ Ajuda</button>
+      <button onclick="saveText()"><i class="fas fa-save"></i> Salvar</button>
+      <button onclick="loadText()"><i class="fas fa-folder-open"></i> Abrir</button>
+      <button onclick="showHelp()"><i class="fas fa-question-circle"></i> Ajuda</button>
     </nav>
   </header>
 
   <div class="tabs">
-    <button class="active" onclick="openTab(event,'editor-tab')">📝 Editor</button>
-    <button onclick="openTab(event,'storyboard-tab')">🎨 Storyboard</button>
+    <button class="active" onclick="openTab(event,'editor-tab')"><i class="fas fa-edit"></i> Editor</button>
+    <button onclick="openTab(event,'storyboard-tab')"><i class="fas fa-paint-brush"></i> Storyboard</button>
   </div>
 
   <!-- Editor -->
   <div id="editor-tab" class="tab-content active">
     <div class="toolbar">
-      <button onclick="insertElement('scene')">Cena</button>
-      <button onclick="insertElement('character')">Personagem</button>
-      <button onclick="insertElement('dialogue')">Diálogo</button>
-      <button onclick="insertElement('action')">Ação</button>
-      <button onclick="insertElement('transition')">Transição</button>
+      <button onclick="insertElement('scene')"><i class="fas fa-film"></i> Cena</button>
+      <button onclick="insertElement('character')"><i class="fas fa-user"></i> Personagem</button>
+      <button onclick="insertElement('dialogue')"><i class="fas fa-comment"></i> Diálogo</button>
+      <button onclick="insertElement('action')"><i class="fas fa-running"></i> Ação</button>
+      <button onclick="insertElement('transition')"><i class="fas fa-exchange-alt"></i> Transição</button>
     </div>
     <div id="editor" contenteditable="true">
       <div class="scene-heading">INT. SALA DE ESTAR - DIA</div>
@@ -40,8 +464,8 @@
     </div>
 
     <div class="export-buttons">
-      <button onclick="exportFDX()">🎞 Exportar FDX</button>
-      <button onclick="exportPDF()">📑 Exportar PDF</button>
+      <button onclick="exportFDX()"><i class="fas fa-file-export"></i> Exportar FDX</button>
+      <button onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
     </div>
   </div>
 
@@ -49,8 +473,10 @@
   <div id="storyboard-tab" class="tab-content">
     <h2>Storyboard</h2>
     <p>Adicione quadros com imagem + descrição.</p>
-    <button onclick="addStoryboard()">➕ Adicionar Quadro</button>
-    <div id="storyboard"></div>
+    <button onclick="addStoryboard()"><i class="fas fa-plus"></i> Adicionar Quadro</button>
+    <div id="storyboard">
+      <!-- Quadros serão adicionados aqui dinamicamente -->
+    </div>
   </div>
 
   <!-- Modal de Ajuda -->
@@ -83,6 +509,173 @@
     <p>ScriptFlow © 2025 - Plataforma de criação de roteiros | Desenvolvido por Patrick Sonata</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script>
+    // Funções principais da aplicação
+    function openTab(evt, tabName) {
+      // Esconder todos os conteúdos de abas
+      const tabContents = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove("active");
+      }
+      
+      // Desativar todos os botões de aba
+      const tabButtons = document.getElementsByClassName("tabs")[0].getElementsByTagName("button");
+      for (let i = 0; i < tabButtons.length; i++) {
+        tabButtons[i].classList.remove("active");
+      }
+      
+      // Ativar a aba atual
+      document.getElementById(tabName).classList.add("active");
+      evt.currentTarget.classList.add("active");
+    }
+    
+    function insertElement(type) {
+      const editor = document.getElementById('editor');
+      let newElement;
+      
+      switch(type) {
+        case 'scene':
+          newElement = document.createElement('div');
+          newElement.className = 'scene-heading';
+          newElement.contentEditable = true;
+          newElement.textContent = 'INT. LOCAL - DIA';
+          break;
+        case 'character':
+          newElement = document.createElement('div');
+          newElement.className = 'character';
+          newElement.contentEditable = true;
+          newElement.textContent = 'NOME DO PERSONAGEM';
+          break;
+        case 'dialogue':
+          newElement = document.createElement('div');
+          newElement.className = 'dialogue';
+          newElement.contentEditable = true;
+          newElement.textContent = 'Diálogo do personagem aqui...';
+          break;
+        case 'action':
+          newElement = document.createElement('div');
+          newElement.className = 'action';
+          newElement.contentEditable = true;
+          newElement.textContent = 'Ação ou descrição da cena...';
+          break;
+        case 'transition':
+          newElement = document.createElement('div');
+          newElement.className = 'transition';
+          newElement.contentEditable = true;
+          newElement.textContent = 'CORTAR PARA:';
+          break;
+      }
+      
+      editor.appendChild(newElement);
+      newElement.focus();
+      
+      // Mover o cursor para dentro do novo elemento
+      const range = document.createRange();
+      range.selectNodeContents(newElement);
+      range.collapse(false);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+    
+    function showHelp() {
+      document.getElementById('help-modal').style.display = 'flex';
+    }
+    
+    function closeHelp() {
+      document.getElementById('help-modal').style.display = 'none';
+    }
+    
+    function addStoryboard() {
+      const storyboard = document.getElementById('storyboard');
+      const frameCount = storyboard.children.length + 1;
+      
+      const frame = document.createElement('div');
+      frame.className = 'storyboard-frame';
+      frame.innerHTML = `
+        <div class="frame-image">
+          <i class="fas fa-image fa-3x"></i>
+        </div>
+        <div class="frame-content">
+          <h3>Quadro ${frameCount}</h3>
+          <p>Clique para editar a descrição deste quadro...</p>
+        </div>
+        <div class="frame-actions">
+          <button onclick="editFrame(this)"><i class="fas fa-edit"></i></button>
+          <button onclick="deleteFrame(this)"><i class="fas fa-trash"></i></button>
+        </div>
+      `;
+      
+      storyboard.appendChild(frame);
+    }
+    
+    function editFrame(button) {
+      const frameContent = button.parentElement.previousElementSibling;
+      const description = frameContent.querySelector('p');
+      
+      const newText = prompt('Editar descrição do quadro:', description.textContent);
+      if (newText !== null) {
+        description.textContent = newText;
+      }
+    }
+    
+    function deleteFrame(button) {
+      if (confirm('Tem certeza que deseja excluir este quadro?')) {
+        const frame = button.closest('.storyboard-frame');
+        frame.parentNode.removeChild(frame);
+      }
+    }
+    
+    function saveText() {
+      const editorContent = document.getElementById('editor').innerHTML;
+      localStorage.setItem('scriptflow-script', editorContent);
+      alert('Roteiro salvo com sucesso!');
+    }
+    
+    function loadText() {
+      const savedContent = localStorage.getItem('scriptflow-script');
+      if (savedContent) {
+        document.getElementById('editor').innerHTML = savedContent;
+        alert('Roteiro carregado com sucesso!');
+      } else {
+        alert('Nenhum roteiro salvo encontrado.');
+      }
+    }
+    
+    function exportFDX() {
+      alert('Funcionalidade de exportação FDX será implementada em breve!');
+      // Em uma implementação real, aqui seria a lógica para converter para formato FDX
+    }
+    
+    function exportPDF() {
+      alert('Funcionalidade de exportação PDF será implementada em breve!');
+      // Em uma implementação real, aqui seria a lógica para converter para PDF usando jsPDF
+    }
+    
+    // Atalhos de teclado
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        saveText();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
+        e.preventDefault();
+        loadText();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        exportPDF();
+      }
+    });
+    
+    // Carregar storyboards salvos se existirem
+    window.addEventListener('load', function() {
+      // Verificar se há storyboards salvos
+      const savedFrames = localStorage.getItem('scriptflow-storyboards');
+      if (savedFrames) {
+        document.getElementById('storyboard').innerHTML = savedFrames;
+      }
+    });
+  </script>
 </body>
 </html>
