@@ -1,87 +1,131 @@
 // Alternar abas
 function openTab(evt, tabId) {
-  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+  const contents = document.getElementsByClassName("tab-content");
+  for (let i = 0; i < contents.length; i++) {
+    contents[i].classList.remove("active");
+  }
+  const tabs = document.querySelectorAll(".tabs button");
+  tabs.forEach(btn => btn.classList.remove("active"));
   document.getElementById(tabId).classList.add("active");
   evt.currentTarget.classList.add("active");
 }
 
 // Inserir elementos no editor
 function insertElement(type) {
-  const editor = document.getElementById('editor');
-  let el = document.createElement('div');
-  switch(type) {
-    case 'scene': el.className='scene-heading'; el.textContent='INT. LOCAL - DIA'; break;
-    case 'character': el.className='character'; el.textContent='PERSONAGEM'; break;
-    case 'dialogue': el.className='dialogue'; el.textContent='Fala do personagem'; break;
-    case 'action': el.className='action'; el.textContent='Descrição da ação'; break;
-    case 'transition': el.className='transition'; el.textContent='CORTE PARA:'; break;
+  const editor = document.getElementById("editor");
+  let el = document.createElement("div");
+
+  switch (type) {
+    case "scene":
+      el.className = "scene-heading";
+      el.textContent = "INT. LOCAL - DIA";
+      break;
+    case "character":
+      el.className = "character";
+      el.textContent = "NOME DO PERSONAGEM";
+      break;
+    case "dialogue":
+      el.className = "dialogue";
+      el.textContent = "Texto do diálogo...";
+      break;
+    case "action":
+      el.className = "action";
+      el.textContent = "Descrição da ação...";
+      break;
+    case "transition":
+      el.className = "transition";
+      el.textContent = "CORTE PARA:";
+      break;
   }
   editor.appendChild(el);
-  el.focus();
 }
 
-// Salvar e carregar (localStorage)
+// Salvar no navegador
 function saveText() {
   localStorage.setItem("roteiro", document.getElementById("editor").innerHTML);
-  alert("Roteiro salvo!");
+  alert("Roteiro salvo no navegador!");
 }
+
+// Carregar do navegador
 function loadText() {
-  const saved = localStorage.getItem("roteiro");
-  if (saved) document.getElementById("editor").innerHTML = saved;
-  else alert("Nenhum roteiro salvo!");
+  const content = localStorage.getItem("roteiro");
+  if (content) {
+    document.getElementById("editor").innerHTML = content;
+    alert("Roteiro carregado!");
+  } else {
+    alert("Nenhum roteiro salvo ainda.");
+  }
 }
 
-// Exportar FDX
-function exportFDX() {
-  const roteiro = document.getElementById("editor").innerText.split("\n");
-  let fdx = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<FinalDraft DocumentType="Script" Version="1">
-  <Content>\n`;
-
-  roteiro.forEach(line => {
-    if (line.trim()==="") fdx+=`<Paragraph Type="Action"></Paragraph>\n`;
-    else if (line.startsWith("INT.")||line.startsWith("EXT.")) fdx+=`<Paragraph Type="Scene Heading"><Text>${line}</Text></Paragraph>\n`;
-    else if (line===line.toUpperCase()) fdx+=`<Paragraph Type="Character"><Text>${line}</Text></Paragraph>\n`;
-    else if (line.endsWith(":")) fdx+=`<Paragraph Type="Transition"><Text>${line}</Text></Paragraph>\n`;
-    else fdx+=`<Paragraph Type="Action"><Text>${line}</Text></Paragraph>\n`;
-  });
-
-  fdx+=`</Content></FinalDraft>`;
-  const blob=new Blob([fdx],{type:"application/xml"});
-  const link=document.createElement("a");
-  link.href=URL.createObjectURL(blob);
-  link.download="roteiro.fdx";
-  link.click();
+// Mostrar ajuda
+function showHelp() {
+  alert("Use os botões para inserir elementos de roteiro. Salve seu trabalho e exporte para PDF ou FDX.");
 }
 
-// Exportar PDF
-async function exportPDF() {
+// Exportar para PDF
+function exportPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  doc.setFont("courier","normal");
-  const text = document.getElementById("editor").innerText;
-  doc.text(text, 10, 10);
+  doc.setFont("Courier", "normal");
+  doc.setFontSize(12);
+  doc.text(document.getElementById("editor").innerText, 10, 10);
   doc.save("roteiro.pdf");
 }
 
-// Storyboard
+// Exportar para Final Draft (.fdx)
+function exportFDX() {
+  const texto = document.getElementById("editor").innerText.split("\n");
+  let fdxContent = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<FinalDraft DocumentType="Script" Template="No" Version="1">
+  <Content>\n`;
+
+  texto.forEach(line => {
+    if (line.toUpperCase().startsWith("INT.") || line.toUpperCase().startsWith("EXT.")) {
+      fdxContent += `<Paragraph Type="Scene Heading"><Text>${line}</Text></Paragraph>\n`;
+    } else if (line === line.toUpperCase() && line.length > 2) {
+      fdxContent += `<Paragraph Type="Character"><Text>${line}</Text></Paragraph>\n`;
+    } else {
+      fdxContent += `<Paragraph Type="Action"><Text>${line}</Text></Paragraph>\n`;
+    }
+  });
+
+  fdxContent += "  </Content>\n</FinalDraft>";
+
+  const blob = new Blob([fdxContent], { type: "application/xml" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "roteiro.fdx";
+  link.click();
+}
+
+// Adicionar storyboard
 function addStoryboard() {
-  const sb = document.getElementById("storyboard");
-  const card=document.createElement("div");
-  card.className="storyboard-card";
-  card.innerHTML=`
-    <input type="file" accept="image/*" onchange="previewImage(event,this)">
-    <img style="display:none">
-    <textarea placeholder="Descrição da cena"></textarea>`;
-  sb.appendChild(card);
+  const container = document.getElementById("storyboard");
+  const card = document.createElement("div");
+  card.className = "storyboard-card";
+
+  const img = document.createElement("input");
+  img.type = "file";
+  img.accept = "image/*";
+  img.onchange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const imageEl = document.createElement("img");
+        imageEl.src = ev.target.result;
+        card.insertBefore(imageEl, textarea);
+        img.remove();
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const textarea = document.createElement("textarea");
+  textarea.placeholder = "Descrição da cena...";
+
+  card.appendChild(img);
+  card.appendChild(textarea);
+  container.appendChild(card);
 }
-function previewImage(event,input) {
-  const img=input.nextElementSibling;
-  const file=event.target.files[0];
-  if(file){
-    img.src=URL.createObjectURL(file);
-    img.style.display="block";
-  }
-}
-function showHelp(){alert("Bem-vindo ao ScriptFlow! Use os botões para inserir elementos e exportar seu roteiro.");}
+
