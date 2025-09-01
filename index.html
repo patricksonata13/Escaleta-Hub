@@ -6,22 +6,58 @@
   <title>ScriptFlow - Plataforma de Roteiros</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <style>
-    :root { --primary:#2c3e50; --primary-light:#34495e; --accent:#3498db; --success:#2ecc71; --light:#f5f6fa; --shadow:0 4px 6px rgba(0,0,0,0.1); }
-    body{font-family:'Segoe UI',sans-serif;background:#ecf0f1;margin:0;}
-    header{background:var(--primary);color:white;padding:15px;display:flex;justify-content:space-between;align-items:center;}
-    header h1{margin:0;font-size:1.6rem;}
-    nav button{background:var(--primary-light);border:none;color:white;padding:8px 12px;margin-left:8px;border-radius:5px;cursor:pointer;}
-    nav button:hover{background:var(--accent);}
-    .tabs{display:flex;background:#ddd;}
-    .tabs button{flex:1;padding:10px;cursor:pointer;border:none;background:#ddd;font-weight:bold;}
-    .tabs button.active{background:white;border-bottom:3px solid var(--accent);}
-    .tab-content{display:none;padding:20px;background:white;min-height:500px;}
-    .tab-content.active{display:block;}
-    #editor{border:1px solid #ccc;padding:15px;min-height:400px;font-family:'Courier New',monospace;background:white;}
-    .scene-heading{font-weight:bold;text-transform:uppercase;margin:10px 0;}
-    .character{text-align:center;text-transform:uppercase;margin:15px 0 5px 0;}
-    .dialogue{margin:0 0 15px 0;padding:0 20%;}
-    .action{margin:10px 0;}
-    .transition{text-align:right;text-transform:uppercase;margin:15px 0;}
-    .too
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🎬 ScriptFlow</h1>
+    <nav>
+      <button onclick="saveText()">💾 Salvar</button>
+      <button onclick="loadText()">📂 Abrir</button>
+      <button onclick="showHelp()">❓ Ajuda</button>
+    </nav>
+  </header>
+
+  <div class="tabs">
+    <button class="active" onclick="openTab(event,'editor-tab')">📝 Editor</button>
+    <button onclick="openTab(event,'storyboard-tab')">🎨 Storyboard</button>
+  </div>
+
+  <!-- Editor -->
+  <div id="editor-tab" class="tab-content active">
+    <div class="toolbar">
+      <button onclick="insertElement('scene')">Cena</button>
+      <button onclick="insertElement('character')">Personagem</button>
+      <button onclick="insertElement('dialogue')">Diálogo</button>
+      <button onclick="insertElement('action')">Ação</button>
+      <button onclick="insertElement('transition')">Transição</button>
+    </div>
+    <div id="editor" contenteditable="true">
+      <div class="scene-heading">INT. SALA DE ESTAR - DIA</div>
+      <div class="action">Uma sala confortável. JOHN está sentado lendo um jornal.</div>
+      <div class="character">JOHN</div>
+      <div class="dialogue">Onde está minha xícara de café?</div>
+    </div>
+
+    <div class="export-buttons">
+      <button onclick="exportFDX()">🎞 Exportar FDX</button>
+      <button onclick="exportPDF()">📑 Exportar PDF</button>
+    </div>
+  </div>
+
+  <!-- Storyboard -->
+  <div id="storyboard-tab" class="tab-content">
+    <h2>Storyboard</h2>
+    <p>Adicione quadros com imagem + descrição.</p>
+    <button onclick="addStoryboard()">➕ Adicionar Quadro</button>
+    <div id="storyboard"></div>
+  </div>
+
+  <footer>
+    <p>ScriptFlow © 2025 - Plataforma de criação de roteiros | Desenvolvido por Patrick Sonata</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
