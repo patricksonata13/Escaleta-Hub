@@ -19,11 +19,14 @@
       line-height: 1.6;
       min-height: 100vh;
       padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     
     .container {
       max-width: 1200px;
-      margin: 0 auto;
+      width: 100%;
       background: white;
       border-radius: 15px;
       overflow: hidden;
@@ -35,6 +38,7 @@
       color: white;
       padding: 2rem;
       text-align: center;
+      position: relative;
     }
     
     header h1 {
@@ -45,6 +49,29 @@
     header p {
       font-size: 1.2rem;
       opacity: 0.9;
+    }
+    
+    .user-info {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+    }
+    
+    .user-info span {
+      margin-right: 10px;
+    }
+    
+    .logout-btn {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1rem;
     }
     
     .tabs {
@@ -290,6 +317,88 @@
       color: white;
     }
     
+    /* Modal de Login */
+    .login-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .login-modal.active {
+      display: flex;
+    }
+    
+    .login-form {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 400px;
+      max-width: 90%;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .login-form h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      border: none;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    
+    .login-btn {
+      width: 100%;
+      padding: 1rem;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    
+    .login-btn:hover {
+      background: #c0392b;
+    }
+    
+    .register-link {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+    
+    .register-link a {
+      color: #3498db;
+      text-decoration: none;
+    }
+    
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+    
     @media (max-width: 768px) {
       .steps, .research-grid {
         grid-template-columns: 1fr;
@@ -307,14 +416,47 @@
         padding: 0.8rem 1rem;
         font-size: 0.9rem;
       }
+      
+      .user-info {
+        position: relative;
+        top: 0;
+        right: 0;
+        justify-content: center;
+        margin-top: 1rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <!-- Modal de Login -->
+  <div class="login-modal active" id="loginModal">
+    <div class="login-form">
+      <h2><i class="fas fa-scroll"></i> Acessar ScriptFlow</h2>
+      <div class="form-group">
+        <label for="username">Usuário</label>
+        <input type="text" id="username" placeholder="Digite seu usuário">
+      </div>
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input type="password" id="password" placeholder="Digite sua senha">
+      </div>
+      <button class="login-btn" id="loginBtn">Entrar</button>
+      <div class="register-link">
+        <p>Não tem uma conta? <a href="#" id="registerLink">Registrar-se</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" id="appContainer" style="display: none;">
     <header>
-      <h1><i class="fas fa-scroll"></i> ScriptFlow</h1>
-      <p>Plataforma completa para desenvolvimento de roteiros</p>
+      <div>
+        <h1><i class="fas fa-scroll"></i> ScriptFlow</h1>
+        <p>Plataforma completa para desenvolvimento de roteiros</p>
+      </div>
+      <div class="user-info">
+        <span id="userName">Usuário</span>
+        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
     </header>
     
     <div class="tabs">
@@ -495,6 +637,53 @@ João abre a porta e encontra uma carta no chão. Ele a examina, intrigado..."><
   </div>
 
   <script>
+    // Sistema de Login Simulado
+    document.getElementById('loginBtn').addEventListener('click', function() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      if (username && password) {
+        // Simulação de login bem-sucedido
+        document.getElementById('loginModal').classList.remove('active');
+        document.getElementById('appContainer').style.display = 'block';
+        document.getElementById('userName').textContent = username;
+        
+        // Salvar informações de login (apenas para demonstração)
+        localStorage.setItem('loggedIn', 'true');
+        localStorage.setItem('username', username);
+      } else {
+        alert('Por favor, preencha todos os campos.');
+      }
+    });
+    
+    // Botão de logout
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      localStorage.removeItem('loggedIn');
+      localStorage.removeItem('username');
+      document.getElementById('loginModal').classList.add('active');
+      document.getElementById('appContainer').style.display = 'none';
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+    });
+    
+    // Verificar se já está logado (apenas para demonstração)
+    window.addEventListener('DOMContentLoaded', function() {
+      const loggedIn = localStorage.getItem('loggedIn');
+      const username = localStorage.getItem('username');
+      
+      if (loggedIn === 'true' && username) {
+        document.getElementById('loginModal').classList.remove('active');
+        document.getElementById('appContainer').style.display = 'block';
+        document.getElementById('userName').textContent = username;
+      }
+    });
+    
+    // Link de registro (apenas demonstração)
+    document.getElementById('registerLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      alert('Sistema de registro não implementado nesta demonstração. Use qualquer usuário/senha para fazer login.');
+    });
+    
     // Navegação entre abas principais
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', function() {
