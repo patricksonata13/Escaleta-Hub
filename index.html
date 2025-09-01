@@ -1,323 +1,35 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScriptFlow - Verificador de Configuração</title>
-    <style>
-        :root {
-            --primary: #0366d6;
-            --secondary: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --dark: #24292e;
-            --light: #f8f9fa;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        header {
-            background: var(--dark);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .logo {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.8;
-        }
-        
-        .status-card {
-            padding: 30px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .status-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
-        
-        .status-success {
-            color: var(--secondary);
-        }
-        
-        .status-warning {
-            color: var(--warning);
-        }
-        
-        .status-error {
-            color: var(--danger);
-        }
-        
-        .status-message {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-        }
-        
-        .status-details {
-            background: var(--light);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            text-align: left;
-        }
-        
-        .content {
-            padding: 30px;
-        }
-        
-        .section {
-            margin-bottom: 30px;
-        }
-        
-        .section h2 {
-            color: var(--primary);
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--primary);
-        }
-        
-        .steps {
-            list-style-type: none;
-            counter-reset: step-counter;
-        }
-        
-        .steps li {
-            margin-bottom: 20px;
-            padding-left: 60px;
-            position: relative;
-            min-height: 40px;
-        }
-        
-        .steps li:before {
-            content: counter(step-counter);
-            counter-increment: step-counter;
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 40px;
-            height: 40px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-        
-        .code-block {
-            background: #2d2d2d;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            margin: 15px 0;
-            overflow-x: auto;
-        }
-        
-        .command {
-            color: #7ec699;
-        }
-        
-        .comment {
-            color: #6a9955;
-        }
-        
-        .btn {
-            display: inline-block;
-            background: var(--primary);
-            color: white;
-            padding: 12px 25px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            margin: 10px 5px;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .btn:hover {
-            background: #0250b6;
-            transform: translateY(-2px);
-        }
-        
-        .btn-success {
-            background: var(--secondary);
-        }
-        
-        .btn-success:hover {
-            background: #218838;
-        }
-        
-        .btn-danger {
-            background: var(--danger);
-        }
-        
-        .btn-danger:hover {
-            background: #c82333;
-        }
-        
-        .actions {
-            text-align: center;
-            margin: 30px 0;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 20px;
-            background: var(--dark);
-            color: white;
-        }
-        
-        @media (max-width: 768px) {
-            .steps li {
-                padding-left: 50px;
-            }
-            
-            .steps li:before {
-                width: 35px;
-                height: 35px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <div class="logo">🎬</div>
-            <h1>ScriptFlow - Verificador de Configuração</h1>
-            <p class="subtitle">Verificando a configuração do GitHub Pages para seu repositório</p>
-        </header>
-        
-        <div class="status-card">
-            <div class="status-icon status-warning">⚠️</div>
-            <div class="status-message">Configuração do GitHub Pages não detectada</div>
-            <div class="status-details">
-                <p>O repositório <strong>patricksonata13/scriptflow-platform.github.io</strong> existe, mas o GitHub Pages parece não estar configurado corretamente.</p>
-                <p>URL esperada: <code>https://patricksonata13.github.io/scriptflow-platform.github.io/</code></p>
-            </div>
-            <div class="actions">
-                <a href="https://github.com/patricksonata13/scriptflow-platform.github.io/settings/pages" class="btn" target="_blank">Configurar GitHub Pages</a>
-                <a href="https://patricksonata13.github.io/scriptflow-platform.github.io/" class="btn btn-success" target="_blank">Testar URL</a>
-            </div>
-        </div>
-        
-        <div class="content">
-            <div class="section">
-                <h2>Como configurar o GitHub Pages</h2>
-                <ol class="steps">
-                    <li>Acesse seu repositório no GitHub: <code>patricksonata13/scriptflow-platform.github.io</code></li>
-                    <li>Clique na aba <strong>"Settings"</strong> (no menu superior)</li>
-                    <li>No menu lateral, clique em <strong>"Pages"</strong></li>
-                    <li>Em <strong>"Source"</strong>, selecione a branch <strong>"main"</strong></li>
-                    <li>Se estiver usando a pasta <strong>"/docs"</strong>, selecione-a (caso contrário, deixe como <strong>"/ (root)"</strong>)</li>
-                    <li>Clique em <strong>"Save"</strong></li>
-                    <li>Aguarde alguns minutos (até 10 minutos) para o GitHub publicar seu site</li>
-                </ol>
-            </div>
-            
-            <div class="section">
-                <h2>Estrutura do seu repositório</h2>
-                <p>Seu repositório atual contém:</p>
-                <div class="code-block">
-                    scriptflow-platform.github.io/<br>
-                    └── <span class="command">index.html</span> <span class="comment"># Sua página atual sobre GitHub Pages</span>
-                </div>
-                
-                <p>Para o ScriptFlow funcionar, você precisa substituir o conteúdo do index.html pelo código do editor de roteiros.</p>
-                
-                <div class="actions">
-                    <a href="https://github.com/patricksonata13/scriptflow-platform.github.io" class="btn" target="_blank">Acessar Repositório</a>
-                    <a href="https://github.com/patricksonata13/scriptflow-platform.github.io/edit/main/index.html" class="btn btn-success" target="_blank">Editar index.html</a>
-                </div>
-            </div>
-            
-            <div class="section">
-                <h2>Solução de problemas</h2>
-                <ol class="steps">
-                    <li>Verifique se o repositório é <strong>público</strong> (não privado)</li>
-                    <li>Certifique-se de que o arquivo principal se chama <strong>index.html</strong></li>
-                    <li>Confirme que você selecionou a branch <strong>main</strong> nas configurações</li>
-                    <li>Aguarde tempo suficiente (às vezes leva alguns minutos para o site ficar disponível)</li>
-                    <li>Limpe o cache do seu navegador ou teste em uma janela anônima</li>
-                </ol>
-            </div>
-            
-            <div class="actions">
-                <button onclick="window.location.reload()" class="btn">🔄 Verificar Novamente</button>
-                <a href="https://docs.github.com/pt/pages" class="btn btn-success" target="_blank">Documentação do GitHub Pages</a>
-            </div>
-        </div>
-        
-        <footer>
-            <p>Patrick Sonata © 2025 - ScriptFlow Platform</p>
-            <p>Última verificação: <span id="current-date"></span></p>
-        </footer>
-    </div>
-
-    <script>
-        // Adicionando data atual
-        document.addEventListener('DOMContentLoaded', function() {
-            const date = new Date();
-            const options = { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            };
-            const currentDate = date.toLocaleDateString('pt-BR', options);
-            
-            document.getElementById('current-date').textContent = currentDate;
-            
-            // Verificação simples se o site está no GitHub Pages
-            if (window.location.hostname.includes('github.io')) {
-                document.querySelector('.status-icon').className = 'status-icon status-success';
-                document.querySelector('.status-icon').textContent = '✅';
-                document.querySelector('.status-message').textContent = 'GitHub Pages configurado com sucesso!';
-                document.querySelector('.status-details').innerHTML = `
-                    <p>Seu GitHub Pages está funcionando corretamente!</p>
-                    <p>URL atual: <code>${window.location.href}</code></p>
-                `;
-            }
-        });
-    </script>
-</body>
-</html>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScriptFlow - Plataforma de Roteiros</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --primary-light: #34495e;
+      --accent: #3498db;
+      --success: #2ecc71;
+      --light: #f5f6fa;
+      --shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    body { font-family: 'Segoe UI', sans-serif; background: #ecf0f1; margin:0; }
+    header { background: var(--primary); color:white; padding: 15px; display:flex; justify-content:space-between; align-items:center; }
+    header h1 { margin:0; font-size:1.6rem; }
+    nav button { background: var(--primary-light); border:none; color:white; padding:8px 12px; margin-left:8px; border-radius:5px; cursor:pointer; }
+    nav button:hover { background: var(--accent); }
+    .tabs { display:flex; background:#ddd; }
+    .tabs button { flex:1; padding:10px; cursor:pointer; border:none; background:#ddd; font-weight:bold; }
+    .tabs button.active { background:white; border-bottom:3px solid var(--accent); }
+    .tab-content { display:none; padding:20px; background:white; min-height:500px; }
+    .tab-content.active { display:block; }
+    #editor { border:1px solid #ccc; padding:15px; min-height:400px; font-family: 'Courier New', monospace; background:white; }
+    .scene-heading { font-weight:bold; text-transform:uppercase; margin:10px 0; }
+    .character { text-align:center; text-transform:uppercase; margin:15px 0 5px 0; }
+    .dialogue { margin:0 0 15px 0; padding:0 20%; }
+    .action { margin:10px 0; }
+    .transition { text-align:right; text-transform:uppercase; margin:15px 0; }
+    .toolbar { margin-bottom:10px; }
+    .toolbar button { margin-right:8px; padding:6px 12px; cursor:pointer; bo
