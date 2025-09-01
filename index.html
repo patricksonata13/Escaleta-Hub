@@ -33,6 +33,9 @@
       background-color: #f5f7fa;
       color: var(--text);
       line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
     
     /* Header */
@@ -44,6 +47,7 @@
       justify-content: space-between;
       align-items: center;
       box-shadow: var(--shadow);
+      flex-shrink: 0;
     }
     
     header h1 {
@@ -80,6 +84,7 @@
       display: flex;
       background-color: white;
       box-shadow: var(--shadow);
+      flex-shrink: 0;
     }
     
     .tabs button {
@@ -112,6 +117,7 @@
       max-width: 1200px;
       margin: 0 auto;
       width: 100%;
+      flex-grow: 1;
     }
     
     .tab-content.active {
@@ -150,6 +156,7 @@
       min-height: 500px;
       box-shadow: var(--shadow);
       margin-bottom: 1rem;
+      outline: none;
     }
     
     /* Elementos do roteiro */
@@ -237,6 +244,7 @@
       border-radius: 8px;
       overflow: hidden;
       box-shadow: var(--shadow);
+      position: relative;
     }
     
     .frame-image {
@@ -246,6 +254,13 @@
       align-items: center;
       justify-content: center;
       color: var(--text-light);
+      overflow: hidden;
+    }
+    
+    .frame-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
     
     .frame-content {
@@ -370,6 +385,25 @@
       margin-top: 2rem;
       background-color: var(--dark);
       color: white;
+      flex-shrink: 0;
+    }
+    
+    /* Upload de imagem */
+    .image-upload {
+      display: none;
+    }
+    
+    .upload-label {
+      display: block;
+      padding: 0.5rem;
+      text-align: center;
+      background-color: #f8f9fa;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .upload-label:hover {
+      background-color: #e9ecef;
     }
     
     /* Responsividade */
@@ -429,6 +463,25 @@
     
     .storyboard-frame {
       animation: fadeIn 0.5s ease;
+    }
+    
+    /* Notificações */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem;
+      background-color: var(--success);
+      color: white;
+      border-radius: 4px;
+      box-shadow: var(--shadow);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1001;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
     }
   </style>
 </head>
@@ -508,6 +561,8 @@
   <footer>
     <p>ScriptFlow © 2025 - Plataforma de criação de roteiros | Desenvolvido por Patrick Sonata</p>
   </footer>
+
+  <div id="notification" class="notification"></div>
 
   <script>
     // Funções principais da aplicação
@@ -595,10 +650,14 @@
       frame.innerHTML = `
         <div class="frame-image">
           <i class="fas fa-image fa-3x"></i>
+          <input type="file" accept="image/*" class="image-upload" id="upload-${frameCount}" onchange="handleImageUpload(this)">
+          <label for="upload-${frameCount}" class="upload-label">
+            <i class="fas fa-upload"></i> Adicionar imagem
+          </label>
         </div>
         <div class="frame-content">
-          <h3>Quadro ${frameCount}</h3>
-          <p>Clique para editar a descrição deste quadro...</p>
+          <h3 contenteditable="true" onblur="saveStoryboards()">Quadro ${frameCount}</h3>
+          <p contenteditable="true" onblur="saveStoryboards()">Clique para editar a descrição deste quadro...</p>
         </div>
         <div class="frame-actions">
           <button onclick="editFrame(this)"><i class="fas fa-edit"></i></button>
@@ -607,49 +666,104 @@
       `;
       
       storyboard.appendChild(frame);
+      saveStoryboards();
+      showNotification('Quadro adicionado com sucesso!');
+    }
+    
+    function handleImageUpload(input) {
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const frameImage = input.previousElementSibling;
+          frameImage.innerHTML = '';
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          frameImage.appendChild(img);
+          saveStoryboards();
+          showNotification('Imagem adicionada com sucesso!');
+        }
+        reader.readAsDataURL(file);
+      }
     }
     
     function editFrame(button) {
       const frameContent = button.parentElement.previousElementSibling;
+      const title = frameContent.querySelector('h3');
       const description = frameContent.querySelector('p');
       
-      const newText = prompt('Editar descrição do quadro:', description.textContent);
-      if (newText !== null) {
-        description.textContent = newText;
-      }
+      title.focus();
+      
+      // Selecionar todo o texto para edição fácil
+      const range = document.createRange();
+      range.selectNodeContents(title);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
     }
     
     function deleteFrame(button) {
       if (confirm('Tem certeza que deseja excluir este quadro?')) {
         const frame = button.closest('.storyboard-frame');
         frame.parentNode.removeChild(frame);
+        saveStoryboards();
+        showNotification('Quadro removido com sucesso!');
       }
     }
     
     function saveText() {
       const editorContent = document.getElementById('editor').innerHTML;
       localStorage.setItem('scriptflow-script', editorContent);
-      alert('Roteiro salvo com sucesso!');
+      showNotification('Roteiro salvo com sucesso!');
     }
     
     function loadText() {
       const savedContent = localStorage.getItem('scriptflow-script');
       if (savedContent) {
         document.getElementById('editor').innerHTML = savedContent;
-        alert('Roteiro carregado com sucesso!');
+        showNotification('Roteiro carregado com sucesso!');
       } else {
-        alert('Nenhum roteiro salvo encontrado.');
+        showNotification('Nenhum roteiro salvo encontrado.', 'error');
+      }
+    }
+    
+    function saveStoryboards() {
+      const storyboardContent = document.getElementById('storyboard').innerHTML;
+      localStorage.setItem('scriptflow-storyboards', storyboardContent);
+    }
+    
+    function loadStoryboards() {
+      const savedFrames = localStorage.getItem('scriptflow-storyboards');
+      if (savedFrames) {
+        document.getElementById('storyboard').innerHTML = savedFrames;
+        
+        // Reatachar os event listeners para os inputs de upload de imagem
+        const uploadInputs = document.querySelectorAll('.image-upload');
+        uploadInputs.forEach(input => {
+          input.onchange = function() {
+            handleImageUpload(this);
+          };
+        });
       }
     }
     
     function exportFDX() {
-      alert('Funcionalidade de exportação FDX será implementada em breve!');
-      // Em uma implementação real, aqui seria a lógica para converter para formato FDX
+      showNotification('Funcionalidade de exportação FDX será implementada em breve!');
     }
     
     function exportPDF() {
-      alert('Funcionalidade de exportação PDF será implementada em breve!');
-      // Em uma implementação real, aqui seria a lógica para converter para PDF usando jsPDF
+      showNotification('Funcionalidade de exportação PDF será implementada em breve!');
+    }
+    
+    function showNotification(message, type = 'success') {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.style.backgroundColor = type === 'success' ? 'var(--success)' : 'var(--secondary)';
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
     }
     
     // Atalhos de teclado
@@ -668,13 +782,16 @@
       }
     });
     
-    // Carregar storyboards salvos se existirem
+    // Carregar conteúdo salvo ao iniciar
     window.addEventListener('load', function() {
-      // Verificar se há storyboards salvos
-      const savedFrames = localStorage.getItem('scriptflow-storyboards');
-      if (savedFrames) {
-        document.getElementById('storyboard').innerHTML = savedFrames;
+      // Carregar roteiro
+      const savedContent = localStorage.getItem('scriptflow-script');
+      if (savedContent) {
+        document.getElementById('editor').innerHTML = savedContent;
       }
+      
+      // Carregar storyboards
+      loadStoryboards();
     });
   </script>
 </body>
