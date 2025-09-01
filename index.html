@@ -53,6 +53,32 @@
     <div id="storyboard"></div>
   </div>
 
+  <!-- Modal de Ajuda -->
+  <div id="help-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Ajuda do ScriptFlow</h2>
+        <button class="close-modal" onclick="closeHelp()">&times;</button>
+      </div>
+      <p>ScriptFlow é uma plataforma para criação de roteiros cinematográficos e storyboards.</p>
+      <h3>Como usar:</h3>
+      <ul class="help-list">
+        <li>Use os botões na barra de ferramentas para inserir elementos de roteiro</li>
+        <li>Clique em qualquer elemento para editá-lo</li>
+        <li>Salve seu roteiro localmente no seu navegador</li>
+        <li>Exporte para FDX (Final Draft) ou PDF</li>
+        <li>Na aba Storyboard, crie visualizações para suas cenas</li>
+      </ul>
+      <h3>Atalhos:</h3>
+      <ul class="help-list">
+        <li>Ctrl+S: Salvar roteiro</li>
+        <li>Ctrl+O: Abrir roteiro</li>
+        <li>Ctrl+P: Exportar para PDF</li>
+      </ul>
+      <button onclick="closeHelp()">Fechar</button>
+    </div>
+  </div>
+
   <footer>
     <p>ScriptFlow © 2025 - Plataforma de criação de roteiros | Desenvolvido por Patrick Sonata</p>
   </footer>
@@ -60,4 +86,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
