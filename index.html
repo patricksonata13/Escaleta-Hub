@@ -203,10 +203,26 @@
             text-transform: uppercase;
             margin-top: 1.5rem;
             color: #3498db;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 3px;
+            transition: background 0.3s;
+        }
+        
+        .scene-heading:hover {
+            background: rgba(52, 152, 219, 0.2);
         }
         
         .action {
             margin: 0.8rem 0;
+            padding: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .action:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
         
         .character {
@@ -214,17 +230,41 @@
             width: 50%;
             margin: 0.8rem auto;
             font-weight: bold;
+            padding: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .character:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
         
         .dialogue {
             width: 60%;
             margin: 0 auto;
+            padding: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .dialogue:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
         
         .parenthetical {
             width: 50%;
             margin: 0 auto;
             padding-left: 2rem;
+            padding: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .parenthetical:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
         
         .transition {
@@ -232,6 +272,14 @@
             margin-top: 1rem;
             text-transform: uppercase;
             font-weight: bold;
+            padding: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .transition:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
         
         .buttons {
@@ -381,6 +429,7 @@
             margin-top: 15px;
             padding-top: 15px;
             border-top: 1px solid #4a6278;
+            display: none;
         }
         
         .online-users h4 {
@@ -406,6 +455,49 @@
             background: #2ecc71;
             border-radius: 50%;
             margin-right: 8px;
+        }
+        
+        /* Controles de edição */
+        .editor-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .editor-btn {
+            padding: 8px 12px;
+            background: #34495e;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s;
+        }
+        
+        .editor-btn:hover {
+            background: #3498db;
+        }
+        
+        .element-btn {
+            padding: 8px 12px;
+            background: #2c3e50;
+            border: 1px solid #4a6278;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+        
+        .element-btn:hover {
+            background: #3498db;
+            border-color: #3498db;
         }
         
         footer {
@@ -445,6 +537,10 @@
             .chat-sidebar {
                 max-height: 400px;
             }
+            
+            .editor-controls {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -477,27 +573,43 @@
                         <h2><i class="fas fa-file-alt"></i> Roteiro</h2>
                         <p>Desenvolva seu roteiro com formatação profissional no estilo Final Draft.</p>
                         
-                        <div class="script-editor" id="scriptEditor">
-<span class="scene-heading">INT. CASA DE ELIAS - DIA</span>
+                        <div class="editor-controls">
+                            <div>
+                                <button class="editor-btn" data-format="bold"><i class="fas fa-bold"></i></button>
+                                <button class="editor-btn" data-format="italic"><i class="fas fa-italic"></i></button>
+                                <button class="editor-btn" data-format="underline"><i class="fas fa-underline"></i></button>
+                            </div>
+                            <div>
+                                <button class="element-btn" data-element="scene"><i class="fas fa-video"></i> Cena</button>
+                                <button class="element-btn" data-element="action"><i class="fas fa-running"></i> Ação</button>
+                                <button class="element-btn" data-element="character"><i class="fas fa-user"></i> Personagem</button>
+                                <button class="element-btn" data-element="dialogue"><i class="fas fa-comment"></i> Diálogo</button>
+                                <button class="element-btn" data-element="parenthetical"><i class="fas fa-parentheses"></i> Parentético</button>
+                                <button class="element-btn" data-element="transition"><i class="fas fa-arrow-right"></i> Transição</button>
+                            </div>
+                        </div>
+                        
+                        <div class="script-editor" id="scriptEditor" contenteditable="true">
+<span class="scene-heading" onclick="editElement(this)">INT. CASA DE ELIAS - DIA</span>
 
-<span class="action">A cabana é simples, com redes de pesca penduradas e um pequeno altar com imagens de santos. ELIAS (25), magro e com olhos que já viram demasiado, prepara seu equipamento de pesca.</span>
+<span class="action" onclick="editElement(this)">A cabana é simples, com redes de pesca penduradas e um pequeno altar com imagens de santos. ELIAS (25), magro e com olhos que já viram demasiado, prepara seu equipamento de pesca.</span>
 
-<span class="action">Ele se ajoelha diante do altar e faz o sinal da cruz. Suas mãos tremem ligeiramente.</span>
+<span class="action" onclick="editElement(this)">Ele se ajoelha diante do altar e faz o sinal da cruz. Suas mãos tremem ligeiramente.</span>
 
-<span class="character">ELIAS</span>
-<span class="dialogue">(sussurrando)
+<span class="character" onclick="editElement(this)">ELIAS</span>
+<span class="dialogue" onclick="editElement(this)">(sussurrando)
 Por favor, hoje me traga de volta.</span>
 
-<span class="scene-heading">EXT. PORTO - DIA</span>
+<span class="scene-heading" onclick="editElement(this)">EXT. PORTO - DIA</span>
 
-<span class="action">O porto está quase vazio. Apenas alguns pescadores remendam redes. Elias caminha em direção ao seu pequeno barco.</span>
+<span class="action" onclick="editElement(this)">O porto está quase vazio. Apenas alguns pescadores remendam redes. Elias caminha em direção ao seu pequeno barco.</span>
 
-<span class="character">VELHO PESCADOR</span>
-<span class="dialogue">
+<span class="character" onclick="editElement(this)">VELHO PESCADOR</span>
+<span class="dialogue" onclick="editElement(this)">
 Vai arriscar de novo, Elias? O mar não está para peixe hoje.</span>
 
-<span class="character">ELIAS</span>
-<span class="dialogue">
+<span class="character" onclick="editElement(this)">ELIAS</span>
+<span class="dialogue" onclick="editElement(this)">
 Não tenho escolha, senhor Álvaro. Preciso comer.</span>
                         </div>
                         
@@ -623,7 +735,7 @@ Não tenho escolha, senhor Álvaro. Preciso comer.</span>
         // Adicionar cena
         document.getElementById('addSceneBtn').addEventListener('click', function() {
             const newScene = document.createElement('div');
-            newScene.innerHTML = '<span class="scene-heading">INT. NOVO LOCAL - DIA</span>\n\n<span class="action">Descreva a ação aqui.</span>\n\n<span class="character">PERSONAGEM</span>\n<span class="dialogue">Diálogo do personagem aqui.</span>';
+            newScene.innerHTML = '<span class="scene-heading" onclick="editElement(this)">INT. NOVO LOCAL - DIA</span>\n\n<span class="action" onclick="editElement(this)">Descreva a ação aqui.</span>\n\n<span class="character" onclick="editElement(this)">PERSONAGEM</span>\n<span class="dialogue" onclick="editElement(this)">Diálogo do personagem aqui.</span>';
             
             const editor = document.getElementById('scriptEditor');
             editor.appendChild(newScene);
@@ -693,7 +805,7 @@ Não tenho escolha, senhor Álvaro. Preciso comer.</span>
                 // Rolar para a mensagem mais recente
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
-                // Simular resposta após um tempo
+                // Simular resposta após um tiempo
                 setTimeout(simulateResponse, 2000);
             }
         }
@@ -735,11 +847,71 @@ Não tenho escolha, senhor Álvaro. Preciso comer.</span>
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
         
+        // Função para editar elementos do roteiro
+        function editElement(element) {
+            const currentText = element.textContent;
+            const newText = prompt('Editar elemento:', currentText);
+            
+            if (newText !== null && newText !== '') {
+                element.textContent = newText;
+            }
+        }
+        
+        // Botões de formatação
+        document.querySelectorAll('.editor-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const format = this.getAttribute('data-format');
+                document.execCommand(format, false, null);
+                document.getElementById('scriptEditor').focus();
+            });
+        });
+        
+        // Botões de elementos de roteiro
+        document.querySelectorAll('.element-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const element = this.getAttribute('data-element');
+                
+                let newElement = '';
+                
+                switch(element) {
+                    case 'scene':
+                        newElement = '<span class="scene-heading" onclick="editElement(this)">INT. NOVO LOCAL - DIA</span>\n\n';
+                        break;
+                    case 'action':
+                        newElement = '<span class="action" onclick="editElement(this)">Nova ação descritiva aqui.</span>\n\n';
+                        break;
+                    case 'character':
+                        newElement = '<span class="character" onclick="editElement(this)">NOVO PERSONAGEM</span>\n';
+                        break;
+                    case 'dialogue':
+                        newElement = '<span class="dialogue" onclick="editElement(this)">Novo diálogo do personagem aqui.</span>\n\n';
+                        break;
+                    case 'parenthetical':
+                        newElement = '<span class="parenthetical" onclick="editElement(this)">(ação ou emoção do personagem)</span>\n';
+                        break;
+                    case 'transition':
+                        newElement = '<span class="transition" onclick="editElement(this)">CORTE PARA:</span>\n\n';
+                        break;
+                }
+                
+                // Insere o novo elemento no editor
+                document.execCommand('insertHTML', false, newElement);
+                document.getElementById('scriptEditor').focus();
+            });
+        });
+        
         // Carregar roteiro salvo se existir
         document.addEventListener('DOMContentLoaded', function() {
             const savedScript = localStorage.getItem('scriptflow_script');
             if (savedScript) {
                 document.getElementById('scriptEditor').innerHTML = savedScript;
+                
+                // Adicionar eventos de clique aos elementos carregados
+                document.querySelectorAll('.scene-heading, .action, .character, .dialogue, .parenthetical, .transition').forEach(element => {
+                    element.addEventListener('click', function() {
+                        editElement(this);
+                    });
+                });
             }
             
             // Rolar para o final do chat
