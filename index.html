@@ -171,7 +171,7 @@
         
         textarea {
             width: 100%;
-            min-height: 200px;
+            min-height: 150px;
             border: 1px solid #4a6278;
             border-radius: 5px;
             padding: 1rem;
@@ -180,6 +180,7 @@
             background: #2c3e50;
             color: #ecf0f1;
             font-size: 1rem;
+            margin-bottom: 1rem;
         }
         
         .script-editor {
@@ -256,7 +257,7 @@
             padding: 5px;
             border-radius: 3px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: background 极细线
         }
         
         .parenthetical:hover {
@@ -599,6 +600,16 @@
                 flex-direction: column;
             }
         }
+        
+        .argument-section {
+            margin-bottom: 2rem;
+        }
+        
+        .argument-section h3 {
+            color: #3498db;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
@@ -620,6 +631,9 @@
             <div class="tab" data-tab="script">Roteiro</div>
             <div class="tab" data-tab="treatment">Tratamento</div>
             <div class="tab" data-tab="bible">Bíblia</div>
+            <div class="tab" data-tab="storyboard">Storyboard</div>
+            <div class="tab" data-tab="gossip">Fofoca</div>
+            <div class="tab" data-tab="video">Chama</div>
         </div>
         
         <div class="content">
@@ -631,19 +645,29 @@
                         <h2><i class="fas fa-file-alt"></i> Argumento</h2>
                         <p>Desenvolva o argumento da sua história com os elementos essenciais.</p>
                         
-                        <div class="editor-controls">
-                            <div>
-                                <button class="editor-btn" data-format="bold"><i class="fas fa-bold"></i></button>
-                                <button class="editor-btn" data-format="italic"><i class="fas fa-italic"></i></button>
-                                <button class="editor-btn" data-format="underline"><i class="fas fa-underline"></i></button>
-                            </div>
+                        <div class="argument-section">
+                            <h3>Storyline</h3>
+                            <textarea id="storylineEditor" placeholder="Descreva a storyline do seu projeto..."></textarea>
                         </div>
                         
-                        <textarea id="argumentEditor" placeholder="Desenvolva o argumento do seu projeto..." rows="20"></textarea>
+                        <div class="argument-section">
+                            <h3>Logline</h3>
+                            <textarea id="loglineEditor" placeholder="Descreva a logline do seu projeto..."></textarea>
+                        </div>
+                        
+                        <div class="argument-section">
+                            <h3>Sinopse</h3>
+                            <textarea id="synopsisEditor" placeholder="Descreva a sinopse do seu projeto..." rows="6"></textarea>
+                        </div>
+                        
+                        <div class="argument-section">
+                            <h3>Argumento Completo</h3>
+                            <textarea id="argumentEditor" placeholder="Desenvolva o argumento completo do seu projeto..." rows="10"></textarea>
+                        </div>
                         
                         <div class="buttons">
                             <button class="btn" id="saveArgumentBtn"><i class="fas fa-save"></i> Salvar Argumento</button>
-                            <button class="btn btn-primary" id="clearArgumentBtn"><i class="fas fa-trash"></i> Limpar</button>
+                            <button class="btn btn-primary" id="clearArgumentBtn"><i class="fas fa-trash"></i> Limpar Tudo</button>
                         </div>
                     </div>
                 </div>
@@ -754,6 +778,25 @@ Não tenho escolha, senhor Álvaro. Preciso comer.</span>
                         </div>
                     </div>
                 </div>
+                
+                <!-- ABA DE STORYBOARD -->
+                <div class="tab-content" id="storyboard">
+                    <div class="section">
+                        <h2><i class="fas fa-film"></i> Storyboard</h2>
+                        <p>Desenvolva o storyboard do seu projeto visualmente.</p>
+                        
+                        <div class="editor-controls">
+                            <button class="element-btn" onclick="addStoryboardFrame()"><i class="fas fa-plus"></i> Adicionar Quadro</button>
+                            <button class="element-btn" onclick="saveStoryboard()"><i class="fas fa-save"></i> Salvar Storyboard</button>
+                        </div>
+                        
+                        <div id="storyboardContainer" style="background: #1e2a38; padding: 20px; border-radius: 5px; min-height: 500px;">
+                            <p style="text-align: center; color: #95a5a6; margin-top: 50px;">
+                                Clique em "Adicionar Quadro" para começar a criar seu storyboard
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- Sidebar com Fofoca e Chama -->
@@ -830,11 +873,17 @@ Não tenho escolha, senhor Álvaro. Preciso comer.</span>
     <script>
         // Dados da aplicação
         let scriptData = {
-            argument: '',
+            argument: {
+                storyline: '',
+                logline: '',
+                synopsis: '',
+                argument: ''
+            },
             outline: '',
             script: '',
             treatment: '',
             bible: '',
+            storyboard: [],
             messages: []
         };
 
@@ -845,7 +894,10 @@ Não tenho escolha, senhor Álvaro. Preciso comer.</span>
                 scriptData = JSON.parse(savedData);
                 
                 // Preencher campos com dados salvos
-                document.getElementById('argumentEditor').value = scriptData.argument;
+                document.getElementById('storylineEditor').value = scriptData.argument.storyline;
+                document.getElementById('loglineEditor').value = scriptData.argument.logline;
+                document.getElementById('synopsisEditor').value = scriptData.argument.synopsis;
+                document.getElementById('argumentEditor').value = scriptData.argument.argument;
                 document.getElementById('outlineEditor').value = scriptData.outline;
                 document.getElementById('treatmentEditor').value = scriptData.treatment;
                 document.getElementById('bibleEditor').value = scriptData.bible;
@@ -853,12 +905,20 @@ Não tenho escolha, senhor Álvaro. Preciso comer.</span>
                 if (scriptData.script) {
                     document.getElementById('scriptEditor').innerHTML = scriptData.script;
                 }
+                
+                // Carregar storyboard se existir
+                if (scriptData.storyboard && scriptData.storyboard.length > 0) {
+                    loadStoryboard();
+                }
             }
         }
 
         // Salvar dados
         function saveData() {
-            scriptData.argument = document.getElementById('argumentEditor').value;
+            scriptData.argument.storyline = document.getElementById('storylineEditor').value;
+            scriptData.argument.logline = document.getElementById('loglineEditor').value;
+            scriptData.argument.synopsis = document.getElementById('synopsisEditor').value;
+            scriptData.argument.argument = document.getElementById('argumentEditor').value;
             scriptData.outline = document.getElementById('outlineEditor').value;
             scriptData.script = document.getElementById('scriptEditor').innerHTML;
             scriptData.treatment = document.getElementById('treatmentEditor').value;
@@ -946,6 +1006,9 @@ Não tenho escolha, senhor Álvaro. Preciso comer.</span>
         // Limpar conteúdo das abas
         document.getElementById('clearArgumentBtn').addEventListener('click', function() {
             if (confirm('Tem certeza que deseja limpar o argumento?')) {
+                document.getElementById('storylineEditor').value = '';
+                document.getElementById('loglineEditor').value = '';
+                document.getElementById('synopsisEditor').value = '';
                 document.getElementById('argumentEditor').value = '';
                 showNotification('Argumento limpo!');
             }
@@ -1193,6 +1256,107 @@ Não tenho escolha, senhor Álvaro. Preciso comer.</span>
                 showNotification('Chamada encerrada');
             }
         });
+        
+        // Storyboard functions
+        function addStoryboardFrame() {
+            const frameId = Date.now();
+            const frame = document.createElement('div');
+            frame.className = 'storyboard-frame';
+            frame.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4>Quadro ${document.getElementById('storyboardContainer').children.length + 1}</h4>
+                    <button onclick="removeFrame(${frameId})" style="background: #e74c3c; color: white; border: none; border-radius: 3px; padding: 5px 10px; cursor: pointer;">Remover</button>
+                </div>
+                <textarea placeholder="Descrição do quadro..." style="width: 100%; min-height: 100px; margin-bottom: 10px;"></textarea>
+                <input type="file" accept="image/*" onchange="previewImage(this, ${frameId})" style="margin-bottom: 10px;">
+                <div id="preview-${frameId}" style="text-align: center; margin-top: 10px;"></div>
+            `;
+            frame.id = `frame-${frameId}`;
+            document.getElementById('storyboardContainer').appendChild(frame);
+            
+            // Salvar dados do storyboard
+            scriptData.storyboard.push({
+                id: frameId,
+                description: '',
+                image: null
+            });
+            saveData();
+        }
+        
+        function removeFrame(frameId) {
+            const frame = document.getElementById(`frame-${frameId}`);
+            if (frame) {
+                frame.remove();
+                
+                // Remover do array de dados
+                scriptData.storyboard = scriptData.storyboard.filter(item => item.id !== frameId);
+                saveData();
+            }
+        }
+        
+        function previewImage(input, frameId) {
+            const preview = document.getElementById(`preview-${frameId}`);
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" style="max-width: 100%; max-height: 200px; border-radius: 5px;">`;
+                    
+                    // Atualizar dados
+                    const frameIndex = scriptData.storyboard.findIndex(item => item.id === frameId);
+                    if (frameIndex !== -1) {
+                        scriptData.storyboard[frameIndex].image = e.target.result;
+                        saveData();
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function loadStoryboard() {
+            const container = document.getElementById('storyboardContainer');
+            container.innerHTML = '';
+            
+            if (scriptData.storyboard.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #95a5a6; margin-top: 50px;">Clique em "Adicionar Quadro" para começar a criar seu storyboard</p>';
+                return;
+            }
+            
+            scriptData.storyboard.forEach((frame, index) => {
+                const frameElement = document.createElement('div');
+                frameElement.className = 'storyboard-frame';
+                frameElement.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h4>Quadro ${index + 1}</h4>
+                        <button onclick="removeFrame(${frame.id})" style="background: #e74c3c; color: white; border: none; border-radius: 3px; padding: 5px 10px; cursor: pointer;">Remover</button>
+                    </div>
+                    <textarea placeholder="Descrição do quadro..." style="width: 100%; min-height: 100px; margin-bottom: 10px;">${frame.description}</textarea>
+                    <input type="file" accept="image/*" onchange="previewImage(this, ${frame.id})" style="margin-bottom: 10px;">
+                    <div id="preview-${frame.id}" style="text-align: center; margin-top: 10px;">
+                        ${frame.image ? `<img src="${frame.image}" style="max-width: 100%; max-height: 200px; border-radius: 5px;">` : ''}
+                    </div>
+                `;
+                frameElement.id = `frame-${frame.id}`;
+                container.appendChild(frameElement);
+            });
+        }
+        
+        function saveStoryboard() {
+            // Coletar descrições dos quadros
+            const frames = document.querySelectorAll('.storyboard-frame');
+            frames.forEach((frame, index) => {
+                const textarea = frame.querySelector('textarea');
+                if (textarea) {
+                    const frameId = frame.id.split('-')[1];
+                    const frameIndex = scriptData.storyboard.findIndex(item => item.id === parseInt(frameId));
+                    if (frameIndex !== -1) {
+                        scriptData.storyboard[frameIndex].description = textarea.value;
+                    }
+                }
+            });
+            
+            saveData();
+            showNotification('Storyboard salvo com sucesso!');
+        }
         
         // Carregar dados salvos e inicializar a câmera quando a página carregar
         document.addEventListener('DOMContentLoaded', function() {
