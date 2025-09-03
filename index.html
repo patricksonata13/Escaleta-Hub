@@ -7,59 +7,482 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 /* Reset e estilo geral */
-* {margin:0; padding:0; box-sizing:border-box; font-family:'Courier New', monospace;}
-body {background: linear-gradient(135deg, #1a2a3a 0%, #0d1520 100%); color:#fff; min-height:100vh; padding:20px;}
-.container {max-width:1200px; margin:0 auto; background:#2c3e50; border-radius:10px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.5);}
-header {background: linear-gradient(135deg,#e74c3c 0%,#c0392b 100%); color:white; padding:1.5rem; text-align:center; position:relative;}
-header h1 {font-size:2.2rem; margin-bottom:0.5rem;}
-header p {font-size:1rem; opacity:0.9;}
-.user-info {position:absolute; top:15px; right:15px; display:flex; align-items:center; background: rgba(255,255,255,0.2); padding:0.4rem 0.8rem; border-radius:20px;}
-.user-info span {margin-right:8px; font-size:0.9rem;}
-.logout-btn {background:none; border:none; color:white; cursor:pointer; font-size:0.9rem;}
-.tabs {display:flex; background:#34495e; border-bottom:1px solid #4a6278; flex-wrap:wrap;}
-.tab {padding:1rem 1.2rem; cursor:pointer; border-bottom:3px solid transparent; font-weight:600; font-size:0.95rem; transition:all 0.3s;}
-.tab:hover {background:#3d5066;}
-.tab.active {border-bottom:3px solid #e74c3c; background:#3d5066;}
-.content {display:flex; gap:20px; padding:1rem;}
-.main-content {flex:3;}
-.sub-tabs {display:flex; margin-bottom:10px; gap:5px; flex-wrap:wrap;}
-.sub-tab {padding:0.5rem 0.8rem; background:#2c3e50; cursor:pointer; border-radius:5px; transition:all 0.3s; font-size:0.85rem;}
-.sub-tab.active {background:#3498db; font-weight:bold;}
-.tab-content {display:none;}
-.tab-content.active {display:block;}
-.section {margin-bottom:2rem;}
-textarea {width:100%; min-height:200px; border:1px solid #4a6278; border-radius:5px; padding:1rem; font-family:'Courier New', monospace; resize:vertical; background:#2c3e50; color:#ecf0f1; font-size:1rem;}
-.script-editor {font-family:'Courier New', monospace; font-size:12pt; line-height:1.5; padding:1.5rem; background:#1e2a38; color:#ecf0f1; border-radius:5px; min-height:500px; white-space:pre-wrap; overflow-y:auto; position:relative;}
-.scene-heading {font-weight:bold; text-transform:uppercase; margin-top:1.5rem; color:#3498db; cursor:pointer; padding:5px; border-radius:3px; transition:background 0.3s;}
-.scene-heading:hover {background: rgba(52,152,219,0.2);}
-.action, .character, .dialogue, .parenthetical, .transition {margin:0.8rem 0; padding:5px; border-radius:3px; cursor:pointer; transition:background 0.3s;}
-.action:hover, .character:hover, .dialogue:hover, .parenthetical:hover, .transition:hover {background: rgba(255,255,255,0.1);}
-.character {text-align:center; width:50%; margin:0.8rem auto; font-weight:bold;}
-.dialogue {width:60%; margin:0 auto;}
-.parenthetical {width:50%; margin:0 auto; padding-left:2rem;}
-.transition {text-align:right; margin-top:1rem; text-transform:uppercase; font-weight:bold;}
-.buttons {display:flex; justify-content:center; gap:1rem; margin-top:1.5rem;}
-.btn {display:inline-flex; align-items:center; padding:0.7rem 1.2rem; background:#3498db; color:white; text-decoration:none; border-radius:5px; font-weight:600; transition:all 0.3s ease; cursor:pointer; border:none; font-size:0.9rem;}
-.btn:hover {background:#2980b9; transform:translateY(-2px);}
-.btn i {margin-right:8px;}
-.btn-primary {background:#e74c3c;}
-.btn-primary:hover {background:#c0392b;}
-.editor-controls {display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;}
-.element-btn {padding:8px 12px; background:#2c3e50; border:1px solid #4a6278; color:white; border-radius:4px; cursor:pointer; display:flex; align-items:center; gap:5px; transition:background 0.3s;}
-.element-btn:hover {background:#3498db; border-color:#3498db;}
-footer {text-align:center; padding:1.5rem; background:#1a2530; color:#95a5a6; font-size:0.9rem;}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Courier New', monospace;
+}
+
+body {
+  background: linear-gradient(135deg, #1a2a3a 0%, #0d1520 100%);
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #2c3e50;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+header {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+}
+
+header h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+header p {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.user-info {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+}
+
+.user-info span {
+  margin-right: 8px;
+  font-size: 0.9rem;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.tabs {
+  display: flex;
+  background: #34495e;
+  border-bottom: 1px solid #4a6278;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 1rem 1.2rem;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+}
+
+.tab:hover {
+  background: #3d5066;
+}
+
+.tab.active {
+  border-bottom: 3px solid #e74c3c;
+  background: #3d5066;
+}
+
+.content {
+  display: flex;
+  gap: 20px;
+  padding: 1rem;
+  min-height: 600px;
+}
+
+.main-content {
+  flex: 3;
+}
+
+.sub-tabs {
+  display: flex;
+  margin-bottom: 10px;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.sub-tab {
+  padding: 0.5rem 0.8rem;
+  background: #2c3e50;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.3s;
+  font-size: 0.85rem;
+}
+
+.sub-tab.active {
+  background: #3498db;
+  font-weight: bold;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+textarea {
+  width: 100%;
+  min-height: 200px;
+  border: 1px solid #4a6278;
+  border-radius: 5px;
+  padding: 1rem;
+  font-family: 'Courier New', monospace;
+  resize: vertical;
+  background: #2c3e50;
+  color: #ecf0f1;
+  font-size: 1rem;
+}
+
+.script-editor {
+  font-family: 'Courier New', monospace;
+  font-size: 12pt;
+  line-height: 1.5;
+  padding: 1.5rem;
+  background: #1e2a38;
+  color: #ecf0f1;
+  border-radius: 5px;
+  min-height: 500px;
+  white-space: pre-wrap;
+  overflow-y: auto;
+  position: relative;
+}
+
+.scene-heading {
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-top: 1.5rem;
+  color: #3498db;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 3px;
+  transition: background 0.3s;
+}
+
+.scene-heading:hover {
+  background: rgba(52, 152, 219, 0.2);
+}
+
+.action, .character, .dialogue, .parenthetical, .transition {
+  margin: 0.8rem 0;
+  padding: 5px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.action:hover, .character:hover, .dialogue:hover, .parenthetical:hover, .transition:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.character {
+  text-align: center;
+  width: 50%;
+  margin: 0.8rem auto;
+  font-weight: bold;
+}
+
+.dialogue {
+  width: 60%;
+  margin: 0 auto;
+}
+
+.parenthetical {
+  width: 50%;
+  margin: 0 auto;
+  padding-left: 2rem;
+}
+
+.transition {
+  text-align: right;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.7rem 1.2rem;
+  background: #3498db;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.btn:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
+.btn i {
+  margin-right: 8px;
+}
+
+.btn-primary {
+  background: #e74c3c;
+}
+
+.btn-primary:hover {
+  background: #c0392b;
+}
+
+.editor-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.element-btn {
+  padding: 8px 12px;
+  background: #2c3e50;
+  border: 1px solid #4a6278;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.3s;
+}
+
+.element-btn:hover {
+  background: #3498db;
+  border-color: #3498db;
+}
+
+footer {
+  text-align: center;
+  padding: 1.5rem;
+  background: #1a2530;
+  color: #95a5a6;
+  font-size: 0.9rem;
+}
 
 /* Chats flutuantes */
-.chat-footer {position:fixed; bottom:10px; right:10px; display:flex; gap:10px; z-index:1000;}
-.chat-window {background:#2c3e50; border-radius:10px; max-height:300px; width:250px; display:flex; flex-direction:column; overflow:hidden; display:none;}
-.chat-header {background:#34495e; padding:5px 10px; display:flex; justify-content:space-between; align-items:center;}
-.chat-header span {font-weight:bold;}
-.chat-messages {flex:1; padding:5px; overflow-y:auto; font-size:0.85rem;}
-.chat-messages div {margin-bottom:5px;}
-.chat-input {display:flex; gap:5px; padding:5px;}
-.chat-input input {flex:1; padding:5px; border-radius:5px; border:none; outline:none;}
-.chat-input button {background:#e74c3c; border:none; color:white; padding:5px 8px; cursor:pointer; border-radius:5px;}
-.chat-close {cursor:pointer; color:#e74c3c;}
+.chat-footer {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.chat-window {
+  background: #2c3e50;
+  border-radius: 10px;
+  max-height: 300px;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.chat-header {
+  background: #34495e;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+}
+
+.chat-header span {
+  font-weight: bold;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.message {
+  padding: 8px;
+  border-radius: 8px;
+  background: #3d5066;
+  max-width: 80%;
+  word-break: break-word;
+}
+
+.message.self {
+  align-self: flex-end;
+  background: #3498db;
+}
+
+.message.other {
+  align-self: flex-start;
+  background: #34495e;
+}
+
+.chat-input {
+  display: flex;
+  gap: 5px;
+  padding: 10px;
+  border-top: 1px solid #4a6278;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 20px;
+  border: 1px solid #4a6278;
+  outline: none;
+  background: #2c3e50;
+  color: white;
+}
+
+.chat-input button {
+  background: #e74c3c;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 20px;
+  transition: background 0.3s;
+}
+
+.chat-input button:hover {
+  background: #c0392b;
+}
+
+.chat-close {
+  cursor: pointer;
+  color: #e74c3c;
+}
+
+/* Video call */
+.video-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.video-box {
+  background: #2c3e50;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 16/9;
+}
+
+.video-box video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #1e2a38;
+}
+
+.video-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  width: 100%;
+}
+
+.video-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.video-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: #3498db;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.3s;
+}
+
+.video-btn:hover {
+  background: #2980b9;
+  transform: scale(1.05);
+}
+
+.video-btn.end-call {
+  background: #e74c3c;
+}
+
+.video-btn.end-call:hover {
+  background: #c0392b;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .tabs {
+    flex-direction: column;
+  }
+  
+  .content {
+    flex-direction: column;
+  }
+  
+  .chat-footer {
+    flex-direction: column;
+    left: 10px;
+    right: auto;
+  }
+  
+  .chat-window {
+    width: calc(100vw - 20px);
+  }
+  
+  .video-container {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 <body>
@@ -69,7 +492,7 @@ footer {text-align:center; padding:1.5rem; background:#1a2530; color:#95a5a6; fo
 <p>Plataforma completa para desenvolvimento de roteiros</p>
 <div class="user-info">
 <span id="userName">Roteirista</span>
-<button class="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
+<button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i></button>
 </div>
 </header>
 
@@ -94,46 +517,150 @@ footer {text-align:center; padding:1.5rem; background:#1a2530; color:#95a5a6; fo
 <div class="sub-tab" data-sub="synopsis">Sinopse</div>
 <div class="sub-tab" data-sub="argumentDetail">Argumento</div>
 </div>
+
 <div class="section sub-content active" id="storyline">
-<textarea placeholder="Descreva a Storyline..."></textarea>
+<h3>Storyline</h3>
+<textarea id="storylineText" placeholder="Descreva a Storyline do seu projeto..."></textarea>
+<button class="btn" onclick="saveContent('storyline', storylineText.value)"><i class="fas fa-save"></i> Salvar</button>
 </div>
+
 <div class="section sub-content" id="logline">
-<textarea placeholder="Escreva o Logline..."></textarea>
+<h3>Logline</h3>
+<textarea id="loglineText" placeholder="Escreva o Logline do seu projeto..."></textarea>
+<button class="btn" onclick="saveContent('logline', loglineText.value)"><i class="fas fa-save"></i> Salvar</button>
 </div>
+
 <div class="section sub-content" id="synopsis">
-<textarea placeholder="Escreva a Sinopse..."></textarea>
+<h3>Sinopse</h3>
+<textarea id="synopsisText" placeholder="Escreva a Sinopse do seu projeto..."></textarea>
+<button class="btn" onclick="saveContent('synopsis', synopsisText.value)"><i class="fas fa-save"></i> Salvar</button>
 </div>
+
 <div class="section sub-content" id="argumentDetail">
-<textarea placeholder="Desenvolva o Argumento..."></textarea>
+<h3>Argumento Completo</h3>
+<textarea id="argumentText" placeholder="Desenvolva o Argumento completo do seu projeto..."></textarea>
+<button class="btn" onclick="saveContent('argument', argumentText.value)"><i class="fas fa-save"></i> Salvar</button>
 </div>
 </div>
 
 <!-- Escaleta -->
 <div class="tab-content" id="outline">
 <div class="section">
-<textarea placeholder="Descreva a escaleta do seu projeto..." rows="20"></textarea>
+<h2><i class="fas fa-list-ol"></i> Escaleta</h2>
+<textarea id="outlineText" placeholder="Descreva a escaleta do seu projeto..." rows="20"></textarea>
+<button class="btn" onclick="saveContent('outline', outlineText.value)"><i class="fas fa-save"></i> Salvar Escaleta</button>
 </div>
 </div>
 
 <!-- Roteiro -->
 <div class="tab-content" id="script">
 <div class="section">
+<h2><i class="fas fa-file-alt"></i> Roteiro</h2>
+<p>Desenvolva seu roteiro com formatação profissional</p>
+
 <div class="editor-controls">
-<button class="element-btn">Adicionar Cena</button>
-<button class="element-btn">Adicionar Ação</button>
+<button class="element-btn" onclick="addElement('scene')"><i class="fas fa-video"></i> Cena</button>
+<button class="element-btn" onclick="addElement('action')"><i class="fas fa-running"></i> Ação</button>
+<button class="element-btn" onclick="addElement('character')"><i class="fas fa-user"></i> Personagem</button>
+<button class="element-btn" onclick="addElement('dialogue')"><i class="fas fa-comment"></i> Diálogo</button>
+<button class="element-btn" onclick="addElement('parenthetical')"><i class="fas fa-parentheses"></i> Parentético</button>
+<button class="element-btn" onclick="addElement('transition')"><i class="fas fa-arrow-right"></i> Transição</button>
 </div>
-<div class="script-editor" contenteditable="true">INT. CASA DE ELIAS - DIA</div>
+
+<div class="script-editor" id="scriptEditor" contenteditable="true">
+<span class="scene-heading" onclick="editElement(this)">INT. CASA DE ELIAS - DIA</span>
+
+<span class="action" onclick="editElement(this)">A cabana é simples, com redes de pesca penduradas e um pequeno altar com imagens de santos. ELIAS (25), magro e com olhos que já viram demasiado, prepara seu equipamento de pesca.</span>
+
+<span class="action" onclick="editElement(this)">Ele se ajoelha diante do altar e faz o sinal da cruz. Suas mãos tremem ligeiramente.</span>
+
+<span class="character" onclick="editElement(this)">ELIAS</span>
+<span class="dialogue" onclick="editElement(this)">(sussurrando)
+Por favor, hoje me traga de volta.</span>
+
+<span class="scene-heading" onclick="editElement(this)">EXT. PORTO - DIA</span>
+
+<span class="action" onclick="editElement(this)">O porto está quase vazio. Apenas alguns pescadores remendam redes. Elias caminha em direção ao seu pequeno barco.</span>
+
+<span class="character" onclick="editElement(this)">VELHO PESCADOR</span>
+<span class="dialogue" onclick="editElement(this)">Vai arriscar de novo, Elias? O mar não está para peixe hoje.</span>
+
+<span class="character" onclick="editElement(this)">ELIAS</span>
+<span class="dialogue" onclick="editElement(this)">Não tenho escolha, senhor Álvaro. Preciso comer.</span>
+</div>
+
+<div class="buttons">
+<button class="btn" onclick="addNewScene()"><i class="fas fa-plus"></i> Adicionar Cena</button>
+<button class="btn" onclick="saveScript()"><i class="fas fa-save"></i> Salvar Roteiro</button>
+<button class="btn btn-primary" onclick="exportPDF()"><i class="fas fa-download"></i> Exportar PDF</button>
+</div>
 </div>
 </div>
 
 <!-- Tratamento -->
 <div class="tab-content" id="treatment">
-<div class="section"><textarea placeholder="Tratamento do roteiro..."></textarea></div>
+<div class="section">
+<h2><i class="fas fa-edit"></i> Tratamento</h2>
+<textarea id="treatmentText" placeholder="Desenvolva o tratamento do seu roteiro..." rows="20"></textarea>
+<button class="btn" onclick="saveContent('treatment', treatmentText.value)"><i class="fas fa-save"></i> Salvar Tratamento</button>
+</div>
 </div>
 
 <!-- Bíblia -->
 <div class="tab-content" id="bible">
-<div class="section"><textarea placeholder="Bíblia do roteiro..."></textarea></div>
+<div class="section">
+<h2><i class="fas fa-book"></i> Bíblia do Projeto</h2>
+<textarea id="bibleText" placeholder="Desenvolva a bíblia do seu projeto..." rows="20"></textarea>
+<button class="btn" onclick="saveContent('bible', bibleText.value)"><i class="fas fa-save"></i> Salvar Bíblia</button>
+</div>
+</div>
+
+<!-- Fofoca -->
+<div class="tab-content" id="gossip">
+<div class="section">
+<h2><i class="fas fa-comments"></i> Fofoca</h2>
+<p>Converse com outros roteiristas em tempo real</p>
+<div class="chat-messages" id="gossipTabMessages"></div>
+<div class="chat-input">
+<input type="text" id="gossipTabInput" placeholder="Digite sua mensagem...">
+<button onclick="sendMessage('gossip', 'tab')"><i class="fas fa-paper-plane"></i></button>
+</div>
+</div>
+</div>
+
+<!-- Chama -->
+<div class="tab-content" id="video">
+<div class="section">
+<h2><i class="fas fa-video"></i> Chama</h2>
+<p>Conecte-se com outros roteiristas através de videochamada</p>
+
+<div class="video-container">
+<div class="video-box">
+<video id="localVideo" autoplay muted></video>
+<div class="video-label">Você</div>
+</div>
+<div class="video-box">
+<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #1e2a38;">
+<i class="fas fa-user-slash fa-3x" style="color: #4a6278;"></i>
+</div>
+<div class="video-label">Participante</div>
+</div>
+</div>
+
+<div class="video-controls">
+<button class="video-btn" id="toggleVideoBtn"><i class="fas fa-video"></i></button>
+<button class="video-btn" id="toggleAudioBtn"><i class="fas fa-microphone"></i></button>
+<button class="video-btn" id="screenShareBtn"><i class="fas fa-desktop"></i></button>
+<button class="video-btn" id="recordBtn"><i class="fas fa-record-vinyl"></i></button>
+<button class="video-btn end-call" id="endCallBtn"><i class="fas fa-phone-slash"></i></button>
+</div>
+
+<div class="chat-messages" id="videoTabMessages" style="margin-top: 20px; max-height: 200px;"></div>
+<div class="chat-input">
+<input type="text" id="videoTabInput" placeholder="Digite sua mensagem...">
+<button onclick="sendMessage('video', 'tab')"><i class="fas fa-paper-plane"></i></button>
+</div>
+</div>
 </div>
 
 </div>
@@ -142,67 +669,325 @@ footer {text-align:center; padding:1.5rem; background:#1a2530; color:#95a5a6; fo
 <!-- Chats flutuantes -->
 <div class="chat-footer">
 <div class="chat-window" id="gossipChat">
-<div class="chat-header"><span>Fofoca</span><span class="chat-close" onclick="closeChat('gossipChat')"><i class="fas fa-times"></i></span></div>
+<div class="chat-header">
+<span>Fofoca</span>
+<span class="chat-close" onclick="toggleChat('gossipChat')"><i class="fas fa-times"></i></span>
+</div>
 <div class="chat-messages" id="gossipMessages"></div>
 <div class="chat-input">
 <input type="text" id="gossipInput" placeholder="Escreva uma mensagem...">
-<button onclick="sendMessage('gossip')"><i class="fas fa-paper-plane"></i></button>
+<button onclick="sendMessage('gossip', 'float')"><i class="fas fa-paper-plane"></i></button>
 </div>
 </div>
 
 <div class="chat-window" id="videoChat">
-<div class="chat-header"><span>Chama</span><span class="chat-close" onclick="closeChat('videoChat')"><i class="fas fa-times"></i></span></div>
+<div class="chat-header">
+<span>Chama</span>
+<span class="chat-close" onclick="toggleChat('videoChat')"><i class="fas fa-times"></i></span>
+</div>
 <div class="chat-messages" id="videoMessages"></div>
 <div class="chat-input">
 <input type="text" id="videoInput" placeholder="Digite algo...">
-<button onclick="sendMessage('video')"><i class="fas fa-paper-plane"></i></button>
+<button onclick="sendMessage('video', 'float')"><i class="fas fa-paper-plane"></i></button>
 </div>
 </div>
 </div>
 
-<footer>© 2025 ScriptFlow - Plataforma de Roteiros</footer>
+<footer>© 2025 ScriptFlow - Plataforma de Roteiros | Desenvolvido com <i class="fas fa-heart" style="color: #e74c3c;"></i> para roteiristas</footer>
 
 <script>
+// Dados da aplicação
+let scriptData = {
+  argument: { storyline: '', logline: '', synopsis: '', argument: '' },
+  outline: '',
+  script: '',
+  treatment: '',
+  bible: '',
+  messages: { gossip: [], video: [] }
+};
+
 // Abas principais
 const tabs = document.querySelectorAll('.tab');
 const tabContents = document.querySelectorAll('.tab-content');
-tabs.forEach(tab=>{
-  tab.addEventListener('click', ()=>{
-    tabs.forEach(t=>t.classList.remove('active'));
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
-    tabContents.forEach(tc=>tc.classList.remove('active'));
+    tabContents.forEach(tc => tc.classList.remove('active'));
     document.getElementById(tab.dataset.tab).classList.add('active');
-
-    // Exibe chats
-    if(tab.dataset.tab==='gossip') showChat('gossipChat');
-    else closeChat('gossipChat');
-    if(tab.dataset.tab==='video') showChat('videoChat');
-    else closeChat('videoChat');
   });
 });
 
 // Sub-abas Argumento
 const subTabs = document.querySelectorAll('.sub-tab');
 const subContents = document.querySelectorAll('.sub-content');
-subTabs.forEach(st=>{
-  st.addEventListener('click', ()=>{
-    subTabs.forEach(s=>s.classList.remove('active'));
+subTabs.forEach(st => {
+  st.addEventListener('click', () => {
+    subTabs.forEach(s => s.classList.remove('active'));
     st.classList.add('active');
-    subContents.forEach(sc=>sc.classList.remove('active'));
+    subContents.forEach(sc => sc.classList.remove('active'));
     document.getElementById(st.dataset.sub).classList.add('active');
   });
 });
 
-// Funções de chat
-function showChat(id){document.getElementById(id).style.display='flex';}
-function closeChat(id){document.getElementById(id).style.display='none';}
-function sendMessage(type){
-  const input=document.getElementById(type+'Input');
-  const msg=input.value.trim(); if(!msg) return;
-  const msgContainer=document.getElementById(type+'Messages');
-  const div=document.createElement('div'); div.textContent=msg; msgContainer.appendChild(div);
-  input.value=''; msgContainer.scrollTop=msgContainer.scrollHeight;
+// Carregar dados salvos
+function loadSavedData() {
+  const savedData = localStorage.getItem('scriptflow_data');
+  if (savedData) {
+    scriptData = JSON.parse(savedData);
+    
+    // Preencher campos com dados salvos
+    document.getElementById('storylineText').value = scriptData.argument.storyline;
+    document.getElementById('loglineText').value = scriptData.argument.logline;
+    document.getElementById('synopsisText').value = scriptData.argument.synopsis;
+    document.getElementById('argumentText').value = scriptData.argument.argument;
+    document.getElementById('outlineText').value = scriptData.outline;
+    document.getElementById('treatmentText').value = scriptData.treatment;
+    document.getElementById('bibleText').value = scriptData.bible;
+    
+    if (scriptData.script) {
+      document.getElementById('scriptEditor').innerHTML = scriptData.script;
+    }
+    
+    // Carregar mensagens
+    loadMessages();
+  }
 }
+
+// Salvar conteúdo
+function saveContent(type, content) {
+  if (type === 'storyline' || type === 'logline' || type === 'synopsis' || type === 'argument') {
+    scriptData.argument[type] = content;
+  } else {
+    scriptData[type] = content;
+  }
+  
+  localStorage.setItem('scriptflow_data', JSON.stringify(scriptData));
+  showNotification('Conteúdo salvo com sucesso!');
+}
+
+// Salvar roteiro
+function saveScript() {
+  scriptData.script = document.getElementById('scriptEditor').innerHTML;
+  localStorage.setItem('scriptflow_data', JSON.stringify(scriptData));
+  showNotification('Roteiro salvo com sucesso!');
+}
+
+// Exportar PDF (simulação)
+function exportPDF() {
+  showNotification('Funcionalidade de exportação para PDF em desenvolvimento');
+}
+
+// Adicionar nova cena
+function addNewScene() {
+  const newScene = document.createElement('div');
+  newScene.innerHTML = `
+    <span class="scene-heading" onclick="editElement(this)">INT. NOVA CENA - DIA</span>
+    <span class="action" onclick="editElement(this)">Descreva a ação aqui.</span>
+    <span class="character" onclick="editElement(this)">PERSONAGEM</span>
+    <span class="dialogue" onclick="editElement(this)">Diálogo do personagem aqui.</span>
+  `;
+  document.getElementById('scriptEditor').appendChild(newScene);
+  showNotification('Nova cena adicionada!');
+}
+
+// Adicionar elemento ao roteiro
+function addElement(type) {
+  let newElement;
+  
+  switch(type) {
+    case 'scene':
+      newElement = '<span class="scene-heading" onclick="editElement(this)">INT. NOVA CENA - DIA</span>\n\n';
+      break;
+    case 'action':
+      newElement = '<span class="action" onclick="editElement(this)">Nova ação descritiva aqui.</span>\n\n';
+      break;
+    case 'character':
+      newElement = '<span class="character" onclick="editElement(this)">NOVO PERSONAGEM</span>\n';
+      break;
+    case 'dialogue':
+      newElement = '<span class="dialogue" onclick="editElement(this)">Novo diálogo do personagem aqui.</span>\n\n';
+      break;
+    case 'parenthetical':
+      newElement = '<span class="parenthetical" onclick="editElement(this)">(ação ou emoção do personagem)</span>\n';
+      break;
+    case 'transition':
+      newElement = '<span class="transition" onclick="editElement(this)">CORTE PARA:</span>\n\n';
+      break;
+  }
+  
+  document.getElementById('scriptEditor').focus();
+  document.execCommand('insertHTML', false, newElement);
+}
+
+// Editar elemento
+function editElement(element) {
+  const currentText = element.textContent;
+  const newText = prompt('Editar elemento:', currentText);
+  
+  if (newText !== null && newText !== '') {
+    element.textContent = newText;
+  }
+}
+
+// Chat functions
+function toggleChat(chatId) {
+  const chat = document.getElementById(chatId);
+  chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
+}
+
+function sendMessage(type, location) {
+  const inputId = location === 'float' ? `${type}Input` : `${type}TabInput`;
+  const messagesId = location === 'float' ? `${type}Messages` : `${type}TabMessages`;
+  
+  const input = document.getElementById(inputId);
+  const message = input.value.trim();
+  
+  if (!message) return;
+  
+  const messagesContainer = document.getElementById(messagesId);
+  const messageElement = document.createElement('div');
+  messageElement.classList.add('message', 'self');
+  messageElement.textContent = message;
+  
+  messagesContainer.appendChild(messageElement);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  
+  // Salvar mensagem
+  scriptData.messages[type].push({
+    text: message,
+    sender: 'user',
+    time: new Date().toLocaleTimeString()
+  });
+  
+  localStorage.setItem('scriptflow_data', JSON.stringify(scriptData));
+  
+  // Limpar input
+  input.value = '';
+  
+  // Simular resposta após um tempo
+  if (type === 'gossip') {
+    setTimeout(() => {
+      simulateResponse(type, location);
+    }, 1000 + Math.random() * 2000);
+  }
+}
+
+function simulateResponse(type, location) {
+  const responses = [
+    "Interessante! Como você desenvolveu essa ideia?",
+    "Gostei dessa abordagem. Já pensou em expandir?",
+    "Isso me lembra um projeto que vi recentemente.",
+    "Você poderia desenvolver melhor esse conceito?",
+    "Excelente ideia! Tem potencial para ser um grande projeto."
+  ];
+  
+  const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+  const messagesId = location === 'float' ? `${type}Messages` : `${type}TabMessages`;
+  
+  const messagesContainer = document.getElementById(messagesId);
+  const messageElement = document.createElement('div');
+  messageElement.classList.add('message', 'other');
+  messageElement.textContent = randomResponse;
+  
+  messagesContainer.appendChild(messageElement);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  
+  // Salvar mensagem
+  scriptData.messages[type].push({
+    text: randomResponse,
+    sender: 'system',
+    time: new Date().toLocaleTimeString()
+  });
+  
+  localStorage.setItem('scriptflow_data', JSON.stringify(scriptData));
+}
+
+function loadMessages() {
+  // Carregar mensagens para todos os chats
+  ['gossip', 'video'].forEach(type => {
+    ['', 'Tab'].forEach(suffix => {
+      const container = document.getElementById(`${type}${suffix}Messages`);
+      if (container) {
+        container.innerHTML = '';
+        
+        scriptData.messages[type].forEach(msg => {
+          const messageElement = document.createElement('div');
+          messageElement.classList.add('message', msg.sender === 'user' ? 'self' : 'other');
+          messageElement.textContent = msg.text;
+          container.appendChild(messageElement);
+        });
+        
+        container.scrollTop = container.scrollHeight;
+      }
+    });
+  });
+}
+
+// Video functions (simuladas)
+document.getElementById('toggleVideoBtn').addEventListener('click', () => {
+  showNotification('Câmera ' + (document.getElementById('toggleVideoBtn').classList.toggle('active') ? 'desligada' : 'ligada'));
+});
+
+document.getElementById('toggleAudioBtn').addEventListener('click', () => {
+  showNotification('Microfone ' + (document.getElementById('toggleAudioBtn').classList.toggle('active') ? 'desmutado' : 'mutado'));
+});
+
+document.getElementById('screenShareBtn').addEventListener('click', () => {
+  showNotification('Compartilhamento de tela ativado');
+});
+
+document.getElementById('recordBtn').addEventListener('click', () => {
+  showNotification('Gravação ' + (document.getElementById('recordBtn').classList.toggle('active') ? 'iniciada' : 'parada'));
+});
+
+document.getElementById('endCallBtn').addEventListener('click', () => {
+  showNotification('Chamada encerrada');
+});
+
+// Notificação
+function showNotification(message) {
+  const notification = document.createElement('div');
+  notification.style.position = 'fixed';
+  notification.style.bottom = '20px';
+  notification.style.left = '50%';
+  notification.style.transform = 'translateX(-50%)';
+  notification.style.backgroundColor = '#3498db';
+  notification.style.color = 'white';
+  notification.style.padding = '10px 20px';
+  notification.style.borderRadius = '5px';
+  notification.style.zIndex = '1000';
+  notification.style.boxShadow = '0 3px 10px rgba(0,0,0,0.2)';
+  notification.textContent = message;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    notification.style.transition = 'opacity 0.5s';
+    setTimeout(() => notification.remove(), 500);
+  }, 3000);
+}
+
+// Logout
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  if (confirm('Tem certeza que deseja sair?')) {
+    showNotification('Sessão encerrada com sucesso');
+    // Simular logout
+    setTimeout(() => {
+      document.getElementById('userName').textContent = 'Visitante';
+    }, 1000);
+  }
+});
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+  loadSavedData();
+  
+  // Inicializar chats flutuantes como fechados
+  toggleChat('gossipChat');
+  toggleChat('videoChat');
+});
 </script>
 </body>
 </html>
