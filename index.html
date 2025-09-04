@@ -1,285 +1,325 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ScriptFlow Ultimate - Editor Completo</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-:root {
-  --primary:#2c3e50;--secondary:#e74c3c;--accent:#3498db;--light:#ecf0f1;--dark:#2c3e50;
-  --success:#2ecc71;--warning:#f39c12;--danger:#e74c3c;--text:#2c3e50;--bg:#f9f9f9;
-  --header-bg:linear-gradient(135deg,#e74c3c 0%,#c0392b 100%);
-  --sidebar-bg:#34495e;--editor-bg:#fff;--editor-text:#000;--footer-bg:#2c3e50;--footer-text:#ecf0f1;
-}
-.dark-mode{--text:#ecf0f1;--bg:#1a2a3a;--header-bg:linear-gradient(135deg,#c0392b 0%,#922b21 100%);
---sidebar-bg:#2c3e50;--editor-bg:#1e2a38;--editor-text:#ecf0f1;--footer-bg:#1a252f;--footer-text:#bdc3c7;}
-.focus-mode{--text:#3498db;--bg:#1e2a38;--header-bg:linear-gradient(135deg,#2980b9 0%,#1c5d8a 100%);
---sidebar-bg:#2c3e50;--editor-bg:#14212e;--editor-text:#3498db;--footer-bg:#1a252f;--footer-text:#3498db;}
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
-body{background:var(--bg);color:var(--text);display:flex;flex-direction:column;min-height:100vh;transition:all 0.3s;}
-header{background:var(--header-bg);color:white;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.2);}
-.header-left{display:flex;align-items:center;gap:1rem;}
-.logo{font-size:2rem;font-weight:bold;display:flex;align-items:center;gap:0.5rem;}
-.document-info{display:flex;flex-direction:column;}
-.document-title{font-weight:bold;font-size:1.2rem;}
-.document-stats{font-size:0.9rem;opacity:0.9;}
-.header-right{display:flex;gap:1rem;}
-.main-container{display:flex;flex:1;overflow:hidden;}
-.sidebar{width:250px;background:var(--sidebar-bg);color:#ecf0f1;padding:1rem;display:flex;flex-direction:column;box-shadow:2px 0 5px rgba(0,0,0,0.1);}
-.sidebar-section{margin-bottom:1.5rem;}
-.sidebar-section h3{margin-bottom:0.8rem;font-size:1rem;color:#bdc3c7;display:flex;align-items:center;gap:0.5rem;}
-.sidebar-btn{display:flex;align-items:center;gap:0.5rem;padding:0.7rem;width:100%;background:transparent;border:none;color:#ecf0f1;text-align:left;border-radius:4px;cursor:pointer;transition:background 0.2s;margin-bottom:0.3rem;}
-.sidebar-btn:hover{background:#3d5066;}
-.sidebar-btn.active{background:#e74c3c;}
-.workspace{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.toolbar{padding:0.8rem 1.5rem;background:var(--light);display:flex;gap:1rem;flex-wrap:wrap;border-bottom:1px solid #ddd;}
-.toolbar-btn{padding:0.5rem 1rem;background:var(--primary);color:white;border:none;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;transition:all 0.2s;}
-.toolbar-btn:hover{background:#34495e;}
-.toolbar-btn.active{background:var(--secondary);}
-.toolbar-group{display:flex;gap:0.5rem;align-items:center;}
-.divider{width:1px;background:#ddd;height:24px;}
-.editor-container{flex:1;display:flex;overflow:hidden;}
-.script-editor{flex:1;padding:2rem;background:var(--editor-bg);color:var(--editor-text);overflow-y:auto;font-family:'Courier New',monospace;font-size:12pt;line-height:1.5;}
-.scene-heading{font-weight:bold;text-transform:uppercase;margin-top:1.5rem;color:#3498db;cursor:pointer;}
-.action{margin:0.8rem 0;cursor:pointer;}
-.character{text-align:center;width:50%;margin:0.8rem auto;font-weight:bold;cursor:pointer;}
-.dialogue{width:60%;margin:0 auto;cursor:pointer;}
-.parenthetical{width:50%;margin:0 auto;padding-left:2rem;cursor:pointer;}
-.transition{text-align:right;margin-top:1rem;text-transform:uppercase;font-weight:bold;cursor:pointer;}
-.right-panel{width:300px;background:var(--light);padding:1rem;border-left:1px solid #ddd;overflow-y:auto;}
-.panel-tabs{display:flex;margin-bottom:1rem;border-bottom:1px solid #ddd;flex-wrap:wrap;}
-.panel-tab{padding:0.5rem 1rem;border:none;background:transparent;cursor:pointer;}
-.panel-tab.active{border-bottom:2px solid var(--secondary);font-weight:bold;}
-.panel-content{display:none;}
-.panel-content.active{display:block;}
-footer{background:var(--footer-bg);color:var(--footer-text);padding:0.8rem 1.5rem;display:flex;justify-content:space-between;align-items:center;font-size:0.9rem;}
-.footer-left{display:flex;gap:1.5rem;}
-.footer-right{display:flex;gap:0.8rem;}
-.fab-container{position:fixed;bottom:25px;right:25px;display:flex;flex-direction:column;gap:15px;z-index:1000;}
-.fab{width:60px;height:60px;border-radius:50%;background:var(--secondary);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 5px 15px rgba(0,0,0,0.3);transition:all 0.3s;}
-.fab:hover{transform:translateY(-5px) scale(1.05);}
-.fab.chama{background:var(--accent);}
-.panel-content textarea{width:100%;height:100px;}
-.storyboard{display:flex;gap:1rem;overflow-x:auto;padding:1rem;}
-.storyboard-frame{position:relative;flex:0 0 300px;height:200px;background:#fff;border:1px solid #ccc;cursor:pointer;}
-.storyboard-frame canvas{width:100%;height:100%;border:1px solid #000;}
-@media(max-width:900px){.main-container{flex-direction:column;}.sidebar{width:100%;order:2;}.editor-container{flex-direction:column;}.right-panel{width:100%;order:3;}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScriptFlow Ultimate - Editor de Roteiro Profissional</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ===== VARIÁVEIS DE COR ===== */
+    :root {
+      --primary: #2c3e50;
+      --secondary: #e74c3c;
+      --accent: #3498db;
+      --light: #ecf0f1;
+      --dark: #2c3e50;
+      --success: #2ecc71;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+      --text: #2c3e50;
+      --bg: #f9f9f9;
+      --header-bg: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      --sidebar-bg: #34495e;
+      --editor-bg: #ffffff;
+      --editor-text: #000000;
+      --footer-bg: #2c3e50;
+      --footer-text: #ecf0f1;
+    }
+
+    /* ===== RESET E FONTES ===== */
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; transition: all 0.3s ease; }
+
+    /* ===== CABEÇALHO ===== */
+    header { background: var(--header-bg); color:white; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 10px rgba(0,0,0,0.2); }
+    .header-left { display:flex; align-items:center; gap:1rem; }
+    .logo { font-size:2rem; font-weight:bold; display:flex; align-items:center; gap:0.5rem; }
+    .document-info { display:flex; flex-direction:column; }
+    .document-title { font-weight:bold; font-size:1.2rem; }
+    .document-stats { font-size:0.9rem; opacity:0.9; }
+    .header-right { display:flex; gap:1rem; }
+
+    /* ===== LAYOUT ===== */
+    .main-container { display:flex; flex:1; overflow:hidden; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar { width:250px; background:var(--sidebar-bg); color:#ecf0f1; padding:1rem; display:flex; flex-direction:column; box-shadow:2px 0 5px rgba(0,0,0,0.1); }
+    .sidebar-section { margin-bottom:1.5rem; }
+    .sidebar-section h3 { margin-bottom:0.8rem; font-size:1rem; color:#bdc3c7; display:flex; align-items:center; gap:0.5rem; }
+    .sidebar-btn { display:flex; align-items:center; gap:0.5rem; padding:0.7rem; width:100%; background:transparent; border:none; color:#ecf0f1; text-align:left; border-radius:4px; cursor:pointer; transition:background 0.2s; margin-bottom:0.3rem; font-weight:bold; }
+    .sidebar-btn:hover { background:#3d5066; }
+    .sidebar-btn.active { background:#e74c3c; }
+
+    /* ===== WORKSPACE ===== */
+    .workspace { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+
+    /* ===== TOOLBAR ===== */
+    .toolbar { padding:0.8rem 1.5rem; background:var(--light); display:flex; gap:1rem; flex-wrap:wrap; border-bottom:1px solid #ddd; }
+    .toolbar-btn { padding:0.5rem 1rem; background:var(--primary); color:white; border:none; border-radius:4px; cursor:pointer; display:flex; align-items:center; gap:0.5rem; font-size:0.9rem; transition:all 0.2s; }
+    .toolbar-btn:hover { background:#34495e; }
+    .toolbar-btn.active { background:var(--secondary); }
+    .toolbar-group { display:flex; gap:0.5rem; align-items:center; }
+    .divider { width:1px; background:#ddd; height:24px; }
+
+    /* ===== EDITOR ===== */
+    .editor-container { flex:1; display:flex; overflow:hidden; }
+    .script-editor { flex:1; padding:2rem; background:var(--editor-bg); color:var(--editor-text); overflow-y:auto; font-family:'Courier New', monospace; font-size:12pt; line-height:1.5; }
+    .scene-heading { font-weight:bold; text-transform:uppercase; margin-top:1.5rem; color:#3498db; cursor:pointer; }
+    .action { margin:0.8rem 0; cursor:pointer; }
+    .character { text-align:center; width:50%; margin:0.8rem auto; font-weight:bold; cursor:pointer; }
+    .dialogue { width:60%; margin:0 auto; cursor:pointer; }
+    .parenthetical { width:50%; margin:0 auto; padding-left:2rem; cursor:pointer; }
+    .transition { text-align:right; margin-top:1rem; text-transform:uppercase; font-weight:bold; cursor:pointer; }
+
+    /* ===== RIGHT PANEL ===== */
+    .right-panel { width:300px; background:var(--light); padding:1rem; border-left:1px solid #ddd; overflow-y:auto; }
+    .panel-tabs { display:flex; margin-bottom:1rem; border-bottom:1px solid #ddd; }
+    .panel-tab { padding:0.5rem 1rem; border:none; background:transparent; cursor:pointer; }
+    .panel-tab.active { border-bottom:2px solid var(--secondary); font-weight:bold; }
+    .panel-content { display:none; }
+    .panel-content.active { display:block; }
+
+    /* ===== FOOTER ===== */
+    footer { background:var(--footer-bg); color:var(--footer-text); padding:0.8rem 1.5rem; display:flex; justify-content:space-between; align-items:center; font-size:0.9rem; }
+    .footer-left { display:flex; gap:1.5rem; }
+    .footer-right { display:flex; gap:0.8rem; }
+
+    /* ===== FAB ===== */
+    .fab-container { position:fixed; bottom:25px; right:25px; display:flex; flex-direction:column; gap:15px; z-index:1000; }
+    .fab { width:60px; height:60px; border-radius:50%; background:var(--secondary); color:white; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.5rem; box-shadow:0 5px 15px rgba(0,0,0,0.3); transition:all 0.3s; }
+    .fab:hover { transform:translateY(-5px) scale(1.05); }
+    .fab.chama { background:var(--accent); }
+
+    /* ===== RESPONSIVIDADE ===== */
+    @media(max-width:900px) { .main-container { flex-direction:column; } .sidebar{ width:100%; order:2; } .editor-container{ flex-direction:column; } .right-panel{ width:100%; order:3; } }
+
+    /* ===== STORYBOARD ===== */
+    .storyboard { display:flex; gap:10px; overflow-x:auto; padding:10px; border:1px solid #ccc; margin-top:10px; }
+    .frame { flex:0 0 300px; height:200px; border:1px solid #999; position:relative; background:#fff; cursor:pointer; }
+    .frame canvas { width:100%; height:100%; display:block; }
+    .add-frame { display:flex; justify-content:center; align-items:center; font-weight:bold; font-size:2rem; color:#999; }
+  </style>
 </head>
 <body>
-<header>
-<div class="header-left">
-  <div class="logo"><i class="fas fa-scroll"></i> ScriptFlow</div>
-  <div class="document-info">
-    <div class="document-title">Roteiro Sem Título</div>
-    <div class="document-stats">0 cenas • 0 páginas • Modificado agora</div>
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <div class="logo"><i class="fas fa-scroll"></i> ScriptFlow</div>
+      <div class="document-info">
+        <div class="document-title">Roteiro Sem Título</div>
+        <div class="document-stats">0 cenas • 0 páginas • Modificado agora</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="toolbar-btn"><i class="fas fa-save"></i> Salvar</button>
+      <button class="toolbar-btn"><i class="fas fa-file-export"></i> Exportar</button>
+      <button class="toolbar-btn"><i class="fas fa-cloud"></i> Publicar</button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <div class="main-container">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <h3><i class="fas fa-film"></i> Elementos</h3>
+        <button class="sidebar-btn active"><i class="fas fa-video"></i> Cena</button>
+        <button class="sidebar-btn"><i class="fas fa-running"></i> Ação</button>
+        <button class="sidebar-btn"><i class="fas fa-user"></i> Personagem</button>
+        <button class="sidebar-btn"><i class="fas fa-comment"></i> Diálogo</button>
+        <button class="sidebar-btn"><i class="fas fa-parentheses"></i> Parentético</button>
+        <button class="sidebar-btn"><i class="fas fa-arrow-right"></i> Transição</button>
+      </div>
+      <div class="sidebar-section">
+        <h3><i class="fas fa-layer-group"></i> Visualização</h3>
+        <button class="sidebar-btn"><i class="fas fa-list"></i> Outline</button>
+        <button class="sidebar-btn"><i class="fas fa-th"></i> Cartões</button>
+        <button class="sidebar-btn"><i class="fas fa-map"></i> Story Map</button>
+      </div>
+      <div class="sidebar-section">
+        <h3><i class="fas fa-cog"></i> Ferramentas</h3>
+        <button class="sidebar-btn"><i class="fas fa-search"></i> Buscar</button>
+        <button class="sidebar-btn"><i class="fas fa-exchange-alt"></i> Substituir</button>
+        <button class="sidebar-btn"><i class="fas fa-sticky-note"></i> Notas</button>
+        <button class="sidebar-btn"><i class="fas fa-history"></i> Histórico</button>
+      </div>
+    </div>
+
+    <!-- WORKSPACE -->
+    <div class="workspace">
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <div class="toolbar-group">
+          <button class="toolbar-btn"><i class="fas fa-plus"></i> Nova Cena</button>
+          <button class="toolbar-btn"><i class="fas fa-trash"></i> Remover</button>
+        </div>
+        <div class="divider"></div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn"><i class="fas fa-bold"></i></button>
+          <button class="toolbar-btn"><i class="fas fa-italic"></i></button>
+          <button class="toolbar-btn"><i class="fas fa-underline"></i></button>
+        </div>
+        <div class="divider"></div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn"><i class="fas fa-undo"></i></button>
+          <button class="toolbar-btn"><i class="fas fa-redo"></i></button>
+        </div>
+        <div style="flex:1;"></div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn"><i class="fas fa-moon"></i> Modo Noturno</button>
+          <button class="toolbar-btn"><i class="fas fa-crosshairs"></i> Modo Foco</button>
+        </div>
+      </div>
+
+      <!-- EDITOR -->
+      <div class="editor-container">
+        <div class="script-editor" contenteditable="true">
+          <div class="scene-heading">INT. CASA DE JOÃO - DIA</div>
+          <div class="action">Uma casa simples. JOÃO mexe em papéis sobre a mesa.</div>
+          <div class="character">JOÃO</div>
+          <div class="dialogue">Onde ela está? Já era para ter chegado.</div>
+          <div class="transition">CORTE PARA:</div>
+
+          <!-- STORYBOARD -->
+          <div class="storyboard" id="storyboard">
+            <div class="frame add-frame">+</div>
+          </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="right-panel">
+          <div class="panel-tabs">
+            <button class="panel-tab active" data-panel="notes">Notas</button>
+            <button class="panel-tab" data-panel="elements">Elementos</button>
+            <button class="panel-tab" data-panel="stats">Estatísticas</button>
+          </div>
+          <div class="panel-content active" id="notes-panel">
+            <h4>Notas da Cena</h4>
+            <textarea placeholder="Adicione notas..." style="width:100%;height:100px"></textarea>
+          </div>
+          <div class="panel-content" id="elements-panel">
+            <h4>Elementos</h4>
+            <ul><li>INT. CASA DE JOÃO</li><li>JOÃO</li></ul>
+          </div>
+          <div class="panel-content" id="stats-panel">
+            <h4>Estatísticas</h4>
+            <p><strong>Cenas:</strong> 1</p>
+            <p><strong>Páginas:</strong> 1</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-<div class="header-right">
-  <button class="toolbar-btn"><i class="fas fa-save"></i> Salvar</button>
-  <button class="toolbar-btn"><i class="fas fa-file-export"></i> Exportar</button>
-  <button class="toolbar-btn"><i class="fas fa-cloud"></i> Publicar</button>
-</div>
-</header>
 
-<div class="main-container">
-<div class="sidebar">
-  <div class="sidebar-section">
-    <h3><i class="fas fa-film"></i> Elementos</h3>
-    <button class="sidebar-btn active" data-element="scene"><i class="fas fa-video"></i> Cena</button>
-    <button class="sidebar-btn" data-element="action"><i class="fas fa-running"></i> Ação</button>
-    <button class="sidebar-btn" data-element="character"><i class="fas fa-user"></i> Personagem</button>
-    <button class="sidebar-btn" data-element="dialogue"><i class="fas fa-comment"></i> Diálogo</button>
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-left">
+      <div><i class="fas fa-keyboard"></i> <kbd>Ctrl+S</kbd> Salvar</div>
+      <div><i class="fas fa-keyboard"></i> <kbd>Ctrl+1</kbd> Cena</div>
+    </div>
+    <div class="footer-right">
+      <div>Modificado: <span id="last-saved">agora</span></div>
+    </div>
+  </footer>
+
+  <!-- FAB -->
+  <div class="fab-container">
+    <button class="fab" id="fofocaBtn"><i class="fas fa-comments"></i></button>
+    <button class="fab chama" id="chamaBtn"><i class="fas fa-video"></i></button>
   </div>
-</div>
 
-<div class="workspace">
-<div class="toolbar">
-  <div class="toolbar-group">
-    <button class="toolbar-btn" id="newScene"><i class="fas fa-plus"></i> Nova Cena</button>
-  </div>
-  <div class="divider"></div>
-  <div class="toolbar-group">
-    <button class="toolbar-btn" id="boldBtn"><i class="fas fa-bold"></i></button>
-    <button class="toolbar-btn" id="italicBtn"><i class="fas fa-italic"></i></button>
-    <button class="toolbar-btn" id="underlineBtn"><i class="fas fa-underline"></i></button>
-  </div>
-</div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // PAINEL TABS
+      document.querySelectorAll('.panel-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.panel-content').forEach(c => c.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.panel + '-panel').classList.add('active');
+        });
+      });
 
-<div class="editor-container">
-<div class="script-editor" contenteditable="true">
-  <div class="scene-heading">INT. CASA DE JOÃO - DIA</div>
-  <div class="action">Uma casa simples. JOÃO mexe em papéis sobre a mesa.</div>
-  <div class="character">JOÃO</div>
-  <div class="dialogue">Onde ela está? Já era para ter chegado.</div>
-</div>
+      // SIDEBAR
+      document.querySelectorAll('.sidebar-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
 
-<div class="right-panel">
-<div class="panel-tabs">
-  <button class="panel-tab active" data-panel="notes">Notas</button>
-  <button class="panel-tab" data-panel="elements">Elementos</button>
-  <button class="panel-tab" data-panel="stats">Estatísticas</button>
-  <button class="panel-tab" data-panel="rascunho">Rascunho</button>
-  <button class="panel-tab" data-panel="fofoca">Fofoca</button>
-  <button class="panel-tab" data-panel="chama">Chamada</button>
-  <button class="panel-tab" data-panel="storyboard">Storyboard</button>
-</div>
+      // FABs
+      document.getElementById('fofocaBtn').addEventListener('click', () => alert('Chat em breve!'));
+      document.getElementById('chamaBtn').addEventListener('click', () => alert('Chamada de vídeo em breve!'));
 
-<div class="panel-content active" id="notes-panel">
-<h4>Notas da Cena</h4>
-<textarea placeholder="Adicione notas..."></textarea>
-</div>
-<div class="panel-content" id="elements-panel">
-<h4>Elementos</h4>
-<ul><li>INT. CASA DE JOÃO</li><li>JOÃO</li></ul>
-</div>
-<div class="panel-content" id="stats-panel">
-<h4>Estatísticas</h4>
-<p><strong>Cenas:</strong> 1</p>
-<p><strong>Diálogos:</strong> 1</p>
-</div>
-<div class="panel-content" id="rascunho-panel">
-<h4>Rascunho</h4>
-<textarea placeholder="Escreva seu rascunho..." id="rascunho"></textarea>
-</div>
-<div class="panel-content" id="fofoca-panel">
-<h4>Fofoca</h4>
-<div id="chatArea" style="height:150px;overflow:auto;border:1px solid #ccc;padding:5px;margin-bottom:5px;"></div>
-<input type="text" id="chatInput" placeholder="Digite..." style="width:100%;padding:5px;">
-</div>
-<div class="panel-content" id="chama-panel">
-<h4>Chamada de Vídeo</h4>
-<button id="startCall">Iniciar Chamada</button>
-</div>
-<div class="panel-content" id="storyboard-panel">
-<h4>Storyboard</h4>
-<div class="storyboard" id="storyboardContainer"></div>
-<button id="addFrame">Adicionar Quadro</button>
-</div>
-</div>
-</div>
-</div>
-</div>
+      // Modo Noturno/Foco
+      document.querySelectorAll('.toolbar-btn').forEach(btn => {
+        if(btn.textContent.includes('Noturno')) {
+          btn.addEventListener('click', () => { document.body.classList.add('dark-mode'); document.body.classList.remove('focus-mode'); });
+        }
+        if(btn.textContent.includes('Foco')) {
+          btn.addEventListener('click', () => { document.body.classList.add('focus-mode'); document.body.classList.remove('dark-mode'); });
+        }
+      });
 
-<footer>
-<div class="footer-left">
-<div><i class="fas fa-keyboard"></i> <kbd>Ctrl+S</kbd> Salvar</div>
-<div><i class="fas fa-keyboard"></i> <kbd>Ctrl+1</kbd> Cena</div>
-</div>
-<div class="footer-right">Modificado: <span id="last-saved">agora</span></div>
-</footer>
+      // AUTO-SAVE SIMULADO
+      setInterval(()=>{ document.getElementById('last-saved').textContent = 'há alguns segundos'; },10000);
 
-<div class="fab-container">
-<button class="fab" id="fofocaBtn"><i class="fas fa-comments"></i></button>
-<button class="fab chama" id="chamaBtn"><i class="fas fa-video"></i></button>
-</div>
+      // ROTEIRO - ATALHOS
+      const editor = document.querySelector('.script-editor');
+      editor.addEventListener('keydown', e => {
+        // Ctrl+1/2/3/4
+        if(e.ctrlKey){
+          e.preventDefault();
+          if(e.key==='1') insertAtCursor(editor,'<div class="scene-heading">NOVA CENA</div>');
+          if(e.key==='2') insertAtCursor(editor,'<div class="action">AÇÃO...</div>');
+          if(e.key==='3') insertAtCursor(editor,'<div class="character">PERSONAGEM</div>');
+          if(e.key==='4') insertAtCursor(editor,'<div class="dialogue">DIÁLOGO</div>');
+          if(e.key==='b') document.execCommand('bold');
+          if(e.key==='i') document.execCommand('italic');
+          if(e.key==='u') document.execCommand('underline');
+          if(e.key==='s') alert('Salvar (simulado)');
+        }
+      });
 
-<script>
-document.addEventListener('DOMContentLoaded',function(){
+      function insertAtCursor(editor, html) {
+        editor.focus();
+        document.execCommand('insertHTML', false, html);
+      }
 
-// Painel Tabs
-document.querySelectorAll('.panel-tab').forEach(tab=>{
-  tab.addEventListener('click',()=>{
-    document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.panel-content').forEach(c=>c.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById(tab.dataset.panel+'-panel').classList.add('active');
-  });
-});
+      // STORYBOARD
+      const storyboard = document.getElementById('storyboard');
+      storyboard.addEventListener('click', e => {
+        if(e.target.classList.contains('add-frame')){
+          const frame = document.createElement('div');
+          frame.className='frame';
+          const canvas = document.createElement('canvas');
+          frame.appendChild(canvas);
+          storyboard.insertBefore(frame,e.target);
+          initCanvasDrawing(canvas);
+        }
+      });
 
-// Sidebar Elements
-document.querySelectorAll('.sidebar-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.sidebar-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-  });
-});
-
-// FABs
-document.getElementById('fofocaBtn').addEventListener('click',()=>{document.getElementById('fofoca-panel').scrollIntoView();});
-document.getElementById('chamaBtn').addEventListener('click',()=>{document.getElementById('chama-panel').scrollIntoView();});
-
-// Storyboard
-const sbContainer=document.getElementById('storyboardContainer');
-document.getElementById('addFrame').addEventListener('click',()=>{
-  const frame=document.createElement('div');
-  frame.classList.add('storyboard-frame');
-  const canvas=document.createElement('canvas');
-  canvas.width=300; canvas.height=200;
-  frame.appendChild(canvas);
-  sbContainer.appendChild(frame);
-  const ctx=canvas.getContext('2d');
-  let drawing=false;
-  canvas.addEventListener('mousedown',()=>drawing=true);
-  canvas.addEventListener('mouseup',()=>drawing=false);
-  canvas.addEventListener('mousemove',e=>{
-    if(!drawing) return;
-    const rect=canvas.getBoundingClientRect();
-    ctx.fillStyle='#000'; ctx.fillRect(e.clientX-rect.left,e.clientY-rect.top,2,2);
-  });
-});
-
-// Rascunho autosave
-const rascunho=document.getElementById('rascunho');
-if(localStorage.getItem('rascunho')) rascunho.value=localStorage.getItem('rascunho');
-rascunho.addEventListener('input',()=>{localStorage.setItem('rascunho',rascunho.value);});
-
-// Chat Fofoca
-const chatArea=document.getElementById('chatArea');
-const chatInput=document.getElementById('chatInput');
-chatInput.addEventListener('keypress',e=>{
-  if(e.key==='Enter'){
-    const msg=document.createElement('div'); msg.textContent=chatInput.value;
-    chatArea.appendChild(msg); chatInput.value=''; chatArea.scrollTop=chatArea.scrollHeight;
-  }
-});
-
-// Chamada Video
-document.getElementById('startCall').addEventListener('click',()=>alert('Chamada iniciada!'));
-
-// Editor atalhos
-const editor=document.querySelector('.script-editor');
-document.addEventListener('keydown',function(e){
-  if(editor.contains(document.activeElement)){
-    if(e.ctrlKey && e.key==='1'){e.preventDefault();insertAtCursor('<div class="scene-heading">NOVA CENA</div>');}
-    if(e.ctrlKey && e.key==='2'){e.preventDefault();insertAtCursor('<div class="action">AÇÃO...</div>');}
-    if(e.ctrlKey && e.key==='3'){e.preventDefault();insertAtCursor('<div class="character">PERSONAGEM</div>');}
-    if(e.ctrlKey && e.key==='4'){e.preventDefault();insertAtCursor('<div class="dialogue">DIÁLOGO...</div>');}
-    if(e.ctrlKey && e.key==='b'){document.execCommand('bold'); e.preventDefault();}
-    if(e.ctrlKey && e.key==='i'){document.execCommand('italic'); e.preventDefault();}
-    if(e.ctrlKey && e.key==='u'){document.execCommand('underline'); e.preventDefault();}
-  }
-});
-
-// Inserir HTML na posição do cursor
-function insertAtCursor(html){
-  const sel=window.getSelection();
-  if(!sel.rangeCount) return;
-  const range=sel.getRangeAt(0);
-  range.deleteContents();
-  const frag=document.createRange().createContextualFragment(html);
-  range.insertNode(frag);
-  range.collapse(false);
-  editor.focus();
-}
-
-// Estatísticas
-function updateStats(){
-  const statsPanel=document.getElementById('stats-panel');
-  if(statsPanel){
-    statsPanel.innerHTML='<p><strong>Cenas:</strong>'+editor.querySelectorAll('.scene-heading').length+'</p><p><strong>Diálogos:</strong>'+editor.querySelectorAll('.dialogue').length+'</p>';
-  }
-}
-setInterval(updateStats,1000);
-
-// Auto save footer
-setInterval(()=>{document.getElementById('last-saved').textContent='há alguns segundos';},10000);
-
-});
-</script>
+      function initCanvasDrawing(canvas){
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        let drawing=false;
+        canvas.addEventListener('mousedown', e=>{ drawing=true; ctx.moveTo(e.offsetX,e.offsetY); });
+        canvas.addEventListener('mouseup', ()=>drawing=false);
+        canvas.addEventListener('mouseout', ()=>drawing=false);
+        canvas.addEventListener('mousemove', e=>{
+          if(!drawing) return;
+          ctx.lineTo(e.offsetX,e.offsetY);
+          ctx.stroke();
+        });
+      }
+    });
+  </script>
 </body>
 </html>
+
 
 
 
