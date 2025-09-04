@@ -1,17 +1,379 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScriptFlow - Plataforma de Roteiro</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScriptFlow - Plataforma de Roteiro</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    /* ===== ESTILOS GERAIS ===== */
+    * { 
+        margin:0; 
+        padding:0; 
+        box-sizing:border-box; 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body { 
+        background: linear-gradient(135deg, #1a2a3a 0%, #0d1520 100%);
+        color: #fff; 
+        min-height: 100vh;
+        padding: 20px;
+    }
+    
+    /* ===== CABEÇALHO/CAPA ===== */
+    .header-container {
+        max-width: 1200px;
+        margin: 0 auto 20px auto;
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    .header-container h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .header-container p {
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+    
+    /* ===== ABA DE NAVEGAÇÃO ===== */
+    .tabs-container {
+        max-width: 1200px;
+        margin: 0 auto 20px auto;
+        background: #34495e;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .tabs-nav {
+        display: flex;
+        flex-wrap: wrap;
+        background: #2c3e50;
+        padding: 0 15px;
+    }
+    
+    .tab-btn {
+        padding: 15px 20px;
+        background: none;
+        border: none;
+        color: #ecf0f1;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+        border-bottom: 3px solid transparent;
+    }
+    
+    .tab-btn:hover {
+        background: #3d5066;
+    }
+    
+    .tab-btn.active {
+        border-bottom: 3px solid #e74c3c;
+        background: #3d5066;
+        color: #fff;
+    }
+    
+    /* ===== CONTEÚDO DAS ABAS ===== */
+    .tab-content {
+        display: none;
+        padding: 30px;
+        background: #2c3e50;
+        border-radius: 0 0 10px 10px;
+        min-height: 500px;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    textarea {
+        width: 100%;
+        height: 400px;
+        background: #1e2a38;
+        color: #ecf0f1;
+        border: 1px solid #4a6278;
+        border-radius: 5px;
+        padding: 15px;
+        resize: none;
+        font-family: 'Courier New', monospace;
+        font-size: 1rem;
+    }
+    
+    /* ===== STORYBOARD AVANÇADO ===== */
+    .section {
+        margin-bottom: 30px;
+    }
+    
+    .section h2 {
+        color: #f39c12;
+        margin-bottom: 15px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 2px solid #e74c3c;
+        padding-bottom: 10px;
+    }
+    
+    .section p {
+        color: #ecf0f1;
+        margin-bottom: 25px;
+        font-size: 1.1rem;
+    }
+    
+    .editor-controls {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 12px 18px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+        font-weight: 600;
+    }
+    
+    .btn:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+    }
+    
+    .btn-primary {
+        background: #e74c3c;
+    }
+    
+    .btn-primary:hover {
+        background: #c0392b;
+    }
+    
+    .btn.active {
+        background: #e74c3c;
+    }
+    
+    .canvas-container {
+        position: relative;
+        margin: 20px 0;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+        background: #1e2a38;
+        padding: 10px;
+    }
+    
+    #storyboardCanvas {
+        background: #1e2a38;
+        display: block;
+        cursor: crosshair;
+        width: 100%;
+        border-radius: 5px;
+        border: 2px solid #4a6278;
+    }
+    
+    #canvasStatus {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .color-picker {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        margin: 20px 0;
+        padding: 20px;
+        background: #34495e;
+        border-radius: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .color-picker span {
+        color: #ecf0f1;
+        font-weight: 500;
+    }
+    
+    #drawingColor {
+        width: 50px;
+        height: 50px;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+    
+    #brushSize {
+        width: 120px;
+    }
+    
+    /* ===== BOTÕES FLUTUANTES (FOFOCA E CHAMA) ===== */
+    .fab-container {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        z-index: 1000;
+    }
+    
+    .fab {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        transition: all 0.3s;
+    }
+    
+    .fab:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+    
+    .fab.chama {
+        background: #3498db;
+    }
+    
+    /* ===== JANELAS FLUTUANTES ===== */
+    .float-window {
+        position: fixed;
+        bottom: 100px;
+        right: 25px;
+        width: 350px;
+        height: 400px;
+        background: #2c3e50;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        display: none;
+        flex-direction: column;
+        z-index: 999;
+        overflow: hidden;
+    }
+    
+    .float-window.active {
+        display: flex;
+    }
+    
+    .window-header {
+        padding: 15px;
+        background: #34495e;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #4a6278;
+    }
+    
+    .window-header h3 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .window-body {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background: #1e2a38;
+    }
+    
+    .close-btn {
+        background: none;
+        border: none;
+        color: #ecf0f1;
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+    
+    /* ===== RESPONSIVIDADE ===== */
+    @media (max-width: 900px) {
+        .tabs-nav {
+            flex-direction: column;
+        }
+        
+        .tab-btn {
+            width: 100%;
+            text-align: left;
+        }
+        
+        #storyboardCanvas {
+            height: 400px;
+        }
+        
+        .float-window {
+            width: 90%;
+            right: 5%;
+            left: 5%;
+        }
+    }
+    
+    @media (max-width: 600px) {
+        .editor-controls {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .color-picker {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        #storyboardCanvas {
+            height: 300px;
+        }
+        
+        .header-container h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
 </head>
 <body>
 
-<header>
-    <h1>ScriptFlow</h1>
-    <nav>
+<!-- ===== CABEÇALHO/CAPA ===== -->
+<div class="header-container">
+    <h1><i class="fas fa-scroll"></i> ScriptFlow</h1>
+    <p>Plataforma completa para desenvolvimento de roteiros</p>
+</div>
+
+<!-- ===== ABA DE NAVEGAÇÃO ===== -->
+<div class="tabs-container">
+    <div class="tabs-nav">
         <button class="tab-btn active" data-tab="argumento">Argumento</button>
         <button class="tab-btn" data-tab="escaleta">Escaleta</button>
         <button class="tab-btn" data-tab="roteiro">Roteiro</button>
@@ -19,31 +381,35 @@
         <button class="tab-btn" data-tab="biblia">Bíblia</button>
         <button class="tab-btn" data-tab="sala">Sala de Roteiro</button>
         <button class="tab-btn" data-tab="storyboard">Storyboard</button>
-    </nav>
-</header>
+    </div>
 
-<main>
-    <div id="argumento" class="tab active">
+    <!-- ===== CONTEÚDO DAS ABAS ===== -->
+    <div class="tab-content active" id="argumento">
         <textarea placeholder="Escreva o Argumento..."></textarea>
     </div>
-    <div id="escaleta" class="tab">
+    
+    <div class="tab-content" id="escaleta">
         <textarea placeholder="Escreva a Escaleta..."></textarea>
     </div>
-    <div id="roteiro" class="tab">
+    
+    <div class="tab-content" id="roteiro">
         <textarea placeholder="Escreva o Roteiro..."></textarea>
     </div>
-    <div id="tratamento" class="tab">
+    
+    <div class="tab-content" id="tratamento">
         <textarea placeholder="Escreva o Tratamento..."></textarea>
     </div>
-    <div id="biblia" class="tab">
+    
+    <div class="tab-content" id="biblia">
         <textarea placeholder="Escreva a Bíblia do projeto..."></textarea>
     </div>
-    <div id="sala" class="tab">
+    
+    <div class="tab-content" id="sala">
         <textarea placeholder="Sala de Roteiro colaborativa..."></textarea>
     </div>
     
-    <!-- STORYBOARD AVANÇADO -->
-    <div id="storyboard" class="tab">
+    <!-- ===== STORYBOARD AVANÇADO ===== -->
+    <div class="tab-content" id="storyboard">
         <div class="section">
             <h2><i class="fas fa-film"></i> Storyboard</h2>
             <p>Desenvolva o storyboard do seu projeto visualmente. Adicione imagens, desenhe sobre elas e exporte quando pronto.</p>
@@ -69,27 +435,346 @@
             </div>
         </div>
     </div>
-</main>
+</div>
 
-<!-- Chat Fofoca -->
-<div id="fofoca">
-    <div id="fofoca-header"><span>Fofoca 💬</span><i class="fa fa-chevron-down"></i></div>
-    <div id="fofoca-body">
-        <div id="chat-log" style="flex:1; overflow-y:auto; margin-bottom:10px;"></div>
-        <textarea id="chat-input" placeholder="Escreva uma mensagem..."></textarea>
-        <button id="send-chat">Enviar</button>
+<!-- ===== BOTÕES FLUTUANTES ===== -->
+<div class="fab-container">
+    <button class="fab" id="fofocaBtn"><i class="fas fa-comments"></i></button>
+    <button class="fab chama" id="chamaBtn"><i class="fas fa-video"></i></button>
+</div>
+
+<!-- ===== JANELA FOFOFA ===== -->
+<div class="float-window" id="fofocaWindow">
+    <div class="window-header">
+        <h3><i class="fas fa-comments"></i> Fofoca</h3>
+        <button class="close-btn">&times;</button>
+    </div>
+    <div class="window-body">
+        <div id="chat-log" style="height: 250px; overflow-y: auto; margin-bottom: 15px; padding: 10px; background: #2c3e50; border-radius: 5px;"></div>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="chat-input" placeholder="Escreva uma mensagem..." style="flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #4a6278; background: #34495e; color: white;">
+            <button id="send-chat" style="padding: 10px 15px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Enviar</button>
+        </div>
     </div>
 </div>
 
-<!-- Chamada de vídeo -->
-<div id="chama">
-    <div id="chama-header"><span>Chama 📹</span><i class="fa fa-chevron-down"></i></div>
-    <div id="chama-body">
-        <video autoplay muted></video>
+<!-- ===== JANELA CHAMA ===== -->
+<div class="float-window" id="chamaWindow">
+    <div class="window-header">
+        <h3><i class="fas fa-video"></i> Chama</h3>
+        <button class="close-btn">&times;</button>
+    </div>
+    <div class="window-body">
+        <video autoplay muted style="width: 100%; border-radius: 5px; background: #000; margin-bottom: 15px;"></video>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button class="btn" id="startCamera"><i class="fas fa-play"></i> Iniciar</button>
+            <button class="btn btn-primary" id="stopCamera"><i class="fas fa-stop"></i> Parar</button>
+        </div>
     </div>
 </div>
 
-<script src="script.js"></script>
+<script>
+// ===== CONTROLE DE ABAS =====
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.tab-content');
+    const buttons = document.querySelectorAll('.tab-btn');
+    
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.getElementById(btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    // ===== BOTÕES FLUTUANTES =====
+    const fofocaBtn = document.getElementById('fofocaBtn');
+    const chamaBtn = document.getElementById('chamaBtn');
+    const fofocaWindow = document.getElementById('fofocaWindow');
+    const chamaWindow = document.getElementById('chamaWindow');
+    const closeButtons = document.querySelectorAll('.close-btn');
+    
+    fofocaBtn.addEventListener('click', () => {
+        fofocaWindow.classList.toggle('active');
+        chamaWindow.classList.remove('active');
+    });
+    
+    chamaBtn.addEventListener('click', () => {
+        chamaWindow.classList.toggle('active');
+        fofocaWindow.classList.remove('active');
+    });
+    
+    closeButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            fofocaWindow.classList.remove('active');
+            chamaWindow.classList.remove('active');
+        });
+    });
+
+    // ===== CHAT FOFOFA =====
+    const chatInput = document.getElementById('chat-input');
+    const chatLog = document.getElementById('chat-log');
+    
+    document.getElementById('send-chat').addEventListener('click', () => {
+        if(chatInput.value.trim() !== ''){
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = 'Você: ' + chatInput.value;
+            messageDiv.style.padding = '8px';
+            messageDiv.style.marginBottom = '8px';
+            messageDiv.style.background = '#3498db';
+            messageDiv.style.borderRadius = '5px';
+            chatLog.appendChild(messageDiv);
+            chatInput.value = '';
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+    });
+
+    // ===== CHAMADA DE VÍDEO =====
+    const video = document.querySelector('video');
+    const startCamera = document.getElementById('startCamera');
+    const stopCamera = document.getElementById('stopCamera');
+    let stream = null;
+    
+    startCamera.addEventListener('click', async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            video.srcObject = stream;
+        } catch (err) {
+            console.log('Erro ao acessar câmera: ', err);
+            alert('Não foi possível acessar a câmera. Verifique as permissões.');
+        }
+    });
+    
+    stopCamera.addEventListener('click', () => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+        }
+    });
+
+    // ===== SALVAMENTO AUTOMÁTICO =====
+    const textareas = document.querySelectorAll('textarea');
+    textareas.forEach(ta => {
+        const tab = ta.closest('.tab-content');
+        if (tab) {
+            const key = 'scriptflow_' + tab.id;
+            ta.value = localStorage.getItem(key) || '';
+            ta.addEventListener('input', () => localStorage.setItem(key, ta.value));
+        }
+    });
+
+    // ===== STORYBOARD AVANÇADO =====
+    const canvas = document.getElementById('storyboardCanvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        const addImageBtn = document.getElementById('addImageBtn');
+        const drawBtn = document.getElementById('drawBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const drawingColor = document.getElementById('drawingColor');
+        const brushSize = document.getElementById('brushSize');
+        const brushSizeValue = document.getElementById('brushSizeValue');
+        const canvasStatus = document.getElementById('canvasStatus');
+        
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let currentMode = 'draw';
+        let images = [];
+        let currentImageId = 0;
+        
+        // Configuração inicial
+        setTimeout(() => {
+            loadCanvas();
+            setupEventListeners();
+        }, 100);
+        
+        function setupEventListeners() {
+            // Eventos do canvas
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Botões
+            addImageBtn.addEventListener('click', addImage);
+            drawBtn.addEventListener('click', () => setMode('draw'));
+            clearBtn.addEventListener('click', clearCanvas);
+            exportBtn.addEventListener('click', exportCanvas);
+            
+            // Controles
+            drawingColor.addEventListener('change', updateDrawingStyle);
+            brushSize.addEventListener('input', updateBrushSize);
+        }
+        
+        function updateBrushSize() {
+            brushSizeValue.textContent = `${brushSize.value}px`;
+            updateDrawingStyle();
+        }
+        
+        function updateDrawingStyle() {
+            ctx.strokeStyle = drawingColor.value;
+            ctx.lineWidth = brushSize.value;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+        }
+        
+        function setMode(mode) {
+            currentMode = mode;
+            if (mode === 'draw') {
+                canvas.style.cursor = 'crosshair';
+                canvasStatus.textContent = 'Modo: Desenho';
+                drawBtn.classList.add('active');
+            }
+        }
+        
+        function startDrawing(e) {
+            if (currentMode !== 'draw') return;
+            isDrawing = true;
+            const pos = getMousePos(canvas, e);
+            [lastX, lastY] = [pos.x, pos.y];
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const pos = getMousePos(canvas, e);
+            
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            
+            [lastX, lastY] = [pos.x, pos.y];
+            saveCanvas();
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        function getMousePos(canvas, evt) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        }
+        
+        function addImage() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.click();
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const imageId = currentImageId++;
+                        images.push({
+                            id: imageId,
+                            img: img,
+                            x: 50,
+                            y: 50,
+                            width: img.width > 600 ? 600 : img.width,
+                            height: img.height > 400 ? 400 : img.height
+                        });
+                        
+                        redrawCanvas();
+                        saveCanvas();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+        }
+        
+        function redrawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            images.forEach(image => {
+                ctx.drawImage(image.img, image.x, image.y, image.width, image.height);
+            });
+        }
+        
+        function clearCanvas() {
+            if (confirm('Tem certeza que deseja limpar todo o storyboard?')) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                images = [];
+                saveCanvas();
+            }
+        }
+        
+        function exportCanvas() {
+            const dataURL = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'storyboard-' + new Date().toISOString().slice(0, 10) + '.png';
+            link.href = dataURL;
+            link.click();
+        }
+        
+        function saveCanvas() {
+            const dataURL = canvas.toDataURL();
+            localStorage.setItem('scriptflow_storyboard', dataURL);
+            
+            const imagesData = images.map(img => ({
+                id: img.id,
+                data: img.img.src,
+                x: img.x,
+                y: img.y,
+                width: img.width,
+                height: img.height
+            }));
+            localStorage.setItem('scriptflow_storyboard_images', JSON.stringify(imagesData));
+        }
+        
+        function loadCanvas() {
+            const savedCanvas = localStorage.getItem('scriptflow_storyboard');
+            const savedImages = localStorage.getItem('scriptflow_storyboard_images');
+            
+            if (savedCanvas) {
+                const img = new Image();
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0);
+                };
+                img.src = savedCanvas;
+            }
+            
+            if (savedImages) {
+                try {
+                    const imagesData = JSON.parse(savedImages);
+                    imagesData.forEach(imgData => {
+                        const img = new Image();
+                        img.onload = function() {
+                            ctx.drawImage(img, imgData.x, imgData.y, imgData.width, imgData.height);
+                        };
+                        img.src = imgData.data;
+                        images.push({
+                            id: imgData.id,
+                            img: img,
+                            x: imgData.x,
+                            y: imgData.y,
+                            width: imgData.width,
+                            height: imgData.height
+                        });
+                    });
+                    currentImageId = images.length > 0 ? Math.max(...images.map(img => img.id)) + 1 : 0;
+                } catch (e) {
+                    console.error('Erro ao carregar imagens salvas:', e);
+                }
+            }
+            
+            updateDrawingStyle();
+            setMode('draw');
+        }
+    }
+});
+</script>
 </body>
 </html>
 
