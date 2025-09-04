@@ -1,236 +1,386 @@
-// Variáveis globais
-let currentScript = {
-  title: "Roteiro Sem Título",
-  content: "",
-  storyboards: []
-};
+// ========= VARIÁVEIS GLOBAIS PARA VÍDEO =========
+let mediaStream = null;
+let mediaRecorder = null;
+let recordedChunks = [];
+let availableCameras = [];
+let currentCameraIndex = 0;
+let isRecording = false;
+let recordingTimer = null;
+let recordingDuration = 0;
+let screenStream = null;
 
-// Inicialização
-document.addEventListener('DOMContentLoaded', function() {
-  // Carregar dados salvos se existirem
-  if (localStorage.getItem('scriptFlowData')) {
+// ========= FUNÇÕES APERFEIÇOADAS PARA VÍDEO =========
+
+// Inicializar câmera com mais opções
+async function initializeCamera() {
     try {
-      currentScript = JSON.parse(localStorage.getItem('scriptFlowData'));
-      document.getElementById('editor').innerHTML = currentScript.content;
-      
-      // Carregar storyboards se existirem
-      if (currentScript.storyboards && currentScript.storyboards.length > 0) {
-        currentScript.storyboards.forEach(storyboard => {
-          addStoryboard(storyboard.image, storyboard.description);
+        // Parar stream atual se existir
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+        }
+        
+        // Obter dispositivos de mídia disponíveis
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        availableCameras = devices.filter(device => device.kind === 'videoinput');
+        
+        if (availableCameras.length === 0) {
+            throw new Error('Nenhuma câmera encontrada');
+        }
+        
+        // Configurações avançadas da câmera
+        const constraints = {
+            video: {
+                deviceId: availableCameras[currentCameraIndex].deviceId ? 
+                         { exact: availableCameras[currentCameraIndex].deviceId } : 
+                         true,
+                width: { ideal: 1280, max: 1920 },
+                height: { ideal: 720, max: 1080 },
+                frameRate: { ideal: 30, max: 60 }
+            },
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                sampleRate: 44100
+            }
+        };
+        
+        // Obter stream de mídia
+        mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+        const localVideo = document.getElementById('localVideo');
+        
+        if (localVideo) {
+            localVideo.srcObject = mediaStream;
+        }
+        
+        // Atualizar interface
+        updateCameraStatus(true);
+        notify('Câmera ativada com sucesso!');
+        
+        return true;
+    } catch (error) {
+        console.error('Erro ao inicializar câmera:', error);
+        updateCameraStatus(false);
+        notify('Erro ao acessar a câmera: ' + error.message);
+        return false;
+    }
+}
+
+// Alternar entre câmeras
+async function switchCamera() {
+    if (availableCameras.length <= 1) {
+        notify('Apenas uma câmera disponível');
+        return;
+    }
+    
+    currentCameraIndex = (currentCameraIndex + 1) % availableCameras.length;
+    await initializeCamera();
+    notify(`Câmera ${currentCameraIndex + 1} de ${availableCameras.length} ativa`);
+}
+
+// Alternar estado do vídeo
+function toggleVideo() {
+    if (!mediaStream) return;
+    
+    const videoTrack = mediaStream.getVideoTracks()[0];
+    if (videoTrack) {
+        videoTrack.enabled = !videoTrack.enabled;
+        const toggleVideoBtn = document.getElementById('toggleVideoBtn');
+        if (toggleVideoBtn) {
+            toggleVideoBtn.innerHTML = videoTrack.enabled ? 
+                '<i class="fas fa-video"></i>' : 
+                '<i class="fas fa-video-slash"></i>';
+            toggleVideoBtn.style.background = videoTrack.enabled ? '#3498db' : '#e74c3c';
+        }
+        notify(`Vídeo ${videoTrack.enabled ? 'ligado' : 'desligado'}`);
+    }
+}
+
+// Alternar estado do áudio
+function toggleAudio() {
+    if (!mediaStream) return;
+    
+    const audioTrack = mediaStream.getAudioTracks()[0];
+    if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+        const toggleAudioBtn = document.getElementById('toggleAudioBtn');
+        if (toggleAudioBtn) {
+            toggleAudioBtn.innerHTML = audioTrack.enabled ? 
+                '<i class="fas fa-microphone"></i>' : 
+                '<i class="fas fa-microphone-slash"></i>';
+            toggleAudioBtn.style.background = audioTrack.enabled ? '#3498db' : '#e74c3c';
+        }
+        notify(`Áudio ${audioTrack.enabled ? 'ligado' : 'desligado'}`);
+    }
+}
+
+// Compartilhar tela
+async function shareScreen() {
+    try {
+        // Parar gravação se estiver ativa
+        if (isRecording) {
+            stopRecording();
+        }
+        
+        screenStream = await navigator.mediaDevices.getDisplayMedia({
+            video: {
+                cursor: "always",
+                displaySurface: "window"
+            },
+            audio: true
         });
-      }
+        
+        const localVideo = document.getElementById('localVideo');
+        if (localVideo) {
+            localVideo.srcObject = screenStream;
+        }
+        
+        // Atualizar interface
+        const screenShareBtn = document.getElementById('screenShareBtn');
+        if (screenShareBtn) {
+            screenShareBtn.innerHTML = '<i class="fas fa-times"></i>';
+            screenShareBtn.style.background = '#e67e22';
+            screenShareBtn.onclick = stopScreenShare;
+        }
+        
+        // Quando a tela compartilhada for interrompida
+        screenStream.getVideoTracks()[0].onended = stopScreenShare;
+        
+        notify('Compartilhamento de tela ativado');
+    } catch (error) {
+        console.error('Erro ao compartilhar tela:', error);
+        notify('Erro ao compartilhar tela: ' + error.message);
+    }
+}
+
+// Parar compartilhamento de tela
+function stopScreenShare() {
+    if (screenStream) {
+        screenStream.getTracks().forEach(track => track.stop());
+        screenStream = null;
+    }
+    
+    // Restaurar câmera
+    if (mediaStream) {
+        const localVideo = document.getElementById('localVideo');
+        if (localVideo) {
+            localVideo.srcObject = mediaStream;
+        }
+    }
+    
+    // Restaurar botão
+    const screenShareBtn = document.getElementById('screenShareBtn');
+    if (screenShareBtn) {
+        screenShareBtn.innerHTML = '<i class="fas fa-desktop"></i>';
+        screenShareBtn.style.background = '#3498db';
+        screenShareBtn.onclick = shareScreen;
+    }
+    
+    notify('Compartilhamento de tela desativado');
+}
+
+// Iniciar gravação
+function startRecording() {
+    if (!mediaStream && !screenStream) {
+        notify('Nenhuma fonte de vídeo disponível para gravar');
+        return;
+    }
+    
+    const streamToRecord = screenStream || mediaStream;
+    recordedChunks = [];
+    
+    // Configurar o media recorder com opções avançadas
+    const options = {
+        mimeType: 'video/webm;codecs=vp9,opus',
+        videoBitsPerSecond: 2500000 // 2.5 Mbps
+    };
+    
+    try {
+        mediaRecorder = new MediaRecorder(streamToRecord, options);
     } catch (e) {
-      console.error("Erro ao carregar dados salvos:", e);
+        try {
+            // Fallback para codec mais compatível
+            options.mimeType = 'video/webm;codecs=vp8,opus';
+            mediaRecorder = new MediaRecorder(streamToRecord, options);
+        } catch (e2) {
+            notify('Seu navegador não suporta gravação de vídeo: ' + e2.message);
+            return;
+        }
     }
-  }
-  
-  // Adicionar listeners para atalhos de teclado
-  document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey || e.metaKey) {
-      switch(e.key) {
-        case 's':
-          e.preventDefault();
-          saveText();
-          break;
-        case 'o':
-          e.preventDefault();
-          loadText();
-          break;
-        case 'p':
-          e.preventDefault();
-          exportPDF();
-          break;
-      }
+    
+    // Evento quando dados estiverem disponíveis
+    mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+            recordedChunks.push(event.data);
+        }
+    };
+    
+    // Evento quando a gravação for parada
+    mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const videoURL = URL.createObjectURL(blob);
+        
+        // Criar download automático
+        const a = document.createElement('a');
+        a.href = videoURL;
+        a.download = `gravacao-${new Date().toISOString().replace(/[:.]/g,'-')}.webm`;
+        a.click();
+        
+        // Limpar
+        URL.revokeObjectURL(videoURL);
+        isRecording = false;
+        recordingDuration = 0;
+        clearInterval(recordingTimer);
+        
+        // Atualizar interface
+        updateRecordingStatus(false);
+        notify('Gravação salva com sucesso!');
+    };
+    
+    // Iniciar gravação
+    mediaRecorder.start(1000); // Coletar dados a cada 1 segundo
+    isRecording = true;
+    
+    // Iniciar temporizador
+    recordingDuration = 0;
+    recordingTimer = setInterval(() => {
+        recordingDuration++;
+        updateRecordingTime();
+    }, 1000);
+    
+    // Atualizar interface
+    updateRecordingStatus(true);
+    notify('Gravação iniciada');
+}
+
+// Parar gravação
+function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
     }
-  });
-});
-
-// Funções de abas
-function openTab(evt, tabId) {
-  // Esconder todos os conteúdos de abas
-  const tabContents = document.getElementsByClassName('tab-content');
-  for (let i = 0; i < tabContents.length; i++) {
-    tabContents[i].classList.remove('active');
-  }
-  
-  // Desativar todos os botões de abas
-  const tabButtons = document.getElementsByClassName('tabs')[0].getElementsByTagName('button');
-  for (let i = 0; i < tabButtons.length; i++) {
-    tabButtons[i].classList.remove('active');
-  }
-  
-  // Ativar a aba atual
-  document.getElementById(tabId).classList.add('active');
-  evt.currentTarget.classList.add('active');
 }
 
-// Funções do editor
-function insertElement(type) {
-  const editor = document.getElementById('editor');
-  let newElement;
-  
-  switch(type) {
-    case 'scene':
-      newElement = document.createElement('div');
-      newElement.className = 'scene-heading';
-      newElement.contentEditable = true;
-      newElement.textContent = 'INT. LOCAL - DIA';
-      break;
-    case 'character':
-      newElement = document.createElement('div');
-      newElement.className = 'character';
-      newElement.contentEditable = true;
-      newElement.textContent = 'NOME DO PERSONAGEM';
-      break;
-    case 'dialogue':
-      newElement = document.createElement('div');
-      newElement.className = 'dialogue';
-      newElement.contentEditable = true;
-      newElement.textContent = 'Diálogo do personagem...';
-      break;
-    case 'action':
-      newElement = document.createElement('div');
-      newElement.className = 'action';
-      newElement.contentEditable = true;
-      newElement.textContent = 'Ação ou descrição...';
-      break;
-    case 'transition':
-      newElement = document.createElement('div');
-      newElement.className = 'transition';
-      newElement.contentEditable = true;
-      newElement.textContent = 'CORTAR PARA:';
-      break;
-  }
-  
-  editor.appendChild(newElement);
-  newElement.focus();
-  
-  // Salvar automaticamente
-  saveToLocalStorage();
-}
-
-// Funções de salvamento e carregamento
-function saveText() {
-  saveToLocalStorage();
-  alert('Roteiro salvo com sucesso!');
-}
-
-function loadText() {
-  // Simular carregamento de arquivo (em implementação real, usaria FileReader)
-  const loadConfirm = confirm('Deseja carregar o último roteiro salvo?');
-  if (loadConfirm) {
-    if (localStorage.getItem('scriptFlowData')) {
-      try {
-        currentScript = JSON.parse(localStorage.getItem('scriptFlowData'));
-        document.getElementById('editor').innerHTML = currentScript.content;
-        alert('Roteiro carregado com sucesso!');
-      } catch (e) {
-        console.error("Erro ao carregar dados:", e);
-        alert('Erro ao carregar o roteiro.');
-      }
+// Atualizar status da câmera na interface
+function updateCameraStatus(isActive) {
+    const toggleVideoBtn = document.getElementById('toggleVideoBtn');
+    const toggleAudioBtn = document.getElementById('toggleAudioBtn');
+    const startRecordingBtn = document.getElementById('recBtn');
+    
+    if (isActive) {
+        if (toggleVideoBtn) toggleVideoBtn.disabled = false;
+        if (toggleAudioBtn) toggleAudioBtn.disabled = false;
+        if (startRecordingBtn) startRecordingBtn.disabled = false;
     } else {
-      alert('Nenhum roteiro salvo encontrado.');
+        if (toggleVideoBtn) toggleVideoBtn.disabled = true;
+        if (toggleAudioBtn) toggleAudioBtn.disabled = true;
+        if (startRecordingBtn) startRecordingBtn.disabled = true;
     }
-  }
 }
 
-function saveToLocalStorage() {
-  currentScript.content = document.getElementById('editor').innerHTML;
-  currentScript.lastSaved = new Date().toISOString();
-  localStorage.setItem('scriptFlowData', JSON.stringify(currentScript));
-}
-
-// Funções de exportação
-function exportFDX() {
-  alert('Exportação para FDX será implementada em breve!');
-  // Em uma implementação real, aqui seria a lógica para gerar o arquivo FDX
-}
-
-function exportPDF() {
-  alert('Exportação para PDF será implementada em breve!');
-  // Em uma implementação real, usaria a biblioteca jsPDF para gerar o PDF
-}
-
-// Funções do storyboard
-function addStoryboard(imageData = null, description = '') {
-  const storyboardContainer = document.getElementById('storyboard');
-  const frameId = 'frame-' + Date.now();
-  
-  const frame = document.createElement('div');
-  frame.className = 'storyboard-frame';
-  frame.id = frameId;
-  
-  frame.innerHTML = `
-    <div class="frame-image" onclick="triggerImageUpload('${frameId}')">
-      ${imageData ? 
-        `<img src="${imageData}" style="width:100%; height:100%; object-fit:cover;">` : 
-        `<i class="fas fa-image fa-3x"></i><p>Clique para adicionar imagem</p>`
-      }
-    </div>
-    <div class="frame-content">
-      <textarea placeholder="Descrição da cena..." onchange="updateStoryboardDescription('${frameId}', this.value)">${description}</textarea>
-    </div>
-    <div class="frame-actions">
-      <button onclick="removeStoryboard('${frameId}')" class="btn-remove"><i class="fas fa-trash"></i> Remover</button>
-    </div>
-  `;
-  
-  storyboardContainer.appendChild(frame);
-  
-  // Adicionar ao array currentScript e salvar
-  currentScript.storyboards.push({
-    id: frameId,
-    image: imageData,
-    description: description
-  });
-  saveToLocalStorage();
-}
-
-function triggerImageUpload(frameId) {
-  // Simular upload de imagem (em implementação real, usaria input type=file)
-  const useSample = confirm('Deseja usar uma imagem de exemplo?');
-  if (useSample) {
-    const sampleImages = [
-      'https://via.placeholder.com/300x150/3498db/ffffff?text=Cena+1',
-      'https://via.placeholder.com/300x150/e74c3c/ffffff?text=Cena+2',
-      'https://via.placeholder.com/300x150/2ecc71/ffffff?text=Cena+3'
-    ];
-    const randomImage = sampleImages[Math.floor(Math.random() * sampleImages.length)];
+// Atualizar status da gravação na interface
+function updateRecordingStatus(recording) {
+    const recBtn = document.getElementById('recBtn');
+    const recordingIndicator = document.getElementById('recordingIndicator');
     
-    const frameImage = document.querySelector(`#${frameId} .frame-image`);
-    frameImage.innerHTML = `<img src="${randomImage}" style="width:100%; height:100%; object-fit:cover;">`;
-    
-    // Atualizar no currentScript
-    const frameIndex = currentScript.storyboards.findIndex(s => s.id === frameId);
-    if (frameIndex !== -1) {
-      currentScript.storyboards[frameIndex].image = randomImage;
-      saveToLocalStorage();
+    if (recBtn) {
+        if (recording) {
+            recBtn.innerHTML = '<i class="fas fa-stop"></i>';
+            recBtn.style.background = '#e74c3c';
+            recBtn.onclick = stopRecording;
+        } else {
+            recBtn.innerHTML = '<i class="fas fa-record-vinyl"></i>';
+            recBtn.style.background = '#3498db';
+            recBtn.onclick = startRecording;
+        }
     }
-  }
+    
+    if (recordingIndicator) {
+        recordingIndicator.style.display = recording ? 'block' : 'none';
+    }
 }
 
-function updateStoryboardDescription(frameId, description) {
-  const frameIndex = currentScript.storyboards.findIndex(s => s.id === frameId);
-  if (frameIndex !== -1) {
-    currentScript.storyboards[frameIndex].description = description;
-    saveToLocalStorage();
-  }
+// Atualizar tempo de gravação
+function updateRecordingTime() {
+    const recordingTime = document.getElementById('recordingTime');
+    if (recordingTime) {
+        const minutes = Math.floor(recordingDuration / 60);
+        const seconds = recordingDuration % 60;
+        recordingTime.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
 }
 
-function removeStoryboard(frameId) {
-  const frame = document.getElementById(frameId);
-  frame.parentNode.removeChild(frame);
-  
-  // Remover do array currentScript
-  currentScript.storyboards = currentScript.storyboards.filter(s => s.id !== frameId);
-  saveToLocalStorage();
+// Fechar chamada e limpar recursos
+function endCall() {
+    // Parar gravação se estiver ativa
+    if (isRecording) {
+        stopRecording();
+    }
+    
+    // Parar compartilhamento de tela se estiver ativo
+    if (screenStream) {
+        stopScreenShare();
+    }
+    
+    // Parar stream de mídia
+    if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        mediaStream = null;
+    }
+    
+    // Limpar interface
+    const localVideo = document.getElementById('localVideo');
+    if (localVideo) {
+        localVideo.srcObject = null;
+    }
+    
+    updateCameraStatus(false);
+    updateRecordingStatus(false);
+    
+    notify('Chamada encerrada');
 }
 
-// Funções de ajuda
-function showHelp() {
-  document.getElementById('help-modal').style.display = 'flex';
+// ========= INICIALIZAÇÃO DO PAINEL CHAMA =========
+
+// Inicializar o painel de vídeo quando aberto
+function initVideoPanel() {
+    const videoPanel = document.getElementById('videoPanel');
+    
+    if (videoPanel) {
+        // Adicionar indicador de gravação (se não existir)
+        if (!document.getElementById('recordingIndicator')) {
+            const recordingIndicator = document.createElement('div');
+            recordingIndicator.id = 'recordingIndicator';
+            recordingIndicator.style.cssText = 'position:absolute; top:10px; left:10px; background:#e74c3c; color:white; padding:4px 8px; border-radius:4px; font-size:12px; display:none;';
+            recordingIndicator.innerHTML = '<i class="fas fa-circle"></i> <span id="recordingTime">00:00</span>';
+            videoPanel.querySelector('.video-box').appendChild(recordingIndicator);
+        }
+        
+        // Configurar event listeners para os botões
+        document.getElementById('toggleVideoBtn').addEventListener('click', toggleVideo);
+        document.getElementById('toggleAudioBtn').addEventListener('click', toggleAudio);
+        document.getElementById('screenShareBtn').addEventListener('click', shareScreen);
+        document.getElementById('recBtn').addEventListener('click', startRecording);
+        document.getElementById('endCallBtn').addEventListener('click', endCall);
+        
+        // Inicializar câmera quando o painel é aberto
+        if (videoPanel.style.display !== 'none') {
+            initializeCamera();
+        }
+    }
 }
 
-function closeHelp() {
-  document.getElementById('help-modal').style.display = 'none';
+// Adicionar à inicialização principal
+document.addEventListener('DOMContentLoaded', function() {
+    // ... seu código existente ...
+    
+    // Inicializar painel de vídeo
+    initVideoPanel();
+    
+    // Re-inicializar câmera quando o painel é aberto
+    const videoOpenBtn = document.getElementById('openVideoFab');
+    if (videoOpenBtn) {
+        videoOpenBtn.addEventListener('click', function() {
+            setTimeout(initializeCamera, 300); // Pequeno delay para o painel abrir
+        });
+    }
+});
 }
