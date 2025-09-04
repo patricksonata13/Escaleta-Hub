@@ -1,233 +1,964 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>ScriptFlow - Plataforma de Roteiros</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-/* ===== Layout básico ===== */
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f2f5; }
-header, footer { background:#222; color:#fff; text-align:center; padding:15px 0; }
-main { padding:20px; min-height:80vh; }
+/* ===== Base (mantido) ===== */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Courier New',monospace}
+body{background:linear-gradient(135deg,#1a2a3a 0%,#0d1520 100%);color:#fff;line-height:1.6;min-height:100vh;padding:20px;display:flex;justify-content:center;align-items:center}
+.container{max-width:1400px;width:100%;background:#2c3e50;border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+header{background:linear-gradient(135deg,#e74c3c 0%,#c0392b 100%);color:#fff;padding:1.5rem;text-align:center;position:relative}
+header h1{font-size:2.2rem;margin-bottom:.5rem;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+header p{font-size:1rem;opacity:.9}
+.user-info{position:absolute;top:15px;right:15px;display:flex;align-items:center;background:rgba(255,255,255,.2);padding:.4rem .8rem;border-radius:20px}
+.user-info span{margin-right:8px;font-size:.9rem}
+.logout-btn{background:none;border:none;color:#fff;cursor:pointer;font-size:.9rem}
+.tabs{display:flex;background:#34495e;border-bottom:1px solid #4a6278;flex-wrap:wrap}
+.tab{padding:1rem 1.2rem;cursor:pointer;border-bottom:3px solid transparent;transition:all .3s ease;font-weight:600;font-size:.95rem}
+.tab:hover{background:#3d5066}
+.tab.active{border-bottom:3px solid #e74c3c;background:#3d5066}
+.content{padding:1.5rem;min-height:500px;display:flex;gap:20px}
+.main-content{flex:3}
+.sidebar{flex:1;background:#34495e;border-radius:10px;padding:15px;display:flex;flex-direction:column;gap:20px}
+/* Sidebar ficou sem Fofoca/Chama — mantemos a coluna para preservar layout */
+.sidebar-placeholder{background:#2c3e50;border-radius:8px;padding:15px;color:#95a5a6;text-align:center}
+.sidebar-placeholder i{color:#e74c3c;margin-right:8px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.section{margin-bottom:2rem}
+h2{color:#ecf0f1;border-bottom:2px solid #e74c3c;padding-bottom:.5rem;margin-bottom:1.5rem;display:flex;align-items:center}
+h2 i{margin-right:10px;color:#e74c3c}
+textarea{width:100%;min-height:150px;border:1px solid #4a6278;border-radius:5px;padding:1rem;font-family:'Courier New',monospace;resize:vertical;background:#2c3e50;color:#ecf0f1;font-size:1rem;margin-bottom:1rem}
 
-/* ===== Botões flutuantes ===== */
-.fab-stack { position:fixed; bottom:20px; right:20px; display:flex; flex-direction:column; gap:15px; z-index:3000; }
-.fab { background:#222; color:#fff; border:none; border-radius:50%; width:60px; height:60px; cursor:pointer; font-size:24px; display:flex; align-items:center; justify-content:center; transition:all 0.2s ease; box-shadow:0 4px 12px rgba(0,0,0,0.3); }
-.fab:hover { transform:scale(1.1); background:#333; }
-.fab.secondary { background:#555; }
-.fab.secondary:hover { background:#666; }
+/* Roteiro */
+.script-editor{font-family:'Courier New',monospace;font-size:12pt;line-height:1.5;padding:1.5rem;background:#1e2a38;color:#ecf0f1;border-radius:5px;min-height:500px;white-space:pre-wrap}
+.scene-heading{font-weight:bold;text-transform:uppercase;margin-top:1.5rem;color:#3498db;cursor:pointer;padding:5px;border-radius:3px;transition:background .3s}
+.scene-heading:hover{background:rgba(52,152,219,.2)}
+.action{margin:.8rem 0;padding:5px;border-radius:3px;cursor:pointer;transition:background .3s}
+.action:hover,.character:hover,.dialogue:hover,.parenthetical:hover,.transition:hover{background:rgba(255,255,255,.1)}
+.character{text-align:center;width:50%;margin:.8rem auto;font-weight:bold;padding:5px;border-radius:3px;cursor:pointer;transition:background .3s}
+.dialogue{width:60%;margin:0 auto;padding:5px;border-radius:3px;cursor:pointer;transition:background .3s}
+.parenthetical{width:50%;margin:0 auto;padding-left:2rem;padding:5px;border-radius:3px;cursor:pointer;transition:background .3s}
+.transition{text-align:right;margin-top:1rem;text-transform:uppercase;font-weight:bold;padding:5px;border-radius:3px;cursor:pointer;transition:background .3s}
 
-/* ===== Painéis flutuantes ===== */
-.float-panel { position:fixed; display:flex; flex-direction:column; background:#fff; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.25); z-index:2000; width:320px; height:420px; top:100px; right:20px; transition: all 0.25s ease; overflow:hidden; }
-.float-header { background:#222; color:#fff; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; cursor:move; }
-.float-title { font-size:15px; display:flex; align-items:center; gap:8px; }
-.float-actions button { background:transparent; border:none; color:#fff; cursor:pointer; font-size:16px; margin-left:5px; }
-.float-body { flex:1; padding:10px; overflow:auto; background:#fafafa; }
-.minimized { height:45px !important; width:200px !important; overflow:hidden; }
+.buttons{display:flex;justify-content:center;gap:1rem;margin-top:1.5rem}
+.btn{display:inline-flex;align-items:center;padding:.7rem 1.2rem;background:#3498db;color:#fff;text-decoration:none;border-radius:5px;font-weight:600;transition:all .3s ease;cursor:pointer;border:none;font-size:.9rem}
+.btn:hover{background:#2980b9;transform:translateY(-2px)}
+.btn i{margin-right:8px}
+.btn-primary{background:#e74c3c}
+.btn-primary:hover{background:#c0392b}
 
-/* ===== Painéis individuais coloridos ===== */
-#chatPanel .float-header { background:#1e90ff; }
-#videoPanel .float-header { background:#32cd32; }
-#rascunhoPanel .float-header { background:#ff8c00; }
+.editor-controls{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+.editor-btn,.element-btn{padding:8px 12px;background:#34495e;border:none;color:#fff;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .3s}
+.element-btn{background:#2c3e50;border:1px solid #4a6278}
+.element-btn:hover{background:#3498db;border-color:#3498db}
 
-/* ===== Notificação ===== */
-.notification { position:fixed; top:20px; right:20px; background:#222; color:#fff; padding:12px 22px; border-radius:6px; opacity:0; transform:translateY(-20px); transition:opacity 0.3s, transform 0.3s; z-index:4000; box-shadow:0 6px 16px rgba(0,0,0,0.3); }
-.notification.show { opacity:1; transform:translateY(0); }
+/* Argumento subtítulos */
+.argument-section{margin-bottom:2rem}
+.argument-section h3{color:#3498db;margin-bottom:10px;font-size:1.1rem}
 
-/* ===== Inputs e Textarea ===== */
-textarea, input { font-family: Arial, sans-serif; font-size:14px; padding:6px; border-radius:5px; border:1px solid #ccc; box-sizing:border-box; }
-textarea { resize:none; width:100%; height:100%; }
-button { cursor:pointer; }
+/* ===== NOVO: Sala de Roteiro (subtabs) ===== */
+.subtabs{display:flex;gap:8px;margin-bottom:12px;border-bottom:1px solid #4a6278;flex-wrap:wrap}
+.subtab{padding:.6rem .8rem;cursor:pointer;border-bottom:3px solid transparent;font-weight:600;font-size:.9rem}
+.subtab.active{border-bottom:3px solid #e74c3c;background:#3d5066;border-top-left-radius:6px;border-top-right-radius:6px}
+.subtab-panel{display:none}
+.subtab-panel.active{display:block}
 
-/* ===== Chat mensagens ===== */
-.chat-messages { height:calc(100% - 40px); overflow-y:auto; padding:5px; display:flex; flex-direction:column; gap:6px; }
-.chat-message { background:#e1f0ff; padding:6px 10px; border-radius:10px; max-width:80%; word-wrap:break-word; font-size:14px; }
-.chat-message.you { background:#d4ffd4; align-self:flex-end; }
+/* ===== NOVO: Widgets flutuantes no canto inferior direito ===== */
+.fab-stack{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:10px;z-index:999}
+.fab{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#e74c3c;color:#fff;border:none;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35);transition:transform .15s ease}
+.fab:hover{transform:translateY(-2px)}
+.fab.secondary{background:#3498db}
+
+/* Janela flutuante base (chat e video) */
+.float-panel{position:fixed;right:88px;bottom:18px;width:320px;max-height:420px;background:#2c3e50;border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.5);display:flex;flex-direction:column;overflow:hidden;z-index:998;border:1px solid #4a6278}
+.float-header{background:#34495e;padding:8px 10px;display:flex;align-items:center;justify-content:space-between}
+.float-title{display:flex;align-items:center;gap:8px;font-weight:700}
+.float-actions{display:flex;gap:6px}
+.icon-btn{width:28px;height:28px;border:none;border-radius:6px;background:#2c3e50;color:#ecf0f1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.icon-btn:hover{background:#3d5066}
+.float-body{padding:10px;display:flex;flex-direction:column;height:100%}
+
+/* Chat dentro do painel */
+.chat-messages{flex:1;overflow-y:auto;margin-bottom:10px;padding:10px;background:#1f2b3a;border-radius:8px;max-height:260px}
+.message{margin-bottom:10px;padding:10px;border-radius:8px;background:#3d5066;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.message-header{display:flex;justify-content:space-between;margin-bottom:5px;font-size:.85rem}
+.message-sender{font-weight:700;color:#3498db}
+.message-time{color:#95a5a6;font-size:.75rem}
+.message-content{color:#ecf0f1;font-size:.9rem;line-height:1.4}
+.chat-input{display:flex;gap:8px}
+.chat-input input{flex:1;padding:9px;border:1px solid #4a6278;border-radius:20px;background:#2c3e50;color:#ecf0f1;outline:none}
+.chat-input button{background:#e74c3c;border:none;color:#fff;width:42px;height:42px;border-radius:50%;cursor:pointer}
+.chat-input button:hover{background:#c0392b}
+
+/* Vídeo dentro do painel */
+.video-box{background:#1e2a38;border-radius:8px;overflow:hidden;position:relative}
+.video-box video{width:100%;height:190px;object-fit:cover;background:#000}
+.video-label{position:absolute;bottom:0;left:0;background:rgba(0,0,0,.65);color:#fff;padding:4px 8px;font-size:.8rem;width:100%}
+.video-controls{display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.video-btn{width:40px;height:40px;border-radius:50%;border:none;background:#3498db;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.video-btn:hover{filter:brightness(1.05)}
+.video-btn.end{background:#e74c3c}
+
+/* Notificação */
+.notification{position:fixed;bottom:20px;left:20px;background:#2ecc71;color:#fff;padding:10px 16px;border-radius:6px;box-shadow:0 4px 6px rgba(0,0,0,.1);z-index:1000;opacity:0;transform:translateY(20px);transition:all .25s ease}
+.notification.show{opacity:1;transform:translateY(0)}
+
+/* Responsivo */
+@media(max-width:768px){
+  .content{flex-direction:column}
+  .character,.dialogue,.parenthetical{width:90%}
+  .fab-stack{right:12px;bottom:12px}
+  .float-panel{right:76px;bottom:12px;width:92vw;max-width:420px}
+}
 </style>
 </head>
 <body>
+<div class="container">
+  <header>
+    <div>
+      <h1><i class="fas fa-scroll"></i> ScriptFlow</h1>
+      <p>Plataforma completa para desenvolvimento de roteiros</p>
+    </div>
+    <div class="user-info">
+      <span id="userName">Roteirista</span>
+      <button class="logout-btn" id="logoutBtn" title="Sair"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </header>
 
-<header>
-<h1>ScriptFlow - Plataforma de Criação de Roteiros</h1>
-</header>
+  <!-- ===== Abas superiores (REMOVIDOS: Fofoca e Chama) ===== -->
+  <div class="tabs" id="topTabs">
+    <div class="tab active" data-tab="argument">Argumento</div>
+    <div class="tab" data-tab="outline">Escaleta</div>
+    <div class="tab" data-tab="script">Roteiro</div>
+    <div class="tab" data-tab="treatment">Tratamento</div>
+    <div class="tab" data-tab="bible">Bíblia</div>
+    <div class="tab" data-tab="writersroom">Sala de Roteiro</div><!-- NOVA -->
+    <div class="tab" data-tab="storyboard">Storyboard</div>
+  </div>
 
-<main>
-<p>Bem-vindo ao ScriptFlow! Use os botões flutuantes para abrir Fofoca (chat), Chama (vídeo) e Rascunho.</p>
-</main>
+  <div class="content">
+    <!-- ===== Conteúdo principal ===== -->
+    <div class="main-content">
+      <!-- ARGUMENTO -->
+      <div class="tab-content active" id="argument">
+        <div class="section">
+          <h2><i class="fas fa-file-alt"></i> Argumento</h2>
+          <p>Desenvolva o argumento da sua história com os elementos essenciais.</p>
 
-<footer>
-<p>ScriptFlow © 2025 - Plataforma de criação de roteiros</p>
-</footer>
+          <div class="argument-section">
+            <h3>Storyline</h3>
+            <textarea id="storylineEditor" placeholder="Descreva a storyline do seu projeto..."></textarea>
+          </div>
+          <div class="argument-section">
+            <h3>Logline</h3>
+            <textarea id="loglineEditor" placeholder="Descreva a logline do seu projeto..."></textarea>
+          </div>
+          <div class="argument-section">
+            <h3>Sinopse</h3>
+            <textarea id="synopsisEditor" placeholder="Descreva a sinopse do seu projeto..." rows="6"></textarea>
+          </div>
+          <div class="argument-section">
+            <h3>Argumento Completo</h3>
+            <textarea id="argumentEditor" placeholder="Desenvolva o argumento completo do seu projeto..." rows="10"></textarea>
+          </div>
 
+          <div class="buttons">
+            <button class="btn" id="saveArgumentBtn"><i class="fas fa-save"></i> Salvar Argumento</button>
+            <button class="btn btn-primary" id="clearArgumentBtn"><i class="fas fa-trash"></i> Limpar Tudo</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESCALETA -->
+      <div class="tab-content" id="outline">
+        <div class="section">
+          <h2><i class="fas fa-list-ol"></i> Escaleta</h2>
+          <p>Desenvolva a escaleta (sequência de cenas) do seu roteiro.</p>
+
+          <div class="editor-controls">
+            <button class="editor-btn" data-format="bold" title="Negrito"><i class="fas fa-bold"></i></button>
+            <button class="editor-btn" data-format="italic" title="Itálico"><i class="fas fa-italic"></i></button>
+            <button class="editor-btn" data-format="underline" title="Sublinhar"><i class="fas fa-underline"></i></button>
+          </div>
+
+          <textarea id="outlineEditor" placeholder="Descreva a escaleta do seu projeto..." rows="20"></textarea>
+
+          <div class="buttons">
+            <button class="btn" id="saveOutlineBtn"><i class="fas fa-save"></i> Salvar Escaleta</button>
+            <button class="btn btn-primary" id="clearOutlineBtn"><i class="fas fa-trash"></i> Limpar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROTEIRO -->
+      <div class="tab-content" id="script">
+        <div class="section">
+          <h2><i class="fas fa-file-alt"></i> Roteiro</h2>
+          <p>Desenvolva seu roteiro com formatação profissional no estilo Final Draft.</p>
+
+          <div class="editor-controls">
+            <div>
+              <button class="editor-btn" data-format="bold" title="Negrito"><i class="fas fa-bold"></i></button>
+              <button class="editor-btn" data-format="italic" title="Itálico"><i class="fas fa-italic"></i></button>
+              <button class="editor-btn" data-format="underline" title="Sublinhar"><i class="fas fa-underline"></i></button>
+            </div>
+            <div>
+              <button class="element-btn" data-element="scene"><i class="fas fa-video"></i> Cena</button>
+              <button class="element-btn" data-element="action"><i class="fas fa-running"></i> Ação</button>
+              <button class="element-btn" data-element="character"><i class="fas fa-user"></i> Personagem</button>
+              <button class="element-btn" data-element="dialogue"><i class="fas fa-comment"></i> Diálogo</button>
+              <button class="element-btn" data-element="parenthetical"><i class="fas fa-parentheses"></i> Parentético</button>
+              <button class="element-btn" data-element="transition"><i class="fas fa-arrow-right"></i> Transição</button>
+            </div>
+          </div>
+
+          <div class="script-editor" id="scriptEditor" contenteditable="true">
+<span class="scene-heading" onclick="editElement(this)">INT. CASA DE ELIAS - DIA</span>
+
+<span class="action" onclick="editElement(this)">A cabana é simples, com redes de pesca penduradas e um pequeno altar com imagens de santos. ELIAS (25), magro e com olhos que já viram demasiado, prepara seu equipamento de pesca.</span>
+
+<span class="action" onclick="editElement(this)">Ele se ajoelha diante do altar e faz o sinal da cruz. Suas mãos tremem ligeiramente.</span>
+
+<span class="character" onclick="editElement(this)">ELIAS</span>
+<span class="dialogue" onclick="editElement(this)">(sussurrando)
+Por favor, hoje me traga de volta.</span>
+
+<span class="scene-heading" onclick="editElement(this)">EXT. PORTO - DIA</span>
+
+<span class="action" onclick="editElement(this)">O porto está quase vazio. Apenas alguns pescadores remendam redes. Elias caminha em direção ao seu pequeno barco.</span>
+
+<span class="character" onclick="editElement(this)">VELHO PESCADOR</span>
+<span class="dialogue" onclick="editElement(this)">
+Vai arriscar de novo, Elias? O mar não está para peixe hoje.</span>
+
+<span class="character" onclick="editElement(this)">ELIAS</span>
+<span class="dialogue" onclick="editElement(this)">
+Não tenho escolha, senhor Álvaro. Preciso comer.</span>
+          </div>
+
+          <div class="buttons">
+            <button class="btn" id="addSceneBtn"><i class="fas fa-plus"></i> Adicionar Cena</button>
+            <button class="btn" id="saveScriptBtn"><i class="fas fa-save"></i> Salvar Roteiro</button>
+            <button class="btn btn-primary" id="exportPDFBtn"><i class="fas fa-download"></i> Exportar PDF</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRATAMENTO -->
+      <div class="tab-content" id="treatment">
+        <div class="section">
+          <h2><i class="fas fa-edit"></i> Tratamento</h2>
+          <p>Desenvolva o tratamento do seu roteiro com descrições detalhadas de cenas.</p>
+          <textarea id="treatmentEditor" placeholder="Desenvolva o tratamento do seu roteiro..." rows="20"></textarea>
+          <div class="buttons">
+            <button class="btn" id="saveTreatmentBtn"><i class="fas fa-save"></i> Salvar Tratamento</button>
+            <button class="btn btn-primary" id="clearTreatmentBtn"><i class="fas fa-trash"></i> Limpar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BÍBLIA -->
+      <div class="tab-content" id="bible">
+        <div class="section">
+          <h2><i class="fas fa-book"></i> Bíblia do Projeto</h2>
+          <p>Use a bíblia para consolidar capa, storyline, logline, argumento, roteiro e visão geral de episódios.</p>
+          <textarea id="bibleEditor" placeholder="Desenvolva a bíblia do seu projeto..." rows="20"></textarea>
+          <div class="buttons">
+            <button class="btn" id="saveBibleBtn"><i class="fas fa-save"></i> Salvar Bíblia</button>
+            <button class="btn btn-primary" id="clearBibleBtn"><i class="fas fa-trash"></i> Limpar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SALA DE ROTEIRO (NOVA) -->
+      <div class="tab-content" id="writersroom">
+        <div class="section">
+          <h2><i class="fas fa-people-group"></i> Sala de Roteiro</h2>
+          <div class="subtabs" id="wrSubtabs">
+            <div class="subtab active" data-sub="integrantes">Integrantes</div>
+            <div class="subtab" data-sub="agenda">Agenda</div>
+            <div class="subtab" data-sub="cronograma">Cronograma</div>
+            <div class="subtab" data-sub="rascunho">Rascunho</div>
+          </div>
+
+          <div class="subtab-panel active" id="integrantes">
+            <p>Cadastre e liste integrantes da sala de roteiro.</p>
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+              <input id="wrMemberName" placeholder="Nome" style="padding:8px;border:1px solid #4a6278;background:#2c3e50;color:#ecf0f1;border-radius:6px">
+              <input id="wrMemberRole" placeholder="Função (ex: Head Writer)" style="padding:8px;border:1px solid #4a6278;background:#2c3e50;color:#ecf0f1;border-radius:6px">
+              <button class="btn" id="addMemberBtn"><i class="fas fa-user-plus"></i> Adicionar</button>
+            </div>
+            <div id="wrMembersList" style="background:#1e2a38;border-radius:8px;padding:10px"></div>
+          </div>
+
+          <div class="subtab-panel" id="agenda">
+            <p>Agenda de reuniões e marcos.</p>
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+              <input id="wrAgendaDate" type="date" style="padding:8px;border:1px solid #4a6278;background:#2c3e50;color:#ecf0f1;border-radius:6px">
+              <input id="wrAgendaTitle" placeholder="Título do evento" style="padding:8px;border:1px solid #4a6278;background:#2c3e50;color:#ecf0f1;border-radius:6px">
+              <button class="btn" id="addAgendaBtn"><i class="fas fa-calendar-plus"></i> Adicionar</button>
+            </div>
+            <div id="wrAgendaList" style="background:#1e2a38;border-radius:8px;padding:10px"></div>
+          </div>
+
+          <div class="subtab-panel" id="cronograma">
+            <p>Defina entregas e prazos.</p>
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+              <input id="wrTaskTitle" placeholder="Tarefa" style="padding:8px;border:1px solid #4a6278;background:#2c3e50;color:#ecf0f1;border-radius:6px">
+              <input id="wrTaskDeadline" type="date" style="padding:8px;border:1px solid #4a6278;background:#2c3e50;color:#ecf0f1;border-radius:6px">
+              <button class="btn" id="addTaskBtn"><i class="fas fa-list-check"></i> Adicionar</button>
+            </div>
+            <div id="wrTasksList" style="background:#1e2a38;border-radius:8px;padding:10px"></div>
+          </div>
+
+          <div class="subtab-panel" id="rascunho">
+            <p>Anotações rápidas e ideias.</p>
+            <textarea id="wrScratchpad" placeholder="Rascunhos da sala de roteiro..." rows="10"></textarea>
+            <div class="buttons">
+              <button class="btn" id="saveScratchBtn"><i class="fas fa-save"></i> Salvar Rascunho</button>
+              <button class="btn btn-primary" id="clearScratchBtn"><i class="fas fa-trash"></i> Limpar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STORYBOARD -->
+      <div class="tab-content" id="storyboard">
+        <div class="section">
+          <h2><i class="fas fa-film"></i> Storyboard</h2>
+          <p>Desenvolva o storyboard do seu projeto visualmente.</p>
+          <div class="editor-controls">
+            <button class="element-btn" id="addSbBtn"><i class="fas fa-plus"></i> Adicionar Quadro</button>
+            <button class="element-btn" id="saveSbBtn"><i class="fas fa-save"></i> Salvar Storyboard</button>
+          </div>
+          <div id="storyboardContainer" style="background:#1e2a38;padding:20px;border-radius:5px;min-height:400px">
+            <p style="text-align:center;color:#95a5a6;margin-top:40px">Clique em "Adicionar Quadro" para começar</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Sidebar preservada (placeholder para manter layout) ===== -->
+    <div class="sidebar">
+      <div class="sidebar-placeholder">
+        <p><i class="fas fa-square"></i> Área lateral preservada do layout.</p>
+        <small>Fofoca e Chama agora estão nos ícones flutuantes no canto inferior direito.</small>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>ScriptFlow © 2025 - Plataforma de criação de roteiros</p>
+  </footer>
+</div>
+
+<!-- ===== Notificação ===== -->
 <div class="notification" id="notification"></div>
 
-<!-- ===== Botões flutuantes ===== -->
+<!-- ===== Botões flutuantes (Fofoca e Chama) ===== -->
 <div class="fab-stack">
-<button class="fab secondary" id="openChatFab" title="Abrir Fofoca"><i class="fas fa-comments"></i></button>
-<button class="fab" id="openVideoFab" title="Abrir Chama"><i class="fas fa-video"></i></button>
-<button class="fab" id="openRascunhoFab" title="Abrir Rascunho"><i class="fas fa-pencil-alt"></i></button>
+  <button class="fab secondary" id="openChatFab" title="Abrir Fofoca (chat)"><i class="fas fa-comments"></i></button>
+  <button class="fab" id="openVideoFab" title="Abrir Chama (vídeo)"><i class="fas fa-video"></i></button>
 </div>
 
 <!-- ===== Painel Fofoca ===== -->
-<div class="float-panel" id="chatPanel" style="display:none;">
-<div class="float-header">
-<div class="float-title"><i class="fas fa-comments"></i> Fofoca</div>
-<div class="float-actions">
-<button class="icon-btn" id="chatMinBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
-<button class="icon-btn" id="chatMaxBtn" title="Maximizar"><i class="fas fa-up-right-and-down-left-from-center"></i></button>
-<button class="icon-btn" id="chatCloseBtn" title="Fechar"><i class="fas fa-times"></i></button>
-</div>
-</div>
-<div class="float-body">
-<div class="chat-messages" id="chatMessages"></div>
-<div class="chat-input">
-<input type="text" id="messageInput" placeholder="Digite sua mensagem..." />
-<button id="sendMessageBtn" title="Enviar"><i class="fas fa-paper-plane"></i></button>
-</div>
-</div>
-</div>
-
-<!-- ===== Painel Chama ===== -->
-<div class="float-panel" id="videoPanel" style="display:none;">
-<div class="float-header">
-<div class="float-title"><i class="fas fa-video"></i> Chama</div>
-<div class="float-actions">
-<button class="icon-btn" id="videoMinBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
-<button class="icon-btn" id="videoMaxBtn" title="Maximizar"><i class="fas fa-up-right-and-down-left-from-center"></i></button>
-<button class="icon-btn" id="videoPopBtn" title="Abrir em janela"><i class="fas fa-window-restore"></i></button>
-<button class="icon-btn" id="videoCloseBtn" title="Fechar"><i class="fas fa-times"></i></button>
-</div>
-</div>
-<div class="float-body">
-<div class="video-box">
-<video id="localVideo" autoplay playsinline muted style="width:100%; border-radius:6px;"></video>
-<div class="video-label">Você</div>
-</div>
-<div class="video-controls" style="margin-top:10px; display:flex; justify-content:space-around;">
-<button class="video-btn" id="toggleVideoBtn" title="Ligar/Desligar Vídeo"><i class="fas fa-video"></i></button>
-<button class="video-btn" id="toggleAudioBtn" title="Ligar/Desligar Áudio"><i class="fas fa-microphone"></i></button>
-<button class="video-btn" id="screenShareBtn" title="Compartilhar Tela"><i class="fas fa-desktop"></i></button>
-<button class="video-btn" id="recBtn" title="Gravar (WebM)"><i class="fas fa-record-vinyl"></i></button>
-<button class="video-btn end" id="endCallBtn" title="Encerrar"><i class="fas fa-phone-slash"></i></button>
-</div>
-</div>
+<div class="float-panel" id="chatPanel" style="display:none">
+  <div class="float-header">
+    <div class="float-title"><i class="fas fa-comments"></i> Fofoca</div>
+    <div class="float-actions">
+      <button class="icon-btn" id="chatMinBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
+      <button class="icon-btn" id="chatMaxBtn" title="Maximizar"><i class="fas fa-up-right-and-down-left-from-center"></i></button>
+      <button class="icon-btn" id="chatCloseBtn" title="Fechar"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="float-body">
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input">
+      <input type="text" id="messageInput" placeholder="Digite sua mensagem..." />
+      <button id="sendMessageBtn" title="Enviar"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
 </div>
 
-<!-- ===== Painel Rascunho ===== -->
-<div class="float-panel" id="rascunhoPanel" style="display:none;">
-<div class="float-header">
-<div class="float-title"><i class="fas fa-pencil-alt"></i> Rascunho</div>
-<div class="float-actions">
-<button class="icon-btn" id="rascunhoMinBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
-<button class="icon-btn" id="rascunhoMaxBtn" title="Maximizar"><i class="fas fa-up-right-and-down-left-from-center"></i></button>
-<button class="icon-btn" id="rascunhoCloseBtn" title="Fechar"><i class="fas fa-times"></i></button>
-</div>
-</div>
-<div class="float-body">
-<textarea id="rascunhoTextarea" placeholder="Escreva aqui..."></textarea>
-</div>
+<!-- ===== Painel Chama (vídeo) ===== -->
+<div class="float-panel" id="videoPanel" style="display:none">
+  <div class="float-header">
+    <div class="float-title"><i class="fas fa-video"></i> Chama</div>
+    <div class="float-actions">
+      <button class="icon-btn" id="videoMinBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
+      <button class="icon-btn" id="videoMaxBtn" title="Maximizar"><i class="fas fa-up-right-and-down-left-from-center"></i></button>
+      <button class="icon-btn" id="videoPopBtn" title="Abrir em janela"><i class="fas fa-window-restore"></i></button>
+      <button class="icon-btn" id="videoCloseBtn" title="Fechar"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="float-body">
+    <div class="video-box">
+      <video id="localVideo" autoplay playsinline muted></video>
+      <div class="video-label">Você</div>
+    </div>
+    <div class="video-controls">
+      <button class="video-btn" id="toggleVideoBtn" title="Ligar/Desligar Vídeo"><i class="fas fa-video"></i></button>
+      <button class="video-btn" id="toggleAudioBtn" title="Ligar/Desligar Áudio"><i class="fas fa-microphone"></i></button>
+      <button class="video-btn" id="screenShareBtn" title="Compartilhar Tela"><i class="fas fa-desktop"></i></button>
+      <button class="video-btn" id="recBtn" title="Gravar (WebM)"><i class="fas fa-record-vinyl"></i></button>
+      <button class="video-btn end" id="endCallBtn" title="Encerrar"><i class="fas fa-phone-slash"></i></button>
+    </div>
+  </div>
 </div>
 
 <script>
-// ===== Abrir/Fechar painéis =====
-function togglePanel(id){
-  const p = document.getElementById(id);
-  p.style.display = p.style.display==='none'?'flex':'none';
+/* ========= Estado / Persistência ========= */
+const STORAGE_KEY = 'scriptflow_data_v2';
+const state = {
+  argument:{storyline:'',logline:'',synopsis:'',argument:''},
+  outline:'', script:'', treatment:'', bible:'',
+  storyboard:[], messages:[],
+  writersroom:{
+    integrantes:[], agenda:[], tasks:[], scratch:''
+  },
+  ui:{
+    chatOpen:false, videoOpen:false, chatMin:false, videoMin:false, chatMax:false, videoMax:false
+  }
+};
+
+function loadState(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return;
+  try{
+    const saved = JSON.parse(raw);
+    // merge simples
+    Object.assign(state, saved);
+  }catch(e){console.warn('Falha ao carregar estado:', e)}
 }
-document.getElementById("openChatFab").onclick = ()=>togglePanel('chatPanel');
-document.getElementById("openVideoFab").onclick = ()=>togglePanel('videoPanel');
-document.getElementById("openRascunhoFab").onclick = ()=>togglePanel('rascunhoPanel');
-
-// ===== Minimizar/Maximizar/Fechar =====
-const chatPanel = document.getElementById("chatPanel");
-document.getElementById("chatMinBtn").onclick = ()=>chatPanel.classList.add("minimized");
-document.getElementById("chatMaxBtn").onclick = ()=>chatPanel.classList.remove("minimized");
-document.getElementById("chatCloseBtn").onclick = ()=>chatPanel.style.display="none";
-
-const videoPanel = document.getElementById("videoPanel");
-document.getElementById("videoMinBtn").onclick = ()=>videoPanel.classList.add("minimized");
-document.getElementById("videoMaxBtn").onclick = ()=>videoPanel.classList.remove("minimized");
-document.getElementById("videoCloseBtn").onclick = ()=>videoPanel.style.display="none";
-
-const rascunhoPanel = document.getElementById("rascunhoPanel");
-const rascunhoTextarea = document.getElementById("rascunhoTextarea");
-document.getElementById("rascunhoMinBtn").onclick = ()=>rascunhoPanel.classList.add("minimized");
-document.getElementById("rascunhoMaxBtn").onclick = ()=>rascunhoPanel.classList.remove("minimized");
-document.getElementById("rascunhoCloseBtn").onclick = ()=>rascunhoPanel.style.display="none";
-
-// ===== Persistência Rascunho =====
-const STORAGE_RASCUNHO="rascunho_text";
-if(localStorage.getItem(STORAGE_RASCUNHO)) rascunhoTextarea.value = localStorage.getItem(STORAGE_RASCUNHO);
-rascunhoTextarea.addEventListener("input",()=>localStorage.setItem(STORAGE_RASCUNHO, rascunhoTextarea.value));
-
-// ===== Tornar painéis arrastáveis =====
-function makeDraggable(panelId){
-  const panel = document.getElementById(panelId);
-  const header = panel.querySelector('.float-header');
-  let offsetX=0, offsetY=0, isDown=false;
-  header.addEventListener('mousedown',e=>{
-    isDown=true;
-    offsetX = panel.offsetLeft - e.clientX;
-    offsetY = panel.offsetTop - e.clientY;
-  });
-  document.addEventListener('mouseup',()=>isDown=false);
-  document.addEventListener('mousemove',e=>{
-    if(!isDown) return;
-    panel.style.top=(e.clientY+offsetY)+'px';
-    panel.style.left=(e.clientX+offsetX)+'px';
-  });
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
-makeDraggable('chatPanel');
-makeDraggable('videoPanel');
-makeDraggable('rascunhoPanel');
-
-// ===== Notificação =====
 function notify(msg){
   const n = document.getElementById('notification');
-  if(!n) return;
   n.textContent = msg;
   n.classList.add('show');
   setTimeout(()=>n.classList.remove('show'), 2500);
 }
 
-// ===== Chat funcional =====
-const chatMessages = document.getElementById('chatMessages');
-const messageInput = document.getElementById('messageInput');
-const sendBtn = document.getElementById('sendMessageBtn');
-const STORAGE_CHAT = 'chat_messages';
+/* ========= Tabs Superiores ========= */
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active'));
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
 
-function loadChat(){
-  const saved = JSON.parse(localStorage.getItem(STORAGE_CHAT) || '[]');
+/* ========= Subtabs (Sala de Roteiro) ========= */
+document.querySelectorAll('#wrSubtabs .subtab').forEach(st=>{
+  st.addEventListener('click', ()=>{
+    document.querySelectorAll('#wrSubtabs .subtab').forEach(s=>s.classList.remove('active'));
+    st.classList.add('active');
+    document.querySelectorAll('.subtab-panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById(st.dataset.sub).classList.add('active');
+  });
+});
+
+/* ========= Formatação simples ========= */
+document.querySelectorAll('.editor-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.execCommand(btn.dataset.format,false,null);
+  });
+});
+
+/* ========= Roteiro: inserir elementos ========= */
+document.querySelectorAll('.element-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const el = btn.dataset.element;
+    let html = '';
+    switch(el){
+      case 'scene': html='<span class="scene-heading" onclick="editElement(this)">INT. NOVO LOCAL - DIA</span>\n\n';break;
+      case 'action': html='<span class="action" onclick="editElement(this)">Nova ação descritiva aqui.</span>\n\n';break;
+      case 'character': html='<span class="character" onclick="editElement(this)">NOVO PERSONAGEM</span>\n';break;
+      case 'dialogue': html='<span class="dialogue" onclick="editElement(this)">Novo diálogo do personagem aqui.</span>\n\n';break;
+      case 'parenthetical': html='<span class="parenthetical" onclick="editElement(this)">(ação/emoção)</span>\n';break;
+      case 'transition': html='<span class="transition" onclick="editElement(this)">CORTE PARA:</span>\n\n';break;
+    }
+    document.execCommand('insertHTML', false, html);
+    saveAll();
+  });
+});
+function editElement(el){
+  const txt = prompt('Editar elemento:', el.textContent);
+  if(txt!==null){ el.textContent = txt; saveAll(); }
+}
+
+/* ========= Botões Salvar/Limpar ========= */
+function saveAll(){
+  state.argument.storyline = document.getElementById('storylineEditor').value;
+  state.argument.logline   = document.getElementById('loglineEditor').value;
+  state.argument.synopsis  = document.getElementById('synopsisEditor').value;
+  state.argument.argument  = document.getElementById('argumentEditor').value;
+  state.outline = document.getElementById('outlineEditor').value;
+  state.script  = document.getElementById('scriptEditor').innerHTML;
+  state.treatment = document.getElementById('treatmentEditor').value;
+  state.bible = document.getElementById('bibleEditor').value;
+  state.writersroom.scratch = document.getElementById('wrScratchpad')?.value || state.writersroom.scratch;
+  saveState();
+  notify('Dados salvos.');
+}
+document.getElementById('saveArgumentBtn').onclick = saveAll;
+document.getElementById('saveOutlineBtn').onclick = saveAll;
+document.getElementById('saveScriptBtn').onclick = saveAll;
+document.getElementById('saveTreatmentBtn').onclick = saveAll;
+document.getElementById('saveBibleBtn').onclick = saveAll;
+
+document.getElementById('clearArgumentBtn').onclick = ()=>{
+  if(confirm('Limpar argumento inteiro?')){
+    ['storylineEditor','loglineEditor','synopsisEditor','argumentEditor'].forEach(id=>document.getElementById(id).value='');
+    saveAll();
+  }
+};
+document.getElementById('clearOutlineBtn').onclick = ()=>{ if(confirm('Limpar escaleta?')){ document.getElementById('outlineEditor').value=''; saveAll(); } };
+document.getElementById('clearTreatmentBtn').onclick = ()=>{ if(confirm('Limpar tratamento?')){ document.getElementById('treatmentEditor').value=''; saveAll(); } };
+document.getElementById('clearBibleBtn').onclick = ()=>{ if(confirm('Limpar bíblia?')){ document.getElementById('bibleEditor').value=''; saveAll(); } };
+
+/* ========= Exportar PDF (mantém simples via janela de impressão) ========= */
+document.getElementById('exportPDFBtn').onclick = ()=>{
+  const w = window.open('','','width=800,height=900');
+  const styles = `
+    <style>
+      body{font-family:'Courier New',monospace;color:#000;padding:24px}
+      .scene-heading{font-weight:bold;text-transform:uppercase;color:#000}
+      .character{text-align:center;display:block;margin:12px auto;font-weight:bold}
+      .dialogue{display:block;margin:0 auto 12px auto;width:60%}
+      .parenthetical{display:block;margin:0 auto;width:50%}
+      .transition{text-align:right;text-transform:uppercase;font-weight:bold}
+      .action{display:block;margin:10px 0}
+    </style>`;
+  w.document.write('<html><head><title>Roteiro</title>'+styles+'</head><body>'+document.getElementById('scriptEditor').innerHTML+'</body></html>');
+  w.document.close(); w.focus(); w.print();
+};
+
+/* ========= Adicionar Cena ========= */
+document.getElementById('addSceneBtn').onclick = ()=>{
+  const ed = document.getElementById('scriptEditor');
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+<span class="scene-heading" onclick="editElement(this)">INT. NOVO LOCAL - NOITE</span>
+
+<span class="action" onclick="editElement(this)">Descreva a ação.</span>
+
+<span class="character" onclick="editElement(this)">PERSONAGEM</span>
+<span class="dialogue" onclick="editElement(this)">Novo diálogo...</span>
+  `;
+  ed.appendChild(wrap);
+  ed.scrollTop = ed.scrollHeight;
+  saveAll();
+  notify('Nova cena adicionada.');
+};
+
+/* ========= Storyboard ========= */
+const sbContainer = document.getElementById('storyboardContainer');
+document.getElementById('addSbBtn').onclick = ()=>{
+  const id = Date.now();
+  const el = document.createElement('div');
+  el.className='story';
+  el.style.cssText='border:1px solid #4a6278;border-radius:8px;padding:10px;margin-bottom:12px;background:#2c3e50';
+  el.id = 'frame-'+id;
+  el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <strong>Quadro</strong>
+      <button onclick="removeFrame(${id})" style="background:#e74c3c;color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer">Remover</button>
+    </div>
+    <textarea placeholder="Descrição do quadro..." style="width:100%;min-height:90px;margin-bottom:8px;background:#1e2a38;color:#ecf0f1;border:1px solid #4a6278;border-radius:6px;padding:8px"></textarea>
+    <input type="file" accept="image/*" onchange="previewImage(this,${id})" style="margin-bottom:8px">
+    <div id="preview-${id}" style="text-align:center;margin-top:8px"></div>`;
+  sbContainer.appendChild(el);
+  state.storyboard.push({id,description:'',image:null});
+  saveState();
+};
+function removeFrame(id){
+  const node = document.getElementById('frame-'+id);
+  if(node) node.remove();
+  state.storyboard = state.storyboard.filter(f=>f.id!==id);
+  saveState();
+}
+function previewImage(input,id){
+  const prev = document.getElementById('preview-'+id);
+  if(input.files && input.files[0]){
+    const r = new FileReader();
+    r.onload = e=>{
+      prev.innerHTML = `<img src="${e.target.result}" style="max-width:100%;max-height:200px;border-radius:6px">`;
+      const idx = state.storyboard.findIndex(f=>f.id===id);
+      if(idx>-1){ state.storyboard[idx].image = e.target.result; saveState(); }
+    };
+    r.readAsDataURL(input.files[0]);
+  }
+}
+document.getElementById('saveSbBtn').onclick = ()=>{
+  // coleta descrições
+  state.storyboard.forEach(f=>{
+    const ta = document.querySelector('#frame-'+f.id+' textarea');
+    if(ta) f.description = ta.value;
+  });
+  saveState();
+  notify('Storyboard salvo.');
+};
+
+/* ========= Sala de Roteiro: Integrantes/Agenda/Cronograma/Rascunho ========= */
+const wrList = document.getElementById('wrMembersList');
+const agendaList = document.getElementById('wrAgendaList');
+const tasksList = document.getElementById('wrTasksList');
+
+function renderMembers(){
+  wrList.innerHTML = (state.writersroom.integrantes.length===0)
+    ? '<em style="color:#95a5a6">Nenhum integrante cadastrado.</em>'
+    : state.writersroom.integrantes.map((m,i)=>`
+      <div style="display:flex;justify-content:space-between;background:#263445;padding:8px;border-radius:6px;margin-bottom:6px">
+        <span><strong>${m.name}</strong> — ${m.role}</span>
+        <button onclick="delMember(${i})" style="background:#e74c3c;color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer">Excluir</button>
+      </div>`).join('');
+}
+function renderAgenda(){
+  agendaList.innerHTML = (state.writersroom.agenda.length===0)
+    ? '<em style="color:#95a5a6">Nenhum evento na agenda.</em>'
+    : state.writersroom.agenda.map((ev,i)=>`
+      <div style="display:flex;justify-content:space-between;background:#263445;padding:8px;border-radius:6px;margin-bottom:6px">
+        <span><strong>${ev.date}</strong> — ${ev.title}</span>
+        <button onclick="delAgenda(${i})" style="background:#e74c3c;color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer">Excluir</button>
+      </div>`).join('');
+}
+function renderTasks(){
+  tasksList.innerHTML = (state.writersroom.tasks.length===0)
+    ? '<em style="color:#95a5a6">Nenhuma tarefa definida.</em>'
+    : state.writersroom.tasks.map((t,i)=>`
+      <div style="display:flex;justify-content:space-between;background:#263445;padding:8px;border-radius:6px;margin-bottom:6px">
+        <span><strong>${t.title}</strong> — prazo ${t.deadline||'-'}</span>
+        <button onclick="delTask(${i})" style="background:#e74c3c;color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer">Excluir</button>
+      </div>`).join('');
+}
+
+document.getElementById('addMemberBtn').onclick = ()=>{
+  const name = document.getElementById('wrMemberName').value.trim();
+  const role = document.getElementById('wrMemberRole').value.trim();
+  if(!name) return notify('Informe o nome.');
+  state.writersroom.integrantes.push({name,role});
+  saveState(); renderMembers();
+  document.getElementById('wrMemberName').value='';
+  document.getElementById('wrMemberRole').value='';
+};
+function delMember(i){ state.writersroom.integrantes.splice(i,1); saveState(); renderMembers(); }
+
+document.getElementById('addAgendaBtn').onclick = ()=>{
+  const date = document.getElementById('wrAgendaDate').value;
+  const title= document.getElementById('wrAgendaTitle').value.trim();
+  if(!title) return notify('Informe o título do evento.');
+  state.writersroom.agenda.push({date,title});
+  saveState(); renderAgenda();
+  document.getElementById('wrAgendaTitle').value='';
+};
+function delAgenda(i){ state.writersroom.agenda.splice(i,1); saveState(); renderAgenda(); }
+
+document.getElementById('addTaskBtn').onclick = ()=>{
+  const title = document.getElementById('wrTaskTitle').value.trim();
+  const deadline = document.getElementById('wrTaskDeadline').value;
+  if(!title) return notify('Descreva a tarefa.');
+  state.writersroom.tasks.push({title,deadline});
+  saveState(); renderTasks();
+  document.getElementById('wrTaskTitle').value='';
+  document.getElementById('wrTaskDeadline').value='';
+};
+function delTask(i){ state.writersroom.tasks.splice(i,1); saveState(); renderTasks(); }
+
+document.getElementById('saveScratchBtn').onclick = ()=>{ state.writersroom.scratch = document.getElementById('wrScratchpad').value; saveState(); notify('Rascunho salvo.'); };
+document.getElementById('clearScratchBtn').onclick = ()=>{ if(confirm('Limpar rascunho?')){ document.getElementById('wrScratchpad').value=''; state.writersroom.scratch=''; saveState(); } };
+
+/* ========= Chat (Fofoca) ========= */
+const chatPanel = document.getElementById('chatPanel');
+const openChatFab = document.getElementById('openChatFab');
+const chatMessages = document.getElementById('chatMessages');
+const msgInput = document.getElementById('messageInput');
+
+openChatFab.onclick = ()=>{ chatPanel.style.display='flex'; state.ui.chatOpen=true; saveState(); };
+document.getElementById('chatCloseBtn').onclick = ()=>{ chatPanel.style.display='none'; state.ui.chatOpen=false; saveState(); };
+document.getElementById('chatMinBtn').onclick = ()=>{
+  const body = chatPanel.querySelector('.float-body');
+  state.ui.chatMin = !state.ui.chatMin;
+  body.style.display = state.ui.chatMin ? 'none':'flex';
+  saveState();
+};
+document.getElementById('chatMaxBtn').onclick = ()=>{
+  state.ui.chatMax = !state.ui.chatMax;
+  chatPanel.style.width = state.ui.chatMax ? '520px':'320px';
+  saveState();
+};
+
+document.getElementById('sendMessageBtn').onclick = sendMessage;
+msgInput.addEventListener('keypress', e=>{ if(e.key==='Enter'){ sendMessage(); } });
+
+function renderChat(){
   chatMessages.innerHTML = '';
-  saved.forEach(msg=>{
+  if(state.messages.length===0){
+    // Mensagens iniciais de exemplo
+    state.messages = [
+      {sender:'Ana Silva', text:'Alguém já viu o novo episódio sobre estrutura de atos?', time:ts()},
+      {sender:'Carlos Mendes', text:'Vi sim! O quadro de pontos de virada tá ótimo.', time:ts()},
+      {sender:'Marina Costa', text:'Tô travada no segundo ato 😫', time:ts()}
+    ];
+    saveState();
+  }
+  state.messages.forEach(m=>{
     const div = document.createElement('div');
-    div.className = 'chat-message '+(msg.you?'you':'');
-    div.textContent = msg.text;
+    div.className='message';
+    div.innerHTML = `
+      <div class="message-header">
+        <span class="message-sender">${m.sender}</span>
+        <span class="message-time">${m.time}</span>
+      </div>
+      <div class="message-content">${m.text}</div>`;
     chatMessages.appendChild(div);
   });
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
-function saveChat(msg){
-  const saved = JSON.parse(localStorage.getItem(STORAGE_CHAT) || '[]');
-  saved.push(msg);
-  localStorage.setItem(STORAGE_CHAT, JSON.stringify(saved));
+function ts(){
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 function sendMessage(){
-  const text = messageInput.value.trim();
+  const text = msgInput.value.trim();
   if(!text) return;
-  const msg = { text, you:true };
-  saveChat(msg);
-  loadChat();
-  messageInput.value='';
+  const m = {sender:'Você', text, time:ts()};
+  state.messages.push(m); saveState(); renderChat();
+  msgInput.value=''; msgInput.focus();
+  // resposta simulada
+  setTimeout(()=>{
+    const bots = [
+      {sender:'Ana Silva', text:'Boa! Vamos marcar na agenda da sala?'},
+      {sender:'Carlos Mendes', text:'Concordo. Dá pra jogar isso pro cronograma.'},
+      {sender:'Marina Costa', text:'Amei a ideia!'}
+    ];
+    const r = bots[Math.floor(Math.random()*bots.length)];
+    state.messages.push({sender:r.sender,text:r.text,time:ts()});
+    saveState(); renderChat();
+  }, 900+Math.random()*1500);
 }
-sendBtn.onclick = sendMessage;
-messageInput.addEventListener('keydown',e=>{ if(e.key==='Enter') sendMessage(); });
 
-loadChat();
+/* ========= Vídeo (Chama) ========= */
+const videoPanel = document.getElementById('videoPanel');
+const openVideoFab = document.getElementById('openVideoFab');
+const localVideo = document.getElementById('localVideo');
+let mediaStream = null;
+let recorder = null;
+let recordingChunks = [];
+let sharingScreen = false;
+
+openVideoFab.onclick = async ()=>{
+  videoPanel.style.display='flex'; state.ui.videoOpen=true; saveState();
+  if(!mediaStream) await startCamera();
+};
+document.getElementById('videoCloseBtn').onclick = ()=>{ hideVideo(); };
+document.getElementById('videoMinBtn').onclick = ()=>{
+  const body = videoPanel.querySelector('.float-body');
+  state.ui.videoMin = !state.ui.videoMin;
+  body.style.display = state.ui.videoMin ? 'none':'flex';
+  saveState();
+};
+document.getElementById('videoMaxBtn').onclick = ()=>{
+  state.ui.videoMax = !state.ui.videoMax;
+  videoPanel.style.width = state.ui.videoMax ? '560px':'320px';
+  saveState();
+};
+document.getElementById('videoPopBtn').onclick = ()=>{
+  const win = window.open('', 'chamaPop', 'width=520,height=420');
+  // conteúdo mínimo + reinit da câmera no popout
+  win.document.write(`
+    <html><head><title>Chama</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <style>
+        body{margin:0;background:#1e2a38;color:#fff;font-family:'Courier New',monospace}
+        .head{background:#34495e;padding:8px 10px;display:flex;justify-content:space-between;align-items:center}
+        .box{padding:10px}
+        video{width:100%;height:280px;background:#000;object-fit:cover}
+        .controls{display:flex;gap:8px;justify-content:center;margin-top:10px}
+        button{width:40px;height:40px;border-radius:50%;border:none;background:#3498db;color:#fff;cursor:pointer}
+        button.end{background:#e74c3c}
+      </style>
+    </head>
+    <body>
+      <div class="head"><strong><i class="fas fa-video"></i> Chama</strong><span>Abrir em janela</span></div>
+      <div class="box">
+        <video id="v" autoplay playsinline muted></video>
+        <div class="controls">
+          <button id="vid"><i class="fas fa-video"></i></button>
+          <button id="mic"><i class="fas fa-microphone"></i></button>
+          <button id="scr"><i class="fas fa-desktop"></i></button>
+          <button id="end" class="end"><i class="fas fa-phone-slash"></i></button>
+        </div>
+      </div>
+      <script>
+        let stream=null; let sharing=false;
+        async function startCam(){
+          try{ stream = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+               document.getElementById('v').srcObject = stream;
+          }catch(e){ alert('Não foi possível acessar câmera/microfone.'); }
+        }
+        startCam();
+        document.getElementById('vid').onclick = ()=>{
+          const t = stream?.getVideoTracks?.()[0];
+          if(t){ t.enabled = !t.enabled; }
+        };
+        document.getElementById('mic').onclick = ()=>{
+          const t = stream?.getAudioTracks?.()[0];
+          if(t){ t.enabled = !t.enabled; }
+        };
+        document.getElementById('scr').onclick = async ()=>{
+          try{
+            const s = await navigator.mediaDevices.getDisplayMedia({video:true});
+            sharing=true; document.getElementById('v').srcObject = s;
+            s.getVideoTracks()[0].onended = ()=>{ document.getElementById('v').srcObject = stream; sharing=false; };
+          }catch(e){}
+        };
+        document.getElementById('end').onclick = ()=>{
+          if(stream){ stream.getTracks().forEach(t=>t.stop()); document.getElementById('v').srcObject=null; }
+          window.close();
+        };
+      <\/script>
+    </body></html>
+  `);
+  win.document.close();
+};
+
+async function startCamera(){
+  try{
+    mediaStream = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    localVideo.srcObject = mediaStream;
+    notify('Câmera ligada.');
+  }catch(e){
+    console.error(e); notify('Não foi possível acessar câmera/microfone.');
+  }
+}
+function hideVideo(){
+  videoPanel.style.display='none'; state.ui.videoOpen=false; saveState();
+}
+document.getElementById('toggleVideoBtn').onclick = ()=>{
+  const vt = mediaStream?.getVideoTracks?.()[0];
+  if(vt){ vt.enabled = !vt.enabled; notify('Vídeo '+(vt.enabled?'ligado':'desligado')); }
+};
+document.getElementById('toggleAudioBtn').onclick = ()=>{
+  const at = mediaStream?.getAudioTracks?.()[0];
+  if(at){ at.enabled = !at.enabled; notify('Áudio '+(at.enabled?'ligado':'desligado')); }
+};
+document.getElementById('screenShareBtn').onclick = async ()=>{
+  try{
+    const s = await navigator.mediaDevices.getDisplayMedia({video:true});
+    sharingScreen = true;
+    localVideo.srcObject = s;
+    s.getVideoTracks()[0].onended = ()=>{
+      if(mediaStream) localVideo.srcObject = mediaStream;
+      sharingScreen = false;
+    };
+  }catch(e){ /* usuário pode cancelar */ }
+};
+document.getElementById('endCallBtn').onclick = ()=>{
+  if(localVideo.srcObject){ localVideo.srcObject.getTracks().forEach(t=>t.stop()); localVideo.srcObject=null; }
+  mediaStream=null; notify('Chamada encerrada.');
+};
+
+/* ========= Gravação (WebM) ========= */
+document.getElementById('recBtn').onclick = ()=>{
+  if(!mediaStream){ notify('Inicie a câmera antes de gravar.'); return; }
+  if(!recorder){
+    try{
+      recorder = new MediaRecorder(localVideo.srcObject, {mimeType:'video/webm;codecs=vp9,opus'});
+    }catch(e){
+      try{ recorder = new MediaRecorder(localVideo.srcObject, {mimeType:'video/webm;codecs=vp8,opus'}); }
+      catch(err){ notify('Gravação não suportada neste navegador.'); return; }
+    }
+    recordingChunks = [];
+    recorder.ondataavailable = ev=>{ if(ev.data && ev.data.size>0) recordingChunks.push(ev.data); };
+    recorder.onstop = ()=>{
+      const blob = new Blob(recordingChunks,{type:'video/webm'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href=url; a.download='chamada.webm'; a.click();
+      URL.revokeObjectURL(url);
+      recordingChunks=[]; recorder=null;
+      notify('Gravação salva (WebM).');
+    };
+    recorder.start();
+    notify('Gravando...');
+    document.getElementById('recBtn').style.background='#e67e22';
+  }else{
+    recorder.stop();
+    document.getElementById('recBtn').style.background='';
+  }
+};
+
+/* ========= Logout ========= */
+document.getElementById('logoutBtn').onclick = ()=>{
+  if(confirm('Tem certeza que deseja sair?')){
+    notify('Sessão encerrada.');
+  }
+};
+
+/* ========= Inicialização / Auto-save ========= */
+function populateUI(){
+  // campos
+  document.getElementById('storylineEditor').value = state.argument.storyline||'';
+  document.getElementById('loglineEditor').value   = state.argument.logline||'';
+  document.getElementById('synopsisEditor').value  = state.argument.synopsis||'';
+  document.getElementById('argumentEditor').value  = state.argument.argument||'';
+  document.getElementById('outlineEditor').value   = state.outline||'';
+  document.getElementById('treatmentEditor').value = state.treatment||'';
+  document.getElementById('bibleEditor').value     = state.bible||'';
+  if(state.script) document.getElementById('scriptEditor').innerHTML = state.script;
+
+  // storyboard
+  if(state.storyboard.length){
+    sbContainer.innerHTML = '';
+    state.storyboard.forEach(f=>{
+      const el = document.createElement('div');
+      el.id = 'frame-'+f.id;
+      el.className='story';
+      el.style.cssText='border:1px solid #4a6278;border-radius:8px;padding:10px;margin-bottom:12px;background:#2c3e50';
+      el.innerHTML=`
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <strong>Quadro</strong>
+          <button onclick="removeFrame(${f.id})" style="background:#e74c3c;color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer">Remover</button>
+        </div>
+        <textarea placeholder="Descrição do quadro..." style="width:100%;min-height:90px;margin-bottom:8px;background:#1e2a38;color:#ecf0f1;border:1px solid #4a6278;border-radius:6px;padding:8px">${f.description||''}</textarea>
+        <input type="file" accept="image/*" onchange="previewImage(this,${f.id})" style="margin-bottom:8px">
+        <div id="preview-${f.id}" style="text-align:center;margin-top:8px">${f.image?`<img src="${f.image}" style="max-width:100%;max-height:200px;border-radius:6px">`:''}</div>`;
+      sbContainer.appendChild(el);
+    });
+  }
+
+  // sala de roteiro
+  renderMembers(); renderAgenda(); renderTasks();
+  document.getElementById('wrScratchpad').value = state.writersroom.scratch||'';
+
+  // chat
+  renderChat();
+
+  // reabrir paineis conforme preferências
+  if(state.ui.chatOpen){ chatPanel.style.display='flex'; }
+  if(state.ui.chatMin){ chatPanel.querySelector('.float-body').style.display='none'; }
+  if(state.ui.chatMax){ chatPanel.style.width='520px'; }
+
+  if(state.ui.videoOpen){ videoPanel.style.display='flex'; startCamera(); }
+  if(state.ui.videoMin){ videoPanel.querySelector('.float-body').style.display='none'; }
+  if(state.ui.videoMax){ videoPanel.style.width='560px'; }
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  loadState();
+  populateUI();
+  setInterval(saveAll, 30000); // auto-save
+});
 </script>
-
 </body>
 </html>
 
