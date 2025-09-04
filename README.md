@@ -1,21 +1,31 @@
-# ScriptFlow - Plataforma de Roteiros
+# ScriptFlow - Plataforma de Desenvolvimento de Roteiros
 
-ScriptFlow é uma plataforma web para criação de roteiros cinematográficos e storyboards.
+ScriptFlow é uma plataforma completa para criação e desenvolvimento de roteiros, com ferramentas colaborativas e storyboard visual.
 
 ## Funcionalidades
 
-- Editor de roteiros com formatação adequada
-- Sistema de storyboard com quadros visuais
-- Salvamento automático no navegador
-- Exportação para PDF e FDX (simulada)
+- ✅ **Editor de Roteiro** - Argumento, escaleta, tratamento e bíblia do projeto
+- ✅ **Storyboard Avançado** - Ferramenta visual com desenho e importação de imagens
+- ✅ **Chat em Tempo Real** - Sistema de colaboração "Fofoca"
+- ✅ **Videoconferência** - Sistema "Chama" para reuniões
+- ✅ **Salvamento Automático** - Todos os dados são salvos localmente
 
-## Como usar
+## Como Usar
 
-1. Abra o arquivo `index.html` em qualquer navegador
-2. Use a aba "Editor" para criar seu roteiro
-3. Use a aba "Storyboard" para visualizar suas cenas
-4. Seus dados são salvos automaticamente
+1. **Abra** o arquivo `index.html` em seu navegador
+2. **Navegue** entre as abas para acessar diferentes funcionalidades
+3. **No Storyboard**:
+   - Clique em "Adicionar Imagem" para importar
+   - Use "Desenhar" para fazer anotações visuais
+   - Ajuste cores e tamanho do pincel
+   - Exporte com "Exportar" para salvar como PNG
 
-## Desenvolvido por
+## Tecnologias Utilizadas
 
-Patrick Sonata - 2025
+- HTML5, CSS3, JavaScript Vanilla
+- Canvas API para o storyboard
+- MediaDevices API para a câmera
+- LocalStorage para persistência de dados
+
+## Estrutura de Arquivos
+
