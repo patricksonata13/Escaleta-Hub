@@ -328,21 +328,102 @@ Não tenho escolha, senhor Álvaro. Preciso comer.</span>
         </div>
       </div>
 
-      <!-- STORYBOARD -->
-      <div class="tab-content" id="storyboard">
-        <div class="section">
-          <h2><i class="fas fa-film"></i> Storyboard</h2>
-          <p>Desenvolva o storyboard do seu projeto visualmente.</p>
-          <div class="editor-controls">
-            <button class="element-btn" id="addSbBtn"><i class="fas fa-plus"></i> Adicionar Quadro</button>
-            <button class="element-btn" id="saveSbBtn"><i class="fas fa-save"></i> Salvar Storyboard</button>
-          </div>
-          <div id="storyboardContainer" style="background:#1e2a38;padding:20px;border-radius:5px;min-height:400px">
-            <p style="text-align:center;color:#95a5a6;margin-top:40px">Clique em "Adicionar Quadro" para começar</p>
-          </div>
-        </div>
-      </div>
+<div id="storyboard" class="tab">
+    <div style="margin-bottom:10px;">
+        <button id="add-image">Adicionar Imagem</button>
+        <button id="clear-board">Limpar</button>
+        <button id="export-board">Exportar</button>
     </div>
+    <canvas id="canvas" width="800" height="500" style="background:#222; border:1px solid #555; border-radius:5px;"></canvas>
+</div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Configuração de desenho
+    let drawing = false;
+    let lastX = 0, lastY = 0;
+    let images = [];
+
+    function drawLine(x, y) {
+        if(!drawing) return;
+        ctx.strokeStyle = '#f39c12';
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        lastX = x;
+        lastY = y;
+        saveCanvas();
+    }
+
+    canvas.addEventListener('mousedown', (e)=>{
+        drawing = true;
+        lastX = e.offsetX;
+        lastY = e.offsetY;
+    });
+    canvas.addEventListener('mousemove', (e)=> drawLine(e.offsetX, e.offsetY));
+    canvas.addEventListener('mouseup', ()=> drawing=false);
+    canvas.addEventListener('mouseout', ()=> drawing=false);
+
+    // Adicionar imagem
+    document.getElementById('add-image').addEventListener('click', ()=>{
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.click();
+        input.onchange = ()=>{
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = ()=> {
+                const img = new Image();
+                img.src = reader.result;
+                img.onload = ()=> {
+                    // desenhar imagem no canvas
+                    ctx.drawImage(img, 50, 50, 200, 150);
+                    images.push({src: img.src, x:50, y:50, w:200, h:150});
+                    saveCanvas();
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Limpar canvas
+    document.getElementById('clear-board').addEventListener('click', ()=>{
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        images = [];
+        saveCanvas();
+    });
+
+    // Exportar canvas como imagem
+    document.getElementById('export-board').addEventListener('click', ()=>{
+        const link = document.createElement('a');
+        link.download = 'storyboard.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+
+    // Salvar e carregar canvas no localStorage
+    function saveCanvas() {
+        localStorage.setItem('storyboard', canvas.toDataURL());
+    }
+
+    function loadCanvas() {
+        const data = localStorage.getItem('storyboard');
+        if(data){
+            const img = new Image();
+            img.src = data;
+            img.onload = ()=> ctx.drawImage(img, 0,0,canvas.width, canvas.height);
+        }
+    }
+
+    loadCanvas();
+</script>
+
 
     <!-- ===== Sidebar preservada (placeholder para manter layout) ===== -->
     <div class="sidebar">
