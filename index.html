@@ -3,208 +3,181 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plataforma de Roteiro</title>
+<title>ScriptFlow Ultimate - Editor Unificado</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-    body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height:100vh; display:flex; flex-direction:column;}
-    .top-tabs { display:flex; background:#2c3e50; font-weight:bold;}
-    .tab-btn { flex:1; padding:1rem; color:white; border:none; cursor:pointer; font-size:1rem;}
-    .tab-btn.active { background:#e74c3c;}
-    .tab-content { display:none; flex:1; overflow:auto; height:calc(100vh - 50px);}
-    .tab-content.active { display:block;}
-    .script-editor, .rascunho-editor { padding:20px; height:100%; overflow-y:auto; font-family:'Courier New', monospace; font-size:12pt;}
-    .scene-heading { font-weight:bold; text-transform:uppercase; margin-top:1.5rem; color:#3498db; cursor:pointer;}
-    .action { margin:0.8rem 0; padding:5px; border-radius:3px; cursor:pointer;}
-    .character { text-align:center; width:50%; margin:0.8rem auto; font-weight:bold; padding:5px; border-radius:3px; cursor:pointer;}
-    .dialogue { width:60%; margin:0 auto; padding:5px; border-radius:3px; cursor:pointer;}
-    .parenthetical { width:50%; margin:0 auto; padding-left:2rem; padding:5px; border-radius:3px; cursor:pointer;}
-    .transition { text-align:right; margin-top:1rem; text-transform:uppercase; font-weight:bold; padding:5px; border-radius:3px; cursor:pointer;}
-    #stats-panel { padding:10px; background:#f0f0f0; }
-    #storyboard-canvas { border:1px solid #ccc; display:block; margin:20px auto; }
-    #add-frame { display:block; margin:10px auto; padding:8px 12px; font-size:1rem; cursor:pointer;}
+:root{
+--primary:#2c3e50;--secondary:#e74c3c;--accent:#3498db;--light:#ecf0f1;
+--dark:#2c3e50;--success:#2ecc71;--warning:#f39c12;--danger:#e74c3c;
+--text:#2c3e50;--bg:#f9f9f9;--header-bg:linear-gradient(135deg,#e74c3c,#c0392b);
+--sidebar-bg:#34495e;--editor-bg:#fff;--editor-text:#000;--footer-bg:#2c3e50;
+--footer-text:#ecf0f1;
+}
+body{margin:0;padding:0;font-family:'Segoe UI',sans-serif;color:var(--text);background:var(--bg);display:flex;flex-direction:column;height:100vh;transition:.3s;}
+header{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;background:var(--header-bg);color:#fff;}
+.logo{font-size:2rem;font-weight:bold;display:flex;align-items:center;gap:.5rem;}
+.main-container{flex:1;display:flex;overflow:hidden;}
+.sidebar{width:250px;background:var(--sidebar-bg);color:#ecf0f1;display:flex;flex-direction:column;padding:1rem;overflow-y:auto;}
+.sidebar-btn{display:flex;align-items:center;gap:.5rem;padding:.7rem;border:none;background:transparent;color:#ecf0f1;border-radius:4px;cursor:pointer;margin-bottom:.3rem;}
+.sidebar-btn:hover{background:#3d5066;}
+.sidebar-btn.active{background:var(--secondary);}
+.workspace{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.toolbar{display:flex;gap:1rem;padding:.8rem 1.5rem;background:var(--light);flex-wrap:wrap;border-bottom:1px solid #ddd;}
+.toolbar-btn{padding:.5rem 1rem;background:var(--primary);color:#fff;border:none;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:.5rem;font-size:.9rem;transition:.2s;}
+.toolbar-btn:hover{background:#34495e;}
+.toolbar-btn.active{background:var(--secondary);}
+.editor-container{flex:1;display:flex;overflow:hidden;}
+.tab{flex:1;display:none;overflow:auto;}
+.tab.active{display:block;}
+.script-editor,.rascunho-editor{padding:2rem;flex:1;overflow:auto;background:var(--editor-bg);color:var(--editor-text);font-family:'Courier New',monospace;font-size:12pt;line-height:1.5;}
+.scene-heading{font-weight:bold;text-transform:uppercase;margin-top:1.5rem;color:#3498db;cursor:pointer;}
+.action,.character,.dialogue,.parenthetical,.transition{margin:.8rem 0;cursor:pointer;}
+.storyboard-container{display:flex;gap:1rem;flex-wrap:wrap;padding:1rem;}
+.storyboard-canvas{border:1px solid #ccc;width:200px;height:150px;cursor:crosshair;}
+footer{background:var(--footer-bg);color:var(--footer-text);padding:.8rem 1.5rem;display:flex;justify-content:space-between;}
+.fab-container{position:fixed;bottom:25px;right:25px;display:flex;flex-direction:column;gap:15px;z-index:1000;}
+.fab{width:60px;height:60px;border-radius:50%;background:var(--secondary);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 5px 15px rgba(0,0,0,.3);}
+.fab:hover{transform:translateY(-5px) scale(1.05);}
+.fab.chama{background:var(--accent);}
 </style>
 </head>
 <body>
+<header>
+<div class="logo"><i class="fas fa-scroll"></i> ScriptFlow</div>
+<div class="document-info">
+  <div class="document-title">Roteiro Sem Título</div>
+  <div class="document-stats" id="doc-stats">0 cenas • 0 personagens • 0 diálogos</div>
+</div>
+<div>
+  <button class="toolbar-btn" id="saveBtn"><i class="fas fa-save"></i> Salvar</button>
+</div>
+</header>
 
-<!-- MENU SUPERIOR COM ABAS -->
-<div class="top-tabs">
-    <button class="tab-btn active" data-tab="roteiro-tab">Roteiro</button>
-    <button class="tab-btn" data-tab="escaleta-tab">Escaleta</button>
-    <button class="tab-btn" data-tab="tratamento-tab">Tratamento</button>
-    <button class="tab-btn" data-tab="biblia-tab">Bíblia</button>
-    <button class="tab-btn" data-tab="sala-tab">Sala de Roteiro</button>
-    <button class="tab-btn" data-tab="storyboard-tab">Storyboard</button>
-    <button class="tab-btn" data-tab="rascunho-tab">Rascunho</button>
+<div class="main-container">
+  <div class="sidebar">
+    <button class="sidebar-btn active" data-tab="roteiro-tab"><i class="fas fa-file-alt"></i> Roteiro</button>
+    <button class="sidebar-btn" data-tab="rascunho-tab"><i class="fas fa-sticky-note"></i> Rascunho</button>
+    <button class="sidebar-btn" data-tab="storyboard-tab"><i class="fas fa-th-large"></i> Storyboard</button>
+    <button class="sidebar-btn" data-tab="fofoca-tab"><i class="fas fa-comments"></i> Fofoca</button>
+    <button class="sidebar-btn" data-tab="chama-tab"><i class="fas fa-video"></i> Chama</button>
+  </div>
+
+  <div class="workspace">
+    <div id="roteiro-tab" class="tab active">
+      <div class="script-editor" contenteditable="true">
+        <div class="scene-heading">INT. CASA DE JOÃO - DIA</div>
+        <div class="action">Uma casa simples. JOÃO mexe em papéis sobre a mesa.</div>
+        <div class="character">JOÃO</div>
+        <div class="dialogue">Onde ela está? Já era para ter chegado.</div>
+      </div>
+    </div>
+
+    <div id="rascunho-tab" class="tab">
+      <div class="rascunho-editor" contenteditable="true"></div>
+    </div>
+
+    <div id="storyboard-tab" class="tab">
+      <button class="toolbar-btn" id="addStoryboard"><i class="fas fa-plus"></i> Adicionar Quadro</button>
+      <div class="storyboard-container" id="storyboard">
+        <canvas class="storyboard-canvas"></canvas>
+        <canvas class="storyboard-canvas"></canvas>
+        <canvas class="storyboard-canvas"></canvas>
+      </div>
+    </div>
+
+    <div id="fofoca-tab" class="tab">
+      <p>Chat de fofoca em desenvolvimento...</p>
+    </div>
+
+    <div id="chama-tab" class="tab">
+      <p>Chamada de vídeo em desenvolvimento...</p>
+    </div>
+  </div>
 </div>
 
-<!-- ABAS -->
-<div class="tab-content active" id="roteiro-tab">
-    <div class="script-editor" contenteditable="true"></div>
-    <div id="stats-panel"></div>
-</div>
-<div class="tab-content" id="escaleta-tab">
-    <div contenteditable="true" style="padding:20px;">Conteúdo Escaleta...</div>
-</div>
-<div class="tab-content" id="tratamento-tab">
-    <div contenteditable="true" style="padding:20px;">Conteúdo Tratamento...</div>
-</div>
-<div class="tab-content" id="biblia-tab">
-    <div contenteditable="true" style="padding:20px;">Conteúdo Bíblia...</div>
-</div>
-<div class="tab-content" id="sala-tab">
-    <div contenteditable="true" style="padding:20px;">Conteúdo Sala de Roteiro...</div>
-</div>
-<div class="tab-content" id="storyboard-tab">
-    <canvas id="storyboard-canvas" width="900" height="400"></canvas>
-    <button id="add-frame">+ Adicionar Quadro</button>
-</div>
-<div class="tab-content" id="rascunho-tab">
-    <div class="rascunho-editor" contenteditable="true"></div>
+<footer>
+<div>Modificado: <span id="last-saved">agora</span></div>
+</footer>
+
+<div class="fab-container">
+  <button class="fab" id="fofocaBtn"><i class="fas fa-comments"></i></button>
+  <button class="fab chama" id="chamaBtn"><i class="fas fa-video"></i></button>
 </div>
 
 <script>
-/* --- ABAS --- */
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+document.addEventListener('DOMContentLoaded',()=>{
+  // Alternar abas
+  document.querySelectorAll('.sidebar-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.sidebar-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.getElementById(btn.dataset.tab).classList.add('active');
     });
-});
+  });
 
-/* --- INSERÇÃO DE HTML NO ROTEIRO --- */
-function insertAtCursor(editor, html){
-    const sel = window.getSelection();
-    if(!sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    const frag = document.createRange().createContextualFragment(html);
-    range.insertNode(frag);
-    range.collapse(false);
-    editor.focus();
-}
+  // FABs
+  document.getElementById('fofocaBtn').addEventListener('click',()=>alert('Chat em breve!'));
+  document.getElementById('chamaBtn').addEventListener('click',()=>alert('Chamada em breve!'));
 
-/* --- ATALHOS DE ROTEIRO --- */
-document.addEventListener('keydown', function(e) {
-    const editor = document.querySelector('#roteiro-tab .script-editor');
+  // Auto-save simulado
+  setInterval(()=>document.getElementById('last-saved').textContent='há alguns segundos',10000);
+
+  // Storyboard - desenho livre
+  function makeCanvasDrawable(canvas){
+    const ctx=canvas.getContext('2d');
+    let drawing=false,lastX=0,lastY=0;
+    canvas.addEventListener('mousedown',e=>{drawing=true;lastX=e.offsetX;lastY=e.offsetY;});
+    canvas.addEventListener('mousemove',e=>{if(!drawing)return;ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(e.offsetX,e.offsetY);ctx.strokeStyle='#3498db';ctx.lineWidth=2;ctx.stroke();lastX=e.offsetX;lastY=e.offsetY;});
+    canvas.addEventListener('mouseup',()=>drawing=false);
+    canvas.addEventListener('mouseout',()=>drawing=false);
+  }
+  document.querySelectorAll('.storyboard-canvas').forEach(c=>makeCanvasDrawable(c));
+  document.getElementById('addStoryboard').addEventListener('click',()=>{
+    const canvas=document.createElement('canvas');
+    canvas.classList.add('storyboard-canvas'); canvas.width=200; canvas.height=150;
+    document.getElementById('storyboard').appendChild(canvas);
+    makeCanvasDrawable(canvas);
+  });
+
+  // Atalhos de teclado para roteiro
+  const editor=document.querySelector('#roteiro-tab .script-editor');
+  document.addEventListener('keydown',e=>{
     if(!editor.contains(document.activeElement)) return;
-    if(e.ctrlKey && e.key==='1'){ e.preventDefault(); insertAtCursor(editor, '<div class="scene-heading">NOVA CENA</div>'); }
-    if(e.ctrlKey && e.key==='2'){ e.preventDefault(); insertAtCursor(editor, '<div class="action">AÇÃO...</div>'); }
-    if(e.ctrlKey && e.key==='3'){ e.preventDefault(); insertAtCursor(editor, '<div class="character">PERSONAGEM</div>'); }
-    if(e.ctrlKey && e.key==='4'){ e.preventDefault(); insertAtCursor(editor, '<div class="dialogue">DIÁLOGO...</div>'); }
-    if(e.ctrlKey && e.key==='b'){ document.execCommand('bold'); e.preventDefault(); }
-    if(e.ctrlKey && e.key==='i'){ document.execCommand('italic'); e.preventDefault(); }
-    if(e.ctrlKey && e.key==='u'){ document.execCommand('underline'); e.preventDefault(); }
-});
+    if(e.ctrlKey && e.key==='1'){e.preventDefault(); insertAtCursor(editor,'<div class="scene-heading">NOVA CENA</div>');}
+    if(e.ctrlKey && e.key==='2'){e.preventDefault(); insertAtCursor(editor,'<div class="action">AÇÃO...</div>');}
+    if(e.ctrlKey && e.key==='3'){e.preventDefault(); insertAtCursor(editor,'<div class="character">PERSONAGEM</div>');}
+    if(e.ctrlKey && e.key==='4'){e.preventDefault(); insertAtCursor(editor,'<div class="dialogue">DIÁLOGO...</div>');}
+    if(e.ctrlKey && e.key==='b'){document.execCommand('bold'); e.preventDefault();}
+    if(e.ctrlKey && e.key==='i'){document.execCommand('italic'); e.preventDefault();}
+    if(e.ctrlKey && e.key==='u'){document.execCommand('underline'); e.preventDefault();}
+  });
+  function insertAtCursor(editor,html){
+    const sel=window.getSelection();
+    if(!sel.rangeCount) return;
+    const range=sel.getRangeAt(0);
+    const el=document.createElement("div"); el.innerHTML=html;
+    const frag=document.createDocumentFragment();
+    while(el.firstChild) frag.appendChild(el.firstChild);
+    range.deleteContents(); range.insertNode(frag); range.collapse(false);
+    sel.removeAllRanges(); sel.addRange(range); editor.focus();
+    updateStats();
+  }
 
-/* --- SALVAMENTO SIMULADO --- */
-setInterval(()=>{ console.log('Salvando...'); },30000);
-
-/* --- ANOTAÇÕES INLINE --- */
-document.querySelectorAll('#roteiro-tab .script-editor').forEach(editor=>{
-    editor.addEventListener('dblclick', e=>{
-        const note = prompt('Digite sua nota para esta parte do roteiro:');
-        if(note){
-            const span = document.createElement('span');
-            span.textContent = note;
-            span.style.background='yellow';
-            span.style.cursor='help';
-            span.title='Nota: '+note;
-            e.target.appendChild(span);
-        }
-    });
-});
-
-/* --- ESTATÍSTICAS --- */
-function atualizarEstatisticas(){
-    const editor = document.querySelector('#roteiro-tab .script-editor');
-    if(!editor) return;
-    const cenas = editor.querySelectorAll('.scene-heading').length;
-    const personagens = editor.querySelectorAll('.character').length;
-    const dialogos = editor.querySelectorAll('.dialogue').length;
-    const statsPanel = document.getElementById('stats-panel');
-    if(statsPanel){
-        statsPanel.innerHTML = `
-            <p><strong>Cenas:</strong> ${cenas}</p>
-            <p><strong>Personagens:</strong> ${personagens}</p>
-            <p><strong>Diálogos:</strong> ${dialogos}</p>
-        `;
-    }
-}
-setInterval(atualizarEstatisticas,2000);
-
-/* --- DICIONÁRIO SIMPLES --- */
-document.querySelectorAll('#roteiro-tab .script-editor, #rascunho-tab .rascunho-editor').forEach(editor=>{
-    editor.addEventListener('input', e=>{
-        const palavrasErradas = {'teh':'the','receve':'receive'};
-        Object.keys(palavrasErradas).forEach(err=>{
-            const regex = new RegExp(`\\b${err}\\b`,'g');
-            editor.innerHTML = editor.innerHTML.replace(regex, palavrasErradas[err]);
-        });
-    });
-});
-
-/* --- STORYBOARD --- */
-const canvas = document.getElementById('storyboard-canvas');
-const ctx = canvas.getContext('2d');
-let frames = [
-    {x:20,y:20,w:260,h:200, drawing:[]},
-    {x:320,y:20,w:260,h:200, drawing:[]},
-    {x:620,y:20,w:260,h:200, drawing:[]}
-];
-let currentFrame = null;
-let drawing = false;
-
-function drawFrames(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    frames.forEach(f=>{
-        ctx.strokeStyle='#3498db';
-        ctx.lineWidth=2;
-        ctx.strokeRect(f.x,f.y,f.w,f.h);
-        // Desenhos existentes
-        ctx.beginPath();
-        f.drawing.forEach(line=>{
-            ctx.moveTo(line[0].x,line[0].y);
-            line.forEach(p=> ctx.lineTo(p.x,p.y));
-        });
-        ctx.stroke();
-    });
-}
-drawFrames();
-
-canvas.addEventListener('mousedown', e=>{
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX-rect.left;
-    const y = e.clientY-rect.top;
-    currentFrame = frames.find(f=> x>f.x && x<f.x+f.w && y>f.y && y<f.y+f.h);
-    if(currentFrame){
-        drawing = true;
-        currentFrame.drawing.push([{x:x, y:y}]);
-    }
-});
-
-canvas.addEventListener('mousemove', e=>{
-    if(!drawing || !currentFrame) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX-rect.left;
-    const y = e.clientY-rect.top;
-    currentFrame.drawing[currentFrame.drawing.length-1].push({x:x,y:y});
-    drawFrames();
-});
-
-canvas.addEventListener('mouseup', e=>{
-    drawing = false;
-    currentFrame = null;
-});
-
-document.getElementById('add-frame').addEventListener('click', ()=>{
-    const last = frames[frames.length-1];
-    frames.push({x:last.x+300,y:last.y,w:260,h:200, drawing:[]});
-    drawFrames();
+  // Contagem de cenas, personagens, diálogos
+  function updateStats(){
+    const scenes=editor.querySelectorAll('.scene-heading').length;
+    const characters=editor.querySelectorAll('.character').length;
+    const dialogues=editor.querySelectorAll('.dialogue').length;
+    document.getElementById('doc-stats').textContent=`${scenes} cenas • ${characters} personagens • ${dialogues} diálogos`;
+  }
+  editor.addEventListener('input',updateStats);
+  updateStats();
 });
 </script>
 </body>
 </html>
+
 
 
 
