@@ -1,224 +1,232 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ScriptFlow - Plataforma de Roteiros</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScriptFlow - Plataforma de Roteiros</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <style>
-    /* ===== Layout básico ===== */
-    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f2f5; }
-    header, footer { background:#222; color:#fff; text-align:center; padding:15px 0; }
-    main { padding:20px; min-height:80vh; }
+<style>
+/* ===== Layout básico ===== */
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f2f5; }
+header, footer { background:#222; color:#fff; text-align:center; padding:15px 0; }
+main { padding:20px; min-height:80vh; }
 
-    /* ===== Botões flutuantes ===== */
-    .fab-stack { position:fixed; bottom:20px; right:20px; display:flex; flex-direction:column; gap:15px; z-index:3000; }
-    .fab {
-      background:#222; color:#fff; border:none; border-radius:50%; width:60px; height:60px;
-      cursor:pointer; font-size:24px; display:flex; align-items:center; justify-content:center;
-      transition:all 0.2s ease; box-shadow:0 4px 12px rgba(0,0,0,0.3);
-    }
-    .fab:hover { transform:scale(1.1); background:#333; }
-    .fab.secondary { background:#555; }
-    .fab.secondary:hover { background:#666; }
+/* ===== Botões flutuantes ===== */
+.fab-stack { position:fixed; bottom:20px; right:20px; display:flex; flex-direction:column; gap:15px; z-index:3000; }
+.fab { background:#222; color:#fff; border:none; border-radius:50%; width:60px; height:60px; cursor:pointer; font-size:24px; display:flex; align-items:center; justify-content:center; transition:all 0.2s ease; box-shadow:0 4px 12px rgba(0,0,0,0.3); }
+.fab:hover { transform:scale(1.1); background:#333; }
+.fab.secondary { background:#555; }
+.fab.secondary:hover { background:#666; }
 
-    /* ===== Painéis flutuantes ===== */
-    .float-panel {
-      position:fixed; display:flex; flex-direction:column; background:#fff; border-radius:12px;
-      box-shadow:0 8px 20px rgba(0,0,0,0.25); z-index:2000; width:320px; height:420px; top:100px; right:20px;
-      transition: all 0.25s ease;
-      overflow:hidden;
-    }
-    .float-header { background:#222; color:#fff; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; cursor:move; }
-    .float-title { font-size:15px; display:flex; align-items:center; gap:8px; }
-    .float-actions button { background:transparent; border:none; color:#fff; cursor:pointer; font-size:16px; margin-left:5px; }
-    .float-body { flex:1; padding:10px; overflow:auto; background:#fafafa; }
+/* ===== Painéis flutuantes ===== */
+.float-panel { position:fixed; display:flex; flex-direction:column; background:#fff; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.25); z-index:2000; width:320px; height:420px; top:100px; right:20px; transition: all 0.25s ease; overflow:hidden; }
+.float-header { background:#222; color:#fff; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; cursor:move; }
+.float-title { font-size:15px; display:flex; align-items:center; gap:8px; }
+.float-actions button { background:transparent; border:none; color:#fff; cursor:pointer; font-size:16px; margin-left:5px; }
+.float-body { flex:1; padding:10px; overflow:auto; background:#fafafa; }
+.minimized { height:45px !important; width:200px !important; overflow:hidden; }
 
-    .minimized { height:45px !important; width:200px !important; overflow:hidden; }
+/* ===== Painéis individuais coloridos ===== */
+#chatPanel .float-header { background:#1e90ff; }
+#videoPanel .float-header { background:#32cd32; }
+#rascunhoPanel .float-header { background:#ff8c00; }
 
-    /* ===== Painéis individuais coloridos ===== */
-    #chatPanel .float-header { background:#1e90ff; }
-    #videoPanel .float-header { background:#32cd32; }
-    #rascunhoPanel .float-header { background:#ff8c00; }
+/* ===== Notificação ===== */
+.notification { position:fixed; top:20px; right:20px; background:#222; color:#fff; padding:12px 22px; border-radius:6px; opacity:0; transform:translateY(-20px); transition:opacity 0.3s, transform 0.3s; z-index:4000; box-shadow:0 6px 16px rgba(0,0,0,0.3); }
+.notification.show { opacity:1; transform:translateY(0); }
 
-    /* ===== Notificação ===== */
-    .notification {
-      position:fixed; top:20px; right:20px; background:#222; color:#fff; padding:12px 22px;
-      border-radius:6px; opacity:0; transform:translateY(-20px); transition:opacity 0.3s, transform 0.3s; z-index:4000;
-      box-shadow:0 6px 16px rgba(0,0,0,0.3);
-    }
-    .notification.show { opacity:1; transform:translateY(0); }
+/* ===== Inputs e Textarea ===== */
+textarea, input { font-family: Arial, sans-serif; font-size:14px; padding:6px; border-radius:5px; border:1px solid #ccc; box-sizing:border-box; }
+textarea { resize:none; width:100%; height:100%; }
+button { cursor:pointer; }
 
-    /* ===== Inputs e Textarea ===== */
-    textarea, input { font-family: Arial, sans-serif; font-size:14px; padding:6px; border-radius:5px; border:1px solid #ccc; box-sizing:border-box; }
-    textarea { resize:none; width:100%; height:100%; }
-    button { cursor:pointer; }
-  </style>
+/* ===== Chat mensagens ===== */
+.chat-messages { height:calc(100% - 40px); overflow-y:auto; padding:5px; display:flex; flex-direction:column; gap:6px; }
+.chat-message { background:#e1f0ff; padding:6px 10px; border-radius:10px; max-width:80%; word-wrap:break-word; font-size:14px; }
+.chat-message.you { background:#d4ffd4; align-self:flex-end; }
+</style>
 </head>
 <body>
 
-  <!-- ===== Header ===== -->
-  <header>
-    <h1>ScriptFlow - Plataforma de Criação de Roteiros</h1>
-  </header>
+<header>
+<h1>ScriptFlow - Plataforma de Criação de Roteiros</h1>
+</header>
 
-  <!-- ===== Main ===== -->
-  <main>
-    <p>Bem-vindo ao ScriptFlow! Use os botões flutuantes para abrir Fofoca (chat), Chama (vídeo) e Rascunho.</p>
-  </main>
+<main>
+<p>Bem-vindo ao ScriptFlow! Use os botões flutuantes para abrir Fofoca (chat), Chama (vídeo) e Rascunho.</p>
+</main>
 
-  <!-- ===== Footer ===== -->
-  <footer>
-    <p>ScriptFlow © 2025 - Plataforma de criação de roteiros</p>
-  </footer>
+<footer>
+<p>ScriptFlow © 2025 - Plataforma de criação de roteiros</p>
+</footer>
 
-  <!-- ===== Notificação ===== -->
-  <div class="notification" id="notification"></div>
+<div class="notification" id="notification"></div>
 
-  <!-- ===== Botões flutuantes ===== -->
-  <div class="fab-stack">
-    <button class="fab secondary" id="openChatFab" title="Abrir Fofoca"><i class="fas fa-comments"></i></button>
-    <button class="fab" id="openVideoFab" title="Abrir Chama"><i class="fas fa-video"></i></button>
-    <button class="fab" id="openRascunhoFab" title="Abrir Rascunho"><i class="fas fa-pencil-alt"></i></button>
-  </div>
+<!-- ===== Botões flutuantes ===== -->
+<div class="fab-stack">
+<button class="fab secondary" id="openChatFab" title="Abrir Fofoca"><i class="fas fa-comments"></i></button>
+<button class="fab" id="openVideoFab" title="Abrir Chama"><i class="fas fa-video"></i></button>
+<button class="fab" id="openRascunhoFab" title="Abrir Rascunho"><i class="fas fa-pencil-alt"></i></button>
+</div>
 
-  <!-- ===== Painel Fofoca ===== -->
-  <div class="float-panel" id="chatPanel" style="display:none;">
-    <div class="float-header">
-      <div class="float-title"><i class="fas fa-comments"></i> Fofoca</div>
-      <div class="float-actions">
-        <button class="icon-btn" id="chatMinBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
-        <button class="icon-btn" id="chatMaxBtn" title="Maximizar"><i class="fas fa-up-right-and-down-left-from-center"></i></button>
-        <button class="icon-btn" id="chatCloseBtn" title="Fechar"><i class="fas fa-times"></i></button>
-      </div>
-    </div>
-    <div class="float-body">
-      <div class="chat-messages" id="chatMessages"></div>
-      <div class="chat-input">
-        <input type="text" id="messageInput" placeholder="Digite sua mensagem..." />
-        <button id="sendMessageBtn" title="Enviar"><i class="fas fa-paper-plane"></i></button>
-      </div>
-    </div>
-  </div>
+<!-- ===== Painel Fofoca ===== -->
+<div class="float-panel" id="chatPanel" style="display:none;">
+<div class="float-header">
+<div class="float-title"><i class="fas fa-comments"></i> Fofoca</div>
+<div class="float-actions">
+<button class="icon-btn" id="chatMinBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
+<button class="icon-btn" id="chatMaxBtn" title="Maximizar"><i class="fas fa-up-right-and-down-left-from-center"></i></button>
+<button class="icon-btn" id="chatCloseBtn" title="Fechar"><i class="fas fa-times"></i></button>
+</div>
+</div>
+<div class="float-body">
+<div class="chat-messages" id="chatMessages"></div>
+<div class="chat-input">
+<input type="text" id="messageInput" placeholder="Digite sua mensagem..." />
+<button id="sendMessageBtn" title="Enviar"><i class="fas fa-paper-plane"></i></button>
+</div>
+</div>
+</div>
 
-  <!-- ===== Painel Chama ===== -->
-  <div class="float-panel" id="videoPanel" style="display:none;">
-    <div class="float-header">
-      <div class="float-title"><i class="fas fa-video"></i> Chama</div>
-      <div class="float-actions">
-        <button class="icon-btn" id="videoMinBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
-        <button class="icon-btn" id="videoMaxBtn" title="Maximizar"><i class="fas fa-up-right-and-down-left-from-center"></i></button>
-        <button class="icon-btn" id="videoPopBtn" title="Abrir em janela"><i class="fas fa-window-restore"></i></button>
-        <button class="icon-btn" id="videoCloseBtn" title="Fechar"><i class="fas fa-times"></i></button>
-      </div>
-    </div>
-    <div class="float-body">
-      <div class="video-box">
-        <video id="localVideo" autoplay playsinline muted style="width:100%; border-radius:6px;"></video>
-        <div class="video-label">Você</div>
-      </div>
-      <div class="video-controls" style="margin-top:10px; display:flex; justify-content:space-around;">
-        <button class="video-btn" id="toggleVideoBtn" title="Ligar/Desligar Vídeo"><i class="fas fa-video"></i></button>
-        <button class="video-btn" id="toggleAudioBtn" title="Ligar/Desligar Áudio"><i class="fas fa-microphone"></i></button>
-        <button class="video-btn" id="screenShareBtn" title="Compartilhar Tela"><i class="fas fa-desktop"></i></button>
-        <button class="video-btn" id="recBtn" title="Gravar (WebM)"><i class="fas fa-record-vinyl"></i></button>
-        <button class="video-btn end" id="endCallBtn" title="Encerrar"><i class="fas fa-phone-slash"></i></button>
-      </div>
-    </div>
-  </div>
+<!-- ===== Painel Chama ===== -->
+<div class="float-panel" id="videoPanel" style="display:none;">
+<div class="float-header">
+<div class="float-title"><i class="fas fa-video"></i> Chama</div>
+<div class="float-actions">
+<button class="icon-btn" id="videoMinBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
+<button class="icon-btn" id="videoMaxBtn" title="Maximizar"><i class="fas fa-up-right-and-down-left-from-center"></i></button>
+<button class="icon-btn" id="videoPopBtn" title="Abrir em janela"><i class="fas fa-window-restore"></i></button>
+<button class="icon-btn" id="videoCloseBtn" title="Fechar"><i class="fas fa-times"></i></button>
+</div>
+</div>
+<div class="float-body">
+<div class="video-box">
+<video id="localVideo" autoplay playsinline muted style="width:100%; border-radius:6px;"></video>
+<div class="video-label">Você</div>
+</div>
+<div class="video-controls" style="margin-top:10px; display:flex; justify-content:space-around;">
+<button class="video-btn" id="toggleVideoBtn" title="Ligar/Desligar Vídeo"><i class="fas fa-video"></i></button>
+<button class="video-btn" id="toggleAudioBtn" title="Ligar/Desligar Áudio"><i class="fas fa-microphone"></i></button>
+<button class="video-btn" id="screenShareBtn" title="Compartilhar Tela"><i class="fas fa-desktop"></i></button>
+<button class="video-btn" id="recBtn" title="Gravar (WebM)"><i class="fas fa-record-vinyl"></i></button>
+<button class="video-btn end" id="endCallBtn" title="Encerrar"><i class="fas fa-phone-slash"></i></button>
+</div>
+</div>
+</div>
 
-  <!-- ===== Painel Rascunho ===== -->
-  <div class="float-panel" id="rascunhoPanel" style="display:none;">
-    <div class="float-header">
-      <div class="float-title"><i class="fas fa-pencil-alt"></i> Rascunho</div>
-      <div class="float-actions">
-        <button class="icon-btn" id="rascunhoMinBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
-        <button class="icon-btn" id="rascunhoMaxBtn" title="Maximizar"><i class="fas fa-up-right-and-down-left-from-center"></i></button>
-        <button class="icon-btn" id="rascunhoCloseBtn" title="Fechar"><i class="fas fa-times"></i></button>
-      </div>
-    </div>
-    <div class="float-body">
-      <textarea id="rascunhoTextarea" placeholder="Escreva aqui..."></textarea>
-    </div>
-  </div>
+<!-- ===== Painel Rascunho ===== -->
+<div class="float-panel" id="rascunhoPanel" style="display:none;">
+<div class="float-header">
+<div class="float-title"><i class="fas fa-pencil-alt"></i> Rascunho</div>
+<div class="float-actions">
+<button class="icon-btn" id="rascunhoMinBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
+<button class="icon-btn" id="rascunhoMaxBtn" title="Maximizar"><i class="fas fa-up-right-and-down-left-from-center"></i></button>
+<button class="icon-btn" id="rascunhoCloseBtn" title="Fechar"><i class="fas fa-times"></i></button>
+</div>
+</div>
+<div class="float-body">
+<textarea id="rascunhoTextarea" placeholder="Escreva aqui..."></textarea>
+</div>
+</div>
 
-  <!-- ===== Script unificado ===== -->
-  <script>
-    // Abrir/Fechar painéis
-    function togglePanel(id){ 
-      const p = document.getElementById(id); 
-      p.style.display = p.style.display==='none'?'flex':'none';
-    }
-    document.getElementById("openChatFab").onclick = ()=>togglePanel('chatPanel');
-    document.getElementById("openVideoFab").onclick = ()=>togglePanel('videoPanel');
-    document.getElementById("openRascunhoFab").onclick = ()=>togglePanel('rascunhoPanel');
+<script>
+// ===== Abrir/Fechar painéis =====
+function togglePanel(id){
+  const p = document.getElementById(id);
+  p.style.display = p.style.display==='none'?'flex':'none';
+}
+document.getElementById("openChatFab").onclick = ()=>togglePanel('chatPanel');
+document.getElementById("openVideoFab").onclick = ()=>togglePanel('videoPanel');
+document.getElementById("openRascunhoFab").onclick = ()=>togglePanel('rascunhoPanel');
 
-    // Minimizar/Maximizar/Fechar
-    const chatPanel = document.getElementById("chatPanel");
-    document.getElementById("chatMinBtn").onclick = ()=>chatPanel.classList.add("minimized");
-    document.getElementById("chatMaxBtn").onclick = ()=>chatPanel.classList.remove("minimized");
-    document.getElementById("chatCloseBtn").onclick = ()=>chatPanel.style.display="none";
+// ===== Minimizar/Maximizar/Fechar =====
+const chatPanel = document.getElementById("chatPanel");
+document.getElementById("chatMinBtn").onclick = ()=>chatPanel.classList.add("minimized");
+document.getElementById("chatMaxBtn").onclick = ()=>chatPanel.classList.remove("minimized");
+document.getElementById("chatCloseBtn").onclick = ()=>chatPanel.style.display="none";
 
-    const videoPanel = document.getElementById("videoPanel");
-    document.getElementById("videoMinBtn").onclick = ()=>videoPanel.classList.add("minimized");
-    document.getElementById("videoMaxBtn").onclick = ()=>videoPanel.classList.remove("minimized");
-    document.getElementById("videoCloseBtn").onclick = ()=>videoPanel.style.display="none";
+const videoPanel = document.getElementById("videoPanel");
+document.getElementById("videoMinBtn").onclick = ()=>videoPanel.classList.add("minimized");
+document.getElementById("videoMaxBtn").onclick = ()=>videoPanel.classList.remove("minimized");
+document.getElementById("videoCloseBtn").onclick = ()=>videoPanel.style.display="none";
 
-    const rascunhoPanel = document.getElementById("rascunhoPanel");
-    const rascunhoTextarea = document.getElementById("rascunhoTextarea");
-    document.getElementById("rascunhoMinBtn").onclick = ()=>rascunhoPanel.classList.add("minimized");
-    document.getElementById("rascunhoMaxBtn").onclick = ()=>rascunhoPanel.classList.remove("minimized");
-    document.getElementById("rascunhoCloseBtn").onclick = ()=>rascunhoPanel.style.display="none";
+const rascunhoPanel = document.getElementById("rascunhoPanel");
+const rascunhoTextarea = document.getElementById("rascunhoTextarea");
+document.getElementById("rascunhoMinBtn").onclick = ()=>rascunhoPanel.classList.add("minimized");
+document.getElementById("rascunhoMaxBtn").onclick = ()=>rascunhoPanel.classList.remove("minimized");
+document.getElementById("rascunhoCloseBtn").onclick = ()=>rascunhoPanel.style.display="none";
 
-    // Persistência do Rascunho
-    const STORAGE_RASCUNHO="rascunho_text";
-    if(localStorage.getItem(STORAGE_RASCUNHO)) rascunhoTextarea.value = localStorage.getItem(STORAGE_RASCUNHO);
-    rascunhoTextarea.addEventListener("input",()=>localStorage.setItem(STORAGE_RASCUNHO, rascunhoTextarea.value));
+// ===== Persistência Rascunho =====
+const STORAGE_RASCUNHO="rascunho_text";
+if(localStorage.getItem(STORAGE_RASCUNHO)) rascunhoTextarea.value = localStorage.getItem(STORAGE_RASCUNHO);
+rascunhoTextarea.addEventListener("input",()=>localStorage.setItem(STORAGE_RASCUNHO, rascunhoTextarea.value));
 
-    // Tornar painéis arrastáveis
-    function makeDraggable(panelId){
-      const panel = document.getElementById(panelId);
-      const header = panel.querySelector('.float-header');
-      let offsetX=0, offsetY=0, isDown=false;
+// ===== Tornar painéis arrastáveis =====
+function makeDraggable(panelId){
+  const panel = document.getElementById(panelId);
+  const header = panel.querySelector('.float-header');
+  let offsetX=0, offsetY=0, isDown=false;
+  header.addEventListener('mousedown',e=>{
+    isDown=true;
+    offsetX = panel.offsetLeft - e.clientX;
+    offsetY = panel.offsetTop - e.clientY;
+  });
+  document.addEventListener('mouseup',()=>isDown=false);
+  document.addEventListener('mousemove',e=>{
+    if(!isDown) return;
+    panel.style.top=(e.clientY+offsetY)+'px';
+    panel.style.left=(e.clientX+offsetX)+'px';
+  });
+}
+makeDraggable('chatPanel');
+makeDraggable('videoPanel');
+makeDraggable('rascunhoPanel');
 
-      header.addEventListener('mousedown',(e)=>{
-        isDown=true;
-        offsetX = panel.offsetLeft - e.clientX;
-        offsetY = panel.offsetTop - e.clientY;
-      });
+// ===== Notificação =====
+function notify(msg){
+  const n = document.getElementById('notification');
+  if(!n) return;
+  n.textContent = msg;
+  n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'), 2500);
+}
 
-      document.addEventListener('mouseup',()=>isDown=false);
-      document.addEventListener('mousemove',(e)=>{
-        if(!isDown) return;
-        panel.style.top=(e.clientY+offsetY)+'px';
-        panel.style.left=(e.clientX+offsetX)+'px';
-      });
-    }
-    makeDraggable('chatPanel');
-    makeDraggable('videoPanel');
-    makeDraggable('rascunhoPanel');
+// ===== Chat funcional =====
+const chatMessages = document.getElementById('chatMessages');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendMessageBtn');
+const STORAGE_CHAT = 'chat_messages';
 
-    // Notificação
-    function notify(msg){
-      const n = document.getElementById('notification');
-      if(!n) return;
-      n.textContent = msg;
-      n.classList.add('show');
-      setTimeout(()=>n.classList.remove('show'), 2500);
-    }
+function loadChat(){
+  const saved = JSON.parse(localStorage.getItem(STORAGE_CHAT) || '[]');
+  chatMessages.innerHTML = '';
+  saved.forEach(msg=>{
+    const div = document.createElement('div');
+    div.className = 'chat-message '+(msg.you?'you':'');
+    div.textContent = msg.text;
+    chatMessages.appendChild(div);
+  });
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+function saveChat(msg){
+  const saved = JSON.parse(localStorage.getItem(STORAGE_CHAT) || '[]');
+  saved.push(msg);
+  localStorage.setItem(STORAGE_CHAT, JSON.stringify(saved));
+}
+function sendMessage(){
+  const text = messageInput.value.trim();
+  if(!text) return;
+  const msg = { text, you:true };
+  saveChat(msg);
+  loadChat();
+  messageInput.value='';
+}
+sendBtn.onclick = sendMessage;
+messageInput.addEventListener('keydown',e=>{ if(e.key==='Enter') sendMessage(); });
 
-    // Estado global simples
-    const STORAGE_KEY = 'scriptflow_data_v2';
-    const state = { argument:{storyline:'',logline:'',synopsis:'',argument:''}, outline:'', script:'', treatment:'', bible:'', storyboard:[], messages:[] };
-    function loadState(){
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return;
-      try{ Object.assign(state, JSON.parse(raw)); } catch(e){ console.warn(e); }
-    }
-    function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-
-  </script>
+loadChat();
+</script>
 
 </body>
 </html>
