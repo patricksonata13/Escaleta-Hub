@@ -3,309 +3,254 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ScriptFlow Ultimate - Editor de Roteiro Profissional</title>
+<title>ScriptFlow Ultimate - Plataforma de Roteiro</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-    /* ===== VARIÁVEIS ===== */
-    :root {
-        --primary: #2c3e50;
-        --secondary: #e74c3c;
-        --accent: #3498db;
-        --light: #ecf0f1;
-        --dark: #2c3e50;
-        --success: #2ecc71;
-        --warning: #f39c12;
-        --danger: #e74c3c;
-        --text: #2c3e50;
-        --bg: #f9f9f9;
-        --header-bg: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-        --sidebar-bg: #34495e;
-        --editor-bg: #ffffff;
-        --editor-text: #000000;
-        --footer-bg: #2c3e50;
-        --footer-text: #ecf0f1;
-    }
-    .dark-mode { --text:#ecf0f1; --bg:#1a2a3a; --header-bg:linear-gradient(135deg,#c0392b 0%,#922b21 100%); --sidebar-bg:#2c3e50; --editor-bg:#1e2a38; --editor-text:#ecf0f1; --footer-bg:#1a252f; --footer-text:#bdc3c7; }
-    .focus-mode { --text:#3498db; --bg:#1e2a38; --header-bg:linear-gradient(135deg,#2980b9 0%,#1c5d8a 100%); --sidebar-bg:#2c3e50; --editor-bg:#14212e; --editor-text:#3498db; --footer-bg:#1a252f; --footer-text:#3498db; }
+/* ===== VARIÁVEIS ===== */
+:root {
+    --primary: #2c3e50;
+    --secondary: #e74c3c;
+    --accent: #3498db;
+    --light: #ecf0f1;
+    --dark: #2c3e50;
+    --text: #2c3e50;
+    --bg: #f9f9f9;
+    --header-bg: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    --sidebar-bg: #34495e;
+    --editor-bg: #ffffff;
+    --editor-text: #000000;
+    --footer-bg: #2c3e50;
+    --footer-text: #ecf0f1;
+}
 
-    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
-    body{background-color:var(--bg);color:var(--text);line-height:1.6;display:flex;flex-direction:column;min-height:100vh;transition:all 0.3s ease;}
+body {
+    margin:0; padding:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg); color: var(--text); display:flex; flex-direction:column; min-height:100vh;
+}
 
-    /* ===== CABEÇALHO ===== */
-    header{background:var(--header-bg);color:white;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.2);}
-    .header-left{display:flex;align-items:center;gap:1rem;}
-    .logo{font-size:2.2rem;font-weight:bold;display:flex;align-items:center;gap:0.5rem;}
-    .document-info{display:flex;flex-direction:column;}
-    .document-title{font-weight:bold;font-size:1.2rem;}
-    .document-stats{font-size:0.9rem;opacity:0.9;}
-    .header-right{display:flex;gap:1rem;}
-    .login-panel{margin-left:1rem;font-weight:bold;}
+/* ===== LOGIN ===== */
+#login-screen {
+    position:fixed; top:0; left:0; width:100%; height:100%; background:#34495e; display:flex; justify-content:center; align-items:center; flex-direction:column; color:white; z-index:2000;
+}
+#login-screen h1 { font-size:3rem; margin-bottom:2rem;}
+#login-screen input { padding:0.5rem 1rem; margin-bottom:1rem; border:none; border-radius:5px; }
+#login-screen button { padding:0.5rem 1.5rem; background:var(--secondary); border:none; border-radius:5px; color:white; cursor:pointer; font-weight:bold; }
 
-    /* ===== LAYOUT PRINCIPAL ===== */
-    .main-container{display:flex;flex:1;overflow:hidden;}
-    .sidebar{width:250px;background:var(--sidebar-bg);color:#ecf0f1;padding:1rem;display:flex;flex-direction:column;box-shadow:2px 0 5px rgba(0,0,0,0.1);}
-    .sidebar-section{margin-bottom:1.5rem;}
-    .sidebar-section h3{margin-bottom:0.8rem;font-size:1rem;color:#bdc3c7;display:flex;align-items:center;gap:0.5rem;}
-    .sidebar-btn{display:flex;align-items:center;gap:0.5rem;padding:0.7rem;width:100%;background:transparent;border:none;color:#ecf0f1;text-align:left;border-radius:4px;cursor:pointer;transition:background 0.2s;margin-bottom:0.3rem;}
-    .sidebar-btn:hover{background:#3d5066;}
-    .sidebar-btn.active{background:#e74c3c;}
+/* ===== CABEÇALHO ===== */
+header {
+    background: var(--header-bg); color:white; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center;
+}
+header .logo { font-size:2rem; font-weight:bold; display:flex; align-items:center; gap:0.5rem;}
+header .header-right { display:flex; gap:1rem; }
 
-    .workspace{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-    .toolbar{padding:0.8rem 1.5rem;background:var(--light);display:flex;gap:1rem;flex-wrap:wrap;border-bottom:1px solid #ddd;}
-    .toolbar-btn{padding:0.5rem 1rem;background:var(--primary);color:white;border:none;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;transition:all 0.2s;}
-    .toolbar-btn:hover{background:#34495e;}
-    .toolbar-btn.active{background:var(--secondary);}
-    .toolbar-group{display:flex;gap:0.5rem;align-items:center;}
-    .divider{width:1px;background:#ddd;height:24px;}
+/* ===== LAYOUT PRINCIPAL ===== */
+.main-container { display:flex; flex:1; overflow:hidden; }
 
-    /* ===== EDITOR DE ROTEIRO ===== */
-    .editor-container{flex:1;display:flex;overflow:hidden;}
-    .script-editor{flex:1;padding:2rem;background:var(--editor-bg);color:var(--editor-text);overflow-y:auto;font-family:'Courier New',monospace;font-size:12pt;line-height:1.5;}
-    .scene-heading{font-weight:bold;text-transform:uppercase;margin-top:1.5rem;color:#3498db;cursor:pointer;}
-    .action{margin:0.8rem 0;padding:5px;border-radius:3px;cursor:pointer;}
-    .character{text-align:center;width:50%;margin:0.8rem auto;font-weight:bold;padding:5px;border-radius:3px;cursor:pointer;}
-    .dialogue{width:60%;margin:0 auto;padding:5px;border-radius:3px;cursor:pointer;}
-    .parenthetical{width:50%;margin:0 auto;padding-left:2rem;padding:5px;border-radius:3px;cursor:pointer;}
-    .transition{text-align:right;margin-top:1rem;text-transform:uppercase;font-weight:bold;padding:5px;border-radius:3px;cursor:pointer;}
+/* ===== SIDEBAR ===== */
+.sidebar { width:250px; background:var(--sidebar-bg); color:#ecf0f1; padding:1rem; display:flex; flex-direction:column; }
+.sidebar button { background:none; border:none; color:#ecf0f1; text-align:left; padding:0.7rem; border-radius:4px; margin-bottom:0.3rem; cursor:pointer; display:flex; align-items:center; gap:0.5rem; }
+.sidebar button.active { background:var(--secondary); }
 
-    /* ===== PAINEL DIREITO ===== */
-    .right-panel{width:300px;background:var(--light);padding:1rem;border-left:1px solid #ddd;overflow-y:auto;}
-    .panel-tabs{display:flex;margin-bottom:1rem;border-bottom:1px solid #ddd;}
-    .panel-tab{padding:0.5rem 1rem;background:transparent;border:none;cursor:pointer;}
-    .panel-tab.active{border-bottom:2px solid var(--secondary);font-weight:bold;}
-    .panel-content{display:none;}
-    .panel-content.active{display:block;}
+/* ===== WORKSPACE ===== */
+.workspace { flex:1; display:flex; flex-direction:column; overflow:hidden; }
 
-    /* ===== RODAPÉ ===== */
-    footer{background:var(--footer-bg);color:var(--footer-text);padding:0.8rem 1.5rem;display:flex;justify-content:space-between;align-items:center;font-size:0.9rem;}
-    .footer-left{display:flex;gap:1.5rem;}
-    .footer-right{display:flex;gap:0.8rem;}
+/* ===== TOOLBAR ===== */
+.toolbar { padding:0.8rem 1.5rem; background:var(--light); display:flex; gap:1rem; flex-wrap:wrap; border-bottom:1px solid #ddd; }
+.toolbar button { padding:0.5rem 1rem; border:none; border-radius:4px; cursor:pointer; background:var(--primary); color:white; display:flex; align-items:center; gap:0.5rem; }
 
-    /* ===== BOTÕES FLUTUANTES ===== */
-    .fab-container{position:fixed;bottom:25px;right:25px;display:flex;flex-direction:column;gap:15px;z-index:1000;}
-    .fab{width:60px;height:60px;border-radius:50%;background:var(--secondary);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 5px 15px rgba(0,0,0,0.3);transition:all 0.3s;}
-    .fab:hover{transform:translateY(-5px) scale(1.05);box-shadow:0 8px 20px rgba(0,0,0,0.4);}
-    .fab.chama{background:var(--accent);}
-    .fab.rascunho{background:var(--success);}
+/* ===== EDITOR ===== */
+.editor-container { flex:1; display:flex; overflow:hidden; }
+.script-editor, .storyboard-editor, .simple-editor, .bible-editor, .escaleta-editor, .tratamento-editor, .sala-editor { flex:1; padding:2rem; background:var(--editor-bg); color:var(--editor-text); overflow-y:auto; display:none; }
+.script-editor.active, .storyboard-editor.active, .simple-editor.active, .bible-editor.active, .escaleta-editor.active, .tratamento-editor.active, .sala-editor.active { display:block; }
 
-    .rascunho-container{display:none;position:fixed;bottom:100px;right:25px;width:300px;height:400px;background:var(--light);border:1px solid #ccc;border-radius:10px;padding:10px;z-index:1001;box-shadow:0 5px 15px rgba(0,0,0,0.3);}
-    .rascunho-container textarea{width:100%;height:100%;padding:10px;border:none;resize:none;background:var(--light);color:var(--text);}
+/* ===== STORYBOARD ===== */
+.storyboard-canvas { display:flex; gap:1rem; margin-bottom:1rem; }
+.storyboard-canvas canvas { border:1px solid #ccc; width:200px; height:150px; background:white; }
+.add-frame { padding:0.5rem 1rem; background:var(--secondary); color:white; border:none; border-radius:4px; cursor:pointer; height:150px; display:flex; align-items:center; justify-content:center; }
 
-    /* ===== ABAS PRINCIPAIS ===== */
-    .main-tabs{display:flex;gap:10px;margin-bottom:10px;}
-    .main-tab{padding:8px 15px;background:var(--primary);color:white;border:none;border-radius:5px;cursor:pointer;transition:0.3s;}
-    .main-tab.active{background:var(--secondary);}
+/* ===== PAINEL DIREITO ===== */
+.right-panel { width:300px; background:var(--light); padding:1rem; border-left:1px solid #ddd; overflow-y:auto; }
+.panel-tabs { display:flex; margin-bottom:1rem; border-bottom:1px solid #ddd; }
+.panel-tab { padding:0.5rem 1rem; background:transparent; border:none; cursor:pointer; }
+.panel-tab.active { border-bottom:2px solid var(--secondary); font-weight:bold; }
+.panel-content { display:none; }
+.panel-content.active { display:block; }
 
-    /* ===== RESPONSIVIDADE ===== */
-    @media(max-width:1200px){.sidebar{width:200px;}.right-panel{width:250px;}}
-    @media(max-width:900px){.main-container{flex-direction:column;}.sidebar{width:100%;order:2;}.editor-container{flex-direction:column;}.right-panel{width:100%;order:3;}.character,.dialogue,.parenthetical{width:90%;}}
-    @media(max-width:600px){.toolbar{padding:0.5rem;}.toolbar-btn{padding:0.4rem 0.7rem;font-size:0.8rem;}.script-editor{padding:1rem;}header{padding:1rem;flex-direction:column;gap:1rem;}footer{flex-direction:column;gap:1rem;text-align:center;}}
+/* ===== BOTÕES FLUTUANTES ===== */
+.fab-container { position:fixed; bottom:25px; right:25px; display:flex; flex-direction:column; gap:15px; z-index:1000; }
+.fab { width:60px; height:60px; border-radius:50%; background:var(--secondary); color:white; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.5rem; box-shadow:0 5px 15px rgba(0,0,0,0.3); }
+.fab:hover { transform:translateY(-5px) scale(1.05); box-shadow:0 8px 20px rgba(0,0,0,0.4);}
+.fab.rascunho { background:var(--accent); }
+
+/* ===== RESPONSIVIDADE ===== */
+@media(max-width:900px){.main-container{flex-direction:column;}.sidebar{width:100%; order:2;}.right-panel{width:100%; order:3;}}
+
+/* ===== OUTROS ===== */
+textarea { width:100%; padding:10px; margin-top:5px; }
+canvas { touch-action: none; }
 </style>
 </head>
 <body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+    <h1>Roteirista</h1>
+    <input type="text" placeholder="Usuário">
+    <input type="password" placeholder="Senha">
+    <button id="loginBtn">Entrar</button>
+</div>
+
+<!-- CABEÇALHO -->
 <header>
-    <div class="header-left">
-        <div class="logo"><i class="fas fa-scroll"></i><span>ScriptFlow</span></div>
-        <div class="login-panel">Roteirista</div>
-        <div class="document-info">
-            <div class="document-title">Roteiro Sem Título</div>
-            <div class="document-stats">0 cenas • 0 páginas • Modificado agora</div>
-        </div>
-    </div>
+    <div class="logo"><i class="fas fa-scroll"></i> ScriptFlow</div>
     <div class="header-right">
-        <button class="toolbar-btn"><i class="fas fa-save"></i> Salvar</button>
-        <button class="toolbar-btn"><i class="fas fa-file-export"></i> Exportar</button>
-        <button class="toolbar-btn"><i class="fas fa-cloud"></i> Publicar</button>
+        <button><i class="fas fa-save"></i> Salvar</button>
+        <button><i class="fas fa-file-export"></i> Exportar</button>
+        <button><i class="fas fa-cloud"></i> Publicar</button>
     </div>
 </header>
 
-<div class="main-tabs">
-    <button class="main-tab active" data-tab="roteiro">Roteiro</button>
-    <button class="main-tab" data-tab="escaleta">Escaleta</button>
-    <button class="main-tab" data-tab="tratamento">Tratamento</button>
-    <button class="main-tab" data-tab="biblia">Bíblia</button>
-    <button class="main-tab" data-tab="sala">Sala de Roteiro</button>
-    <button class="main-tab" data-tab="storyboard">Storyboard</button>
-</div>
-
+<!-- LAYOUT PRINCIPAL -->
 <div class="main-container">
+    <!-- SIDEBAR -->
     <div class="sidebar">
-        <!-- mesma sidebar original -->
-        <div class="sidebar-section">
-            <h3><i class="fas fa-film"></i> Elementos</h3>
-            <button class="sidebar-btn active"><i class="fas fa-video"></i> Cena</button>
-            <button class="sidebar-btn"><i class="fas fa-running"></i> Ação</button>
-            <button class="sidebar-btn"><i class="fas fa-user"></i> Personagem</button>
-            <button class="sidebar-btn"><i class="fas fa-comment"></i> Diálogo</button>
-            <button class="sidebar-btn"><i class="fas fa-parentheses"></i> Parentético</button>
-            <button class="sidebar-btn"><i class="fas fa-arrow-right"></i> Transição</button>
+        <button class="active" data-tab="roteiro">Roteiro</button>
+        <button data-tab="escaleta">Escaleta</button>
+        <button data-tab="tratamento">Tratamento</button>
+        <button data-tab="bible">Bíblia</button>
+        <button data-tab="sala">Sala de Roteiro</button>
+        <button data-tab="storyboard">Storyboard</button>
+    </div>
+
+    <!-- WORKSPACE -->
+    <div class="workspace">
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <button><i class="fas fa-plus"></i> Novo</button>
+            <button><i class="fas fa-trash"></i> Remover</button>
         </div>
-        <div class="sidebar-section">
-            <h3><i class="fas fa-layer-group"></i> Visualização</h3>
-            <button class="sidebar-btn"><i class="fas fa-list"></i> Outline</button>
-            <button class="sidebar-btn"><i class="fas fa-th"></i> Cartões</button>
-            <button class="sidebar-btn"><i class="fas fa-map"></i> Story Map</button>
-        </div>
-        <div class="sidebar-section">
-            <h3><i class="fas fa-cog"></i> Ferramentas</h3>
-            <button class="sidebar-btn"><i class="fas fa-search"></i> Buscar</button>
-            <button class="sidebar-btn"><i class="fas fa-exchange-alt"></i> Substituir</button>
-            <button class="sidebar-btn"><i class="fas fa-sticky-note"></i> Notas</button>
-            <button class="sidebar-btn"><i class="fas fa-history"></i> Histórico</button>
+
+        <!-- EDITORES -->
+        <div class="editor-container">
+            <div class="script-editor active" contenteditable="true">
+                <h3>Editor de Roteiro</h3>
+                <p>INT. CASA DE JOÃO - DIA</p>
+                <p>Uma casa simples...</p>
+            </div>
+
+            <div class="escaleta-editor">
+                <h3>Escaleta</h3>
+                <p>Estrutura do roteiro...</p>
+            </div>
+
+            <div class="tratamento-editor">
+                <h3>Tratamento</h3>
+                <p>Resumo detalhado...</p>
+            </div>
+
+            <div class="bible-editor">
+                <h3>Bíblia do Projeto</h3>
+                <p>Sinopse, logline, episódios...</p>
+            </div>
+
+            <div class="sala-editor">
+                <h3>Sala de Roteiro</h3>
+                <p>Calendário, agenda, planilha...</p>
+            </div>
+
+            <div class="storyboard-editor">
+                <h3>Storyboard</h3>
+                <div class="storyboard-canvas">
+                    <canvas></canvas>
+                    <canvas></canvas>
+                    <canvas></canvas>
+                    <button class="add-frame">+</button>
+                </div>
+                <p>Use as ferramentas de desenho para criar quadros.</p>
+            </div>
         </div>
     </div>
 
-    <div class="workspace">
-        <!-- Roteiro, Escaleta, etc -->
-        <div class="tab-content" id="roteiro">
-            <!-- mesma área de trabalho original -->
-            <div class="toolbar">
-                <!-- botões de toolbar iguais -->
-            </div>
-            <div class="editor-container">
-                <div class="script-editor" contenteditable="true">
-                    <div class="scene-heading">INT. CASA DE JOÃO - DIA</div>
-                    <div class="action">Uma casa simples mas aconchegante. JOÃO (30), vestindo roupas casuais, mexe em papéis sobre a mesa de centro.</div>
-                    <div class="action">Ele olha para o relógio impacientemente.</div>
-                    <div class="character">JOÃO</div>
-                    <div class="dialogue">Onde ela está? Já era para ter chegado.</div>
-                    <div class="character">MARIA (V.O.)</div>
-                    <div class="dialogue">(sussurrando) Calma, João. Ela vai chegar.</div>
-                    <div class="scene-heading">EXT. RUA - CONTÍNUO</div>
-                    <div class="action">CARLA (28) caminha apressadamente pela rua, segurando uma pasta.</div>
-                    <div class="character">CARLA</div>
-                    <div class="parenthetical">(para si mesma) Espero que não esteja bravo.</div>
-                    <div class="dialogue">Mais uma vez me atrasei...</div>
-                    <div class="transition">CORTE PARA:</div>
-                </div>
-
-                <div class="right-panel">
-                    <div class="panel-tabs">
-                        <button class="panel-tab active" data-panel="notes">Notas</button>
-                        <button class="panel-tab" data-panel="elements">Elementos</button>
-                        <button class="panel-tab" data-panel="stats">Estatísticas</button>
-                    </div>
-                    <div class="panel-content active" id="notes-panel">
-                        <h4>Notas da Cena</h4>
-                        <textarea placeholder="Adicione notas sobre esta cena..."></textarea>
-                        <h4 style="margin-top:20px;">Notas Gerais</h4>
-                        <textarea placeholder="Notas sobre o roteiro..."></textarea>
-                    </div>
-                    <div class="panel-content" id="elements-panel">
-                        <h4>Elementos da Cena</h4>
-                        <ul>
-                            <li><i class="fas fa-video"></i> INT. CASA DE JOÃO - DIA</li>
-                            <li><i class="fas fa-user"></i> JOÃO</li>
-                            <li><i class="fas fa-user"></i> MARIA (V.O.)</li>
-                            <li><i class="fas fa-video"></i> EXT. RUA - CONTÍNUO</li>
-                            <li><i class="fas fa-user"></i> CARLA</li>
-                        </ul>
-                    </div>
-                    <div class="panel-content" id="stats-panel">
-                        <h4>Estatísticas</h4>
-                        <p><strong>Cenas:</strong> 2</p>
-                        <p><strong>Páginas:</strong> 1</p>
-                        <p><strong>Personagens:</strong> 3</p>
-                        <p><strong>Diálogos:</strong> 3</p>
-                        <p><strong>Duração estimada:</strong> 2 minutos</p>
-                    </div>
-                </div>
-            </div>
+    <!-- PAINEL DIREITO -->
+    <div class="right-panel">
+        <div class="panel-tabs">
+            <button class="panel-tab active" data-panel="notes">Notas</button>
+            <button class="panel-tab" data-panel="elements">Elementos</button>
+            <button class="panel-tab" data-panel="stats">Estatísticas</button>
         </div>
-
-        <div class="tab-content" id="escaleta" style="display:none;">
-            <div style="padding:20px;">Conteúdo da Escaleta...</div>
+        <div class="panel-content active" id="notes-panel">
+            <textarea placeholder="Notas sobre a cena..."></textarea>
         </div>
-        <div class="tab-content" id="tratamento" style="display:none;">
-            <div style="padding:20px;">Conteúdo do Tratamento...</div>
+        <div class="panel-content" id="elements-panel">
+            <p>Lista de elementos da cena...</p>
         </div>
-        <div class="tab-content" id="biblia" style="display:none;">
-            <div style="padding:20px;">Conteúdo da Bíblia...</div>
-        </div>
-        <div class="tab-content" id="sala" style="display:none;">
-            <div style="padding:20px;">Conteúdo da Sala de Roteiro...</div>
-        </div>
-        <div class="tab-content" id="storyboard" style="display:none;">
-            <div style="padding:20px;">Conteúdo do Storyboard...</div>
+        <div class="panel-content" id="stats-panel">
+            <p>Estatísticas do roteiro...</p>
         </div>
     </div>
 </div>
 
-<footer>
-    <div class="footer-left">
-        <div><i class="fas fa-keyboard"></i> <kbd>Ctrl+S</kbd> Salvar</div>
-        <div><i class="fas fa-keyboard"></i> <kbd>Ctrl+1</kbd> Cena</div>
-        <div><i class="fas fa-keyboard"></i> <kbd>Ctrl+2</kbd> Ação</div>
-        <div><i class="fas fa-keyboard"></i> <kbd>Ctrl+3</kbd> Personagem</div>
-    </div>
-    <div class="footer-right">
-        <div>Modificado: <span id="last-saved">agora</span></div>
-    </div>
-</footer>
-
+<!-- BOTÕES FLUTUANTES -->
 <div class="fab-container">
     <button class="fab" id="fofocaBtn"><i class="fas fa-comments"></i></button>
     <button class="fab chama" id="chamaBtn"><i class="fas fa-video"></i></button>
-    <button class="fab rascunho" id="rascunhoBtn"><i class="fas fa-pencil-alt"></i></button>
+    <button class="fab rascunho" id="rascunhoBtn"><i class="fas fa-sticky-note"></i></button>
 </div>
 
-<div class="rascunho-container" id="rascunhoBox">
-    <textarea placeholder="Rascunho rápido..."></textarea>
-</div>
-
+<!-- SCRIPT -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Painel direito
-    const panelTabs = document.querySelectorAll('.panel-tab');
-    const panelContents = document.querySelectorAll('.panel-content');
-    panelTabs.forEach(tab => tab.addEventListener('click', ()=>{
-        const panelId=tab.dataset.panel;
-        panelTabs.forEach(t=>t.classList.remove('active'));
-        panelContents.forEach(c=>c.classList.remove('active'));
+document.getElementById('loginBtn').addEventListener('click', ()=>{
+    document.getElementById('login-screen').style.display='none';
+});
+
+// Alternar abas principais
+document.querySelectorAll('.sidebar button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.sidebar button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.getAttribute('data-tab');
+        document.querySelectorAll('.editor-container > div').forEach(e=>e.classList.remove('active'));
+        document.querySelector(`.${tab}-editor`).classList.add('active');
+    });
+});
+
+// Alternar painel direito
+document.querySelectorAll('.panel-tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+        document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));
         tab.classList.add('active');
-        document.getElementById(panelId+'-panel').classList.add('active');
-    }));
-
-    // Sidebar
-    const sidebarBtns = document.querySelectorAll('.sidebar-btn');
-    sidebarBtns.forEach(btn=>btn.addEventListener('click',()=>{sidebarBtns.forEach(b=>b.classList.remove('active'));btn.classList.add('active');}));
-
-    // Salvamento automático
-    setInterval(()=>{
-        document.getElementById('last-saved').textContent='agora';
-        setTimeout(()=>{document.getElementById('last-saved').textContent='há alguns segundos';},1000);
-    },30000);
-
-    // Botões flutuantes
-    document.getElementById('fofocaBtn').addEventListener('click',()=>{alert('Chat "Fofoca" será implementado em breve!');});
-    document.getElementById('chamaBtn').addEventListener('click',()=>{alert('Videoconferência "Chama" será implementada em breve!');});
-    document.getElementById('rascunhoBtn').addEventListener('click',()=>{
-        const box=document.getElementById('rascunhoBox');
-        box.style.display=box.style.display==='block'?'none':'block';
+        document.querySelectorAll('.panel-content').forEach(c=>c.classList.remove('active'));
+        document.getElementById(tab.getAttribute('data-panel')+'-panel').classList.add('active');
     });
+});
 
-    // Modos
-    const modeButtons=document.querySelectorAll('.toolbar-btn');
-    modeButtons.forEach(btn=>{
-        if(btn.textContent.includes('Noturno')){btn.addEventListener('click',()=>{document.body.classList.add('dark-mode');document.body.classList.remove('focus-mode');});}
-        if(btn.textContent.includes('Foco')){btn.addEventListener('click',()=>{document.body.classList.add('focus-mode');document.body.classList.remove('dark-mode');});}
-    });
+// Botões flutuantes
+document.getElementById('fofocaBtn').addEventListener('click', ()=>alert('Chat Fofoca'));
+document.getElementById('chamaBtn').addEventListener('click', ()=>alert('Videoconferência Chama'));
+document.getElementById('rascunhoBtn').addEventListener('click', ()=>{
+    const r = document.createElement('textarea');
+    r.placeholder="Rascunho rápido...";
+    r.style.position="fixed"; r.style.bottom="100px"; r.style.right="25px"; r.style.width="250px"; r.style.height="200px"; r.style.zIndex="2000";
+    document.body.appendChild(r);
+});
 
-    // Abas principais
-    const mainTabs=document.querySelectorAll('.main-tab');
-    const tabContents=document.querySelectorAll('.tab-content');
-    mainTabs.forEach(tab=>{
-        tab.addEventListener('click',()=>{
-            mainTabs.forEach(t=>t.classList.remove('active'));
-            tabContents.forEach(tc=>tc.style.display='none');
-            tab.classList.add('active');
-            document.getElementById(tab.dataset.tab).style.display='block';
-        });
+// Storyboard canvas simples
+const canvases=document.querySelectorAll('.storyboard-canvas canvas');
+canvases.forEach(c=>{
+    const ctx=c.getContext('2d'); ctx.fillStyle="#fff"; ctx.fillRect(0,0,c.width,c.height);
+    let drawing=false;
+    c.addEventListener('mousedown',()=>drawing=true);
+    c.addEventListener('mouseup',()=>drawing=false);
+    c.addEventListener('mousemove', e=>{
+        if(drawing){
+            ctx.fillStyle="#000"; ctx.fillRect(e.offsetX,e.offsetY,2,2);
+        }
     });
 });
 </script>
 </body>
 </html>
+
 
 
 
