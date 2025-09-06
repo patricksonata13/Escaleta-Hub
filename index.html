@@ -178,6 +178,139 @@
       background: var(--light);
     }
     
+    /* Novos estilos para melhorias */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background: var(--editor-bg);
+      padding: 25px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text);
+    }
+    
+    .setting-item {
+      margin-bottom: 15px;
+    }
+    
+    .setting-item label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    
+    .setting-item input, .setting-item select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: var(--editor-bg);
+      color: var(--editor-text);
+    }
+    
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      padding: 12px 20px;
+      background: var(--success);
+      color: white;
+      border-radius: 4px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 1500;
+    }
+    
+    .tooltip {
+      position: relative;
+    }
+    
+    .tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 5px 10px;
+      background: #333;
+      color: white;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s;
+    }
+    
+    .tooltip:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .search-box {
+      display: flex;
+      margin-bottom: 15px;
+    }
+    
+    .search-box input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px 0 0 4px;
+      background: var(--editor-bg);
+      color: var(--editor-text);
+    }
+    
+    .search-box button {
+      padding: 8px 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
+    }
+    
+    .character-list {
+      margin-top: 15px;
+    }
+    
+    .character-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+    }
+    
+    .character-item:hover {
+      background: var(--light);
+    }
+    
     @media(max-width:900px){ 
       .main-container{flex-direction:column;} 
       .sidebar{width:100%; order:2;} 
@@ -187,6 +320,16 @@
         overflow-x: auto;
         white-space: nowrap;
       }
+      .header-right {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .toolbar {
+        padding: 0.5rem;
+      }
+      .toolbar-group {
+        flex-wrap: wrap;
+      }
     }
   </style>
 </head>
@@ -195,14 +338,14 @@
   <div class="header-left">
     <div class="logo"><i class="fas fa-scroll"></i> Escaleta Hub</div>
     <div class="document-info">
-      <div class="document-title">Roteiro Sem Título</div>
-      <div class="document-stats">0 cenas • 0 páginas • Modificado agora</div>
+      <input type="text" id="document-title-input" class="document-title" value="Roteiro Sem Título">
+      <div class="document-stats">3 cenas • 2 páginas • Modificado <span id="last-saved">agora</span></div>
     </div>
   </div>
   <div class="header-right">
-    <button class="toolbar-btn"><i class="fas fa-save"></i> Salvar</button>
-    <button class="toolbar-btn"><i class="fas fa-file-export"></i> Exportar</button>
-    <button class="toolbar-btn"><i class="fas fa-cloud"></i> Publicar</button>
+    <button class="toolbar-btn" id="save-btn"><i class="fas fa-save"></i> Salvar</button>
+    <button class="toolbar-btn" id="export-btn"><i class="fas fa-file-export"></i> Exportar</button>
+    <button class="toolbar-btn" id="settings-btn"><i class="fas fa-cog"></i> Configurações</button>
   </div>
 </header>
 
@@ -218,9 +361,9 @@
     </div>
     <div class="sidebar-section">
       <h3><i class="fas fa-cog"></i> Ferramentas</h3>
-      <button class="sidebar-btn"><i class="fas fa-download"></i> Exportar PDF</button>
-      <button class="sidebar-btn"><i class="fas fa-print"></i> Imprimir</button>
-      <button class="sidebar-btn"><i class="fas fa-sliders-h"></i> Configurações</button>
+      <button class="sidebar-btn" id="stats-btn"><i class="fas fa-chart-bar"></i> Estatísticas</button>
+      <button class="sidebar-btn" id="characters-btn"><i class="fas fa-users"></i> Personagens</button>
+      <button class="sidebar-btn" id="search-btn"><i class="fas fa-search"></i> Buscar</button>
     </div>
     <div class="sidebar-section">
       <h3><i class="fas fa-project-diagram"></i> Projeto</h3>
@@ -244,22 +387,24 @@
       <div id="roteiro-tab" class="tab-content active">
         <div class="toolbar">
           <div class="toolbar-group">
-            <button class="toolbar-btn"><i class="fas fa-plus"></i> Nova Cena</button>
-            <button class="toolbar-btn"><i class="fas fa-trash"></i> Remover</button>
+            <button class="toolbar-btn" id="new-scene-btn"><i class="fas fa-plus"></i> Nova Cena</button>
+            <button class="toolbar-btn" id="delete-btn"><i class="fas fa-trash"></i> Remover</button>
+            <button class="toolbar-btn" id="duplicate-btn"><i class="fas fa-copy"></i> Duplicar</button>
           </div>
           <div class="divider"></div>
           <div class="toolbar-group">
-            <button class="toolbar-btn"><i class="fas fa-bold"></i></button>
-            <button class="toolbar-btn"><i class="fas fa-italic"></i></button>
-            <button class="toolbar-btn"><i class="fas fa-underline"></i></button>
+            <button class="toolbar-btn" data-format="bold"><i class="fas fa-bold"></i></button>
+            <button class="toolbar-btn" data-format="italic"><i class="fas fa-italic"></i></button>
+            <button class="toolbar-btn" data-format="underline"><i class="fas fa-underline"></i></button>
           </div>
           <div style="flex:1"></div>
           <div class="toolbar-group">
-            <button class="toolbar-btn">Modo Noturno</button>
-            <button class="toolbar-btn">Modo Foco</button>
+            <button class="toolbar-btn" id="night-mode-btn">Modo Noturno</button>
+            <button class="toolbar-btn" id="focus-mode-btn">Modo Foco</button>
+            <button class="toolbar-btn" id="normal-mode-btn">Modo Normal</button>
           </div>
         </div>
-        <div class="script-editor" contenteditable="true">
+        <div class="script-editor" contenteditable="true" id="script-editor">
           <div class="scene-heading">INT. CASA DE JOÃO - DIA</div>
           <div class="action">Uma casa simples. JOÃO mexe em papéis sobre a mesa.</div>
           <div class="character">JOÃO</div>
@@ -280,15 +425,16 @@
       <div id="rascunho-tab" class="tab-content">
         <div class="toolbar">
           <div class="toolbar-group">
-            <button class="toolbar-btn"><i class="fas fa-font"></i> Formatação</button>
-            <button class="toolbar-btn"><i class="fas fa-image"></i> Inserir Imagem</button>
+            <button class="toolbar-btn" data-format="bold"><i class="fas fa-font"></i> Negrito</button>
+            <button class="toolbar-btn" data-format="italic"><i class="fas fa-italic"></i> Itálico</button>
+            <button class="toolbar-btn"><i class="fas fa-list-ul"></i> Lista</button>
           </div>
           <div style="flex:1"></div>
           <div class="toolbar-group">
             <button class="toolbar-btn"><i class="fas fa-file-pdf"></i> Exportar</button>
           </div>
         </div>
-        <textarea class="rascunho-editor" placeholder="Escreva suas ideias, anotações e rascunhos aqui..."></textarea>
+        <textarea class="rascunho-editor" id="rascunho-editor" placeholder="Escreva suas ideias, anotações e rascunhos aqui..."></textarea>
       </div>
 
       <!-- ABA BIBLIA -->
@@ -296,25 +442,25 @@
         <div class="biblia-content">
           <div class="biblia-section">
             <h4>Sinopse</h4>
-            <p>Uma história sobre João e Maria, dois personagens em uma jornada emocionante cheia de reviravoltas.</p>
+            <p contenteditable="true">Uma história sobre João e Maria, dois personagens em uma jornada emocionante cheia de reviravoltas.</p>
           </div>
           
           <div class="biblia-section">
             <h4>Logline</h4>
-            <p>Um homem determinado precisa encontrar uma resposta importante antes que seja tarde demais.</p>
+            <p contenteditable="true">Um homem determinado precisa encontrar uma resposta importante antes que seja tarde demais.</p>
           </div>
           
           <div class="biblia-section">
             <h4>Personagens</h4>
-            <p><strong>João:</strong> Protagonista, 35 anos, determinado e inteligente.</p>
-            <p><strong>Maria:</strong> Coadjuvante, 32 anos, perspicaz e leal.</p>
+            <p contenteditable="true"><strong>João:</strong> Protagonista, 35 anos, determinado e inteligente.</p>
+            <p contenteditable="true"><strong>Maria:</strong> Coadjuvante, 32 anos, perspicaz e leal.</p>
           </div>
           
           <div class="biblia-section">
             <h4>Storyline</h4>
-            <p>1. Introdução dos personagens e do conflito principal.</p>
-            <p>2. Desenvolvimento das relações e aumento da tensão.</p>
-            <p>3. Clímax e resolução do conflito.</p>
+            <p contenteditable="true">1. Introdução dos personagens e do conflito principal.</p>
+            <p contenteditable="true">2. Desenvolvimento das relações e aumento da tensão.</p>
+            <p contenteditable="true">3. Clímax e resolução do conflito.</p>
           </div>
         </div>
       </div>
@@ -324,21 +470,21 @@
         <div class="escaleta-content">
           <div class="escaleta-section">
             <h4>Episódio 1: O Início</h4>
-            <p><strong>Cena 1:</strong> INT. CASA DE JOÃO - DIA - João procura por documentos importantes.</p>
-            <p><strong>Cena 2:</strong> EXT. RUA - CONTÍNUO - Maria caminha apressadamente.</p>
-            <p><strong>Cena 3:</strong> INT. CASA DE JOÃO - CONTÍNUO - João atende a porta.</p>
+            <p contenteditable="true"><strong>Cena 1:</strong> INT. CASA DE JOÃO - DIA - João procura por documentos importantes.</p>
+            <p contenteditable="true"><strong>Cena 2:</strong> EXT. RUA - CONTÍNUO - Maria caminha apressadamente.</p>
+            <p contenteditable="true"><strong>Cena 3:</strong> INT. CASA DE JOÃO - CONTÍNUO - João atende a porta.</p>
           </div>
           
           <div class="escaleta-section">
             <h4>Episódio 2: O Desenvolvimento</h4>
-            <p><strong>Cena 4:</strong> INT. RESTAURANTE - NOITE - João e Maria se encontram.</p>
-            <p><strong>Cena 5:</strong> EXT. PARQUE - DIA - Conversa importante revela segredos.</p>
+            <p contenteditable="true"><strong>Cena 4:</strong> INT. RESTAURANTE - NOITE - João and Maria se encontram.</p>
+            <p contenteditable="true"><strong>Cena 5:</strong> EXT. PARQUE - DIA - Conversa importante revela segredos.</p>
           </div>
           
           <div class="escaleta-section">
             <h4>Episódio 3: O Clímax</h4>
-            <p><strong>Cena 6:</strong> INT. ESCRITÓRIO - TARDE - Confronto com o antagonista.</p>
-            <p><strong>Cena 7:</strong> EXT. ESTACIONAMENTO - NOITE - Resolução do conflito.</p>
+            <p contenteditable="true"><strong>Cena 6:</strong> INT. ESCRITÓRIO - TARDE - Confronto com o antagonista.</p>
+            <p contenteditable="true"><strong>Cena 7:</strong> EXT. ESTACIONAMENTO - NOITE - Resolução do conflito.</p>
           </div>
         </div>
       </div>
@@ -347,12 +493,14 @@
       <div id="storyboard-tab" class="tab-content">
         <div class="toolbar">
           <div class="toolbar-group">
-            <button class="toolbar-btn"><i class="fas fa-plus"></i> Novo Storyboard</button>
-            <button class="toolbar-btn"><i class="fas fa-pencil-alt"></i> Ferramentas de Desenho</button>
+            <button class="toolbar-btn" id="new-storyboard-btn"><i class="fas fa-plus"></i> Novo Storyboard</button>
+            <button class="toolbar-btn" id="draw-btn"><i class="fas fa-pencil-alt"></i> Ferramentas de Desenho</button>
+            <button class="toolbar-btn" id="color-picker-btn"><i class="fas fa-palette"></i> Cores</button>
           </div>
           <div style="flex:1"></div>
           <div class="toolbar-group">
             <button class="toolbar-btn"><i class="fas fa-download"></i> Exportar</button>
+            <button class="toolbar-btn"><i class="fas fa-print"></i> Imprimir</button>
           </div>
         </div>
         
@@ -363,6 +511,7 @@
             </div>
             <div class="storyboard-info">
               <p><strong>Cena 1:</strong> INT. CASA DE JOÃO - DIA</p>
+              <textarea placeholder="Descrição da cena..." rows="2" style="width:100%; margin-top:5px; padding:5px; font-size:0.8rem;"></textarea>
             </div>
           </div>
           
@@ -372,6 +521,7 @@
             </div>
             <div class="storyboard-info">
               <p><strong>Cena 2:</strong> EXT. RUA - CONTÍNUO</p>
+              <textarea placeholder="Descrição da cena..." rows="2" style="width:100%; margin-top:5px; padding:5px; font-size:0.8rem;"></textarea>
             </div>
           </div>
           
@@ -381,6 +531,7 @@
             </div>
             <div class="storyboard-info">
               <p><strong>Cena 3:</strong> INT. CASA DE JOÃO - CONTÍNUO</p>
+              <textarea placeholder="Descrição da cena..." rows="2" style="width:100%; margin-top:5px; padding:5px; font-size:0.8rem;"></textarea>
             </div>
           </div>
         </div>
@@ -391,17 +542,88 @@
 
 <footer>
   <div class="footer-left">
-    <div><i class="fas fa-keyboard"></i> <kbd>Ctrl+S</kbd> Salvar</div>
-    <div><i class="fas fa-info-circle"></i> <span id="current-tab">Roteiro</span></div>
+    <div><i class="fas fa-keyboard"></i> <kbd>Ctrl+S</kbd> Salvar | <kbd>Ctrl+N</kbd> Nova Cena</div>
+    <div><i class="fas fa-info-circle"></i> <span id="current-tab">Roteiro</span> | <span id="word-count">0</span> palavras</div>
   </div>
   <div class="footer-right">
-    <div>Modificado: <span id="last-saved">agora</span></div>
+    <div>Modificado: <span id="last-saved-time">agora</span></div>
+    <div id="autosave-status"><i class="fas fa-sync-alt"></i> Auto-salvo</div>
   </div>
 </footer>
 
 <div class="fab-container">
   <button class="fab" id="fofocaBtn"><i class="fas fa-comments"></i></button>
   <button class="fab chama" id="chamaBtn"><i class="fas fa-video"></i></button>
+</div>
+
+<!-- Modal de Configurações -->
+<div class="modal" id="settings-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Configurações</h3>
+      <button class="modal-close" id="close-settings">&times;</button>
+    </div>
+    <div class="setting-item">
+      <label for="autosave-interval">Intervalo de Auto-salvamento (minutos)</label>
+      <select id="autosave-interval">
+        <option value="1">1 minuto</option>
+        <option value="2">2 minutos</option>
+        <option value="5" selected>5 minutos</option>
+        <option value="10">10 minutos</option>
+      </select>
+    </div>
+    <div class="setting-item">
+      <label for="default-view">Visualização Padrão</label>
+      <select id="default-view">
+        <option value="roteiro-tab">Roteiro</option>
+        <option value="rascunho-tab">Rascunho</option>
+        <option value="biblia-tab">Bíblia</option>
+        <option value="escaleta-tab">Escaleta</option>
+        <option value="storyboard-tab">Storyboard</option>
+      </select>
+    </div>
+    <div class="setting-item">
+      <label for="theme-select">Tema</label>
+      <select id="theme-select">
+        <option value="light">Claro</option>
+        <option value="dark">Escuro</option>
+        <option value="focus">Foco</option>
+      </select>
+    </div>
+    <div class="setting-item">
+      <button class="toolbar-btn" style="width:100%">Salvar Configurações</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Personagens -->
+<div class="modal" id="characters-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Personagens</h3>
+      <button class="modal-close" id="close-characters">&times;</button>
+    </div>
+    <div class="search-box">
+      <input type="text" placeholder="Buscar personagem...">
+      <button><i class="fas fa-search"></i></button>
+    </div>
+    <div class="character-list">
+      <div class="character-item">
+        <strong>João</strong> - Protagonista, 35 anos
+      </div>
+      <div class="character-item">
+        <strong>Maria</strong> - Coadjuvante, 32 anos
+      </div>
+      <div class="character-item">
+        <strong>Carlos</strong> - Antagonista, 45 anos
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notificação -->
+<div class="notification" id="notification">
+  <span id="notification-text">Alterações salvas com sucesso!</span>
 </div>
 
 <script>
@@ -446,29 +668,85 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // FABs
-  document.getElementById('fofocaBtn').addEventListener('click', () => alert('Chat em breve!'));
-  document.getElementById('chamaBtn').addEventListener('click', () => alert('Chamada de vídeo em breve!'));
+  document.getElementById('fofocaBtn').addEventListener('click', () => showNotification('Chat em breve!'));
+  document.getElementById('chamaBtn').addEventListener('click', () => showNotification('Chamada de vídeo em breve!'));
 
   // Modos de visualização
-  document.querySelectorAll('.toolbar-btn').forEach(btn => {
-    if(btn.textContent.includes('Noturno')) {
-      btn.addEventListener('click', () => {
-        document.body.classList.add('dark-mode');
-        document.body.classList.remove('focus-mode');
-      });
+  document.getElementById('night-mode-btn').addEventListener('click', () => {
+    document.body.classList.add('dark-mode');
+    document.body.classList.remove('focus-mode');
+    showNotification('Modo noturno ativado');
+  });
+  
+  document.getElementById('focus-mode-btn').addEventListener('click', () => {
+    document.body.classList.add('focus-mode');
+    document.body.classList.remove('dark-mode');
+    showNotification('Modo foco ativado');
+  });
+  
+  document.getElementById('normal-mode-btn').addEventListener('click', () => {
+    document.body.classList.remove('dark-mode', 'focus-mode');
+    showNotification('Modo normal ativado');
+  });
+
+  // Configurações
+  const settingsModal = document.getElementById('settings-modal');
+  const charactersModal = document.getElementById('characters-modal');
+  
+  document.getElementById('settings-btn').addEventListener('click', () => {
+    settingsModal.style.display = 'flex';
+  });
+  
+  document.getElementById('close-settings').addEventListener('click', () => {
+    settingsModal.style.display = 'none';
+  });
+  
+  document.getElementById('characters-btn').addEventListener('click', () => {
+    charactersModal.style.display = 'flex';
+  });
+  
+  document.getElementById('close-characters').addEventListener('click', () => {
+    charactersModal.style.display = 'none';
+  });
+  
+  // Fechar modal ao clicar fora
+  window.addEventListener('click', (e) => {
+    if (e.target === settingsModal) {
+      settingsModal.style.display = 'none';
     }
-    if(btn.textContent.includes('Foco')) {
-      btn.addEventListener('click', () => {
-        document.body.classList.add('focus-mode');
-        document.body.classList.remove('dark-mode');
-      });
+    if (e.target === charactersModal) {
+      charactersModal.style.display = 'none';
     }
   });
 
   // Auto-save
-  setInterval(() => {
-    document.getElementById('last-saved').textContent = 'há alguns segundos';
-  }, 10000);
+  let autosaveInterval = setInterval(saveDocument, 300000); // 5 minutos padrão
+  
+  function saveDocument() {
+    document.getElementById('last-saved-time').textContent = new Date().toLocaleTimeString();
+    document.getElementById('autosave-status').innerHTML = '<i class="fas fa-sync-alt"></i> Auto-salvo';
+    setTimeout(() => {
+      document.getElementById('autosave-status').innerHTML = '';
+    }, 3000);
+  }
+  
+  document.getElementById('save-btn').addEventListener('click', saveDocument);
+  
+  document.getElementById('autosave-interval').addEventListener('change', function() {
+    clearInterval(autosaveInterval);
+    autosaveInterval = setInterval(saveDocument, parseInt(this.value) * 60000);
+    showNotification(`Intervalo de auto-salvamento alterado para ${this.value} minutos`);
+  });
+
+  // Contador de palavras
+  function updateWordCount() {
+    const text = document.getElementById('script-editor').innerText;
+    const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+    document.getElementById('word-count').textContent = wordCount;
+  }
+  
+  document.getElementById('script-editor').addEventListener('input', updateWordCount);
+  updateWordCount();
 
   // Storyboard drawing
   const canvases = document.querySelectorAll('.storyboard-canvas');
@@ -485,6 +763,10 @@ document.addEventListener('DOMContentLoaded', function() {
       canvas.appendChild(drawingCanvas);
       
       const ctx = drawingCanvas.getContext('2d');
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#000';
+      
       let drawing = false;
       
       drawingCanvas.addEventListener('mousedown', e => {
@@ -511,52 +793,67 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Roteiro shortcuts
-  document.addEventListener('keydown', function(e) {
-    const editor = document.querySelector('#roteiro-tab .script-editor');
-    if(!editor.contains(document.activeElement)) return;
+  // Formatação de texto
+  document.querySelectorAll('[data-format]').forEach(button => {
+    button.addEventListener('click', () => {
+      const format = button.getAttribute('data-format');
+      document.execCommand(format);
+    });
+  });
+
+  // Nova cena
+  document.getElementById('new-scene-btn').addEventListener('click', () => {
+    const editor = document.getElementById('script-editor');
+    const newScene = document.createElement('div');
+    newScene.className = 'scene-heading';
+    newScene.contentEditable = true;
+    newScene.textContent = 'INT. NOVA CENA - DIA';
+    editor.appendChild(newScene);
+    newScene.focus();
+  });
+
+  // Sistema de notificações
+  function showNotification(message) {
+    const notification = document.getElementById('notification');
+    document.getElementById('notification-text').textContent = message;
+    notification.style.display = 'block';
     
-    if(e.ctrlKey && e.key === '1') {
+    setTimeout(() => {
+      notification.style.display = 'none';
+    }, 3000);
+  }
+
+  // Atalhos de teclado
+  document.addEventListener('keydown', function(e) {
+    // Ctrl+S para salvar
+    if (e.ctrlKey && e.key === 's') {
       e.preventDefault();
-      insertAtCursor(editor, '<div class="scene-heading">NOVA CENA</div>');
+      saveDocument();
+      showNotification('Documento salvo!');
     }
-    if(e.ctrlKey && e.key === '2') {
+    
+    // Ctrl+N para nova cena (apenas no editor de roteiro)
+    if (e.ctrlKey && e.key === 'n' && document.getElementById('roteiro-tab').classList.contains('active')) {
       e.preventDefault();
-      insertAtCursor(editor, '<div class="action">AÇÃO...</div>');
+      document.getElementById('new-scene-btn').click();
     }
-    if(e.ctrlKey && e.key === '3') {
+    
+    // Ctrl+1 a Ctrl+5 para alternar entre abas
+    if (e.ctrlKey && e.key >= '1' && e.key <= '5') {
       e.preventDefault();
-      insertAtCursor(editor, '<div class="character">PERSONAGEM</div>');
-    }
-    if(e.ctrlKey && e.key === '4') {
-      e.preventDefault();
-      insertAtCursor(editor, '<div class="dialogue">DIÁLOGO...</div>');
-    }
-    if(e.ctrlKey && e.key === 'b') {
-      document.execCommand('bold');
-      e.preventDefault();
-    }
-    if(e.ctrlKey && e.key === 'i') {
-      document.execCommand('italic');
-      e.preventDefault();
-    }
-    if(e.ctrlKey && e.key === 'u') {
-      document.execCommand('underline');
-      e.preventDefault();
+      const tabIndex = parseInt(e.key) - 1;
+      const tabs = Array.from(document.querySelectorAll('.tab-button'));
+      if (tabs[tabIndex]) {
+        tabs[tabIndex].click();
+      }
     }
   });
 
-  function insertAtCursor(editor, html) {
-    const sel = window.getSelection();
-    if(!sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    range.deleteContents();
-    const frag = document.createRange().createContextualFragment(html);
-    range.insertNode(frag);
-    range.collapse(false);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
+  // Tooltips
+  document.querySelectorAll('.toolbar-btn').forEach(button => {
+    button.setAttribute('data-tooltip', button.textContent);
+    button.classList.add('tooltip');
+  });
 });
 </script>
 </body>
