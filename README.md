@@ -1,4 +1,4 @@
-# ScriptFlow - Plataforma de Desenvolvimento de Roteiros
+# Escaleta Hub - Plataforma de Desenvolvimento de Roteiros
 
 ScriptFlow é uma plataforma completa para criação e desenvolvimento de roteiros, com ferramentas colaborativas e storyboard visual.
 
