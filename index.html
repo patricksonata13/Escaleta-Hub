@@ -496,6 +496,54 @@
       background: var(--danger);
     }
     
+    /* Efeito de chama ativa */
+    .flame-active {
+      animation: flame 1.5s infinite alternate;
+      box-shadow: 0 0 20px #ff5722, 0 0 40px #ff9800, 0 0 60px #ffc107;
+    }
+    
+    @keyframes flame {
+      0% {
+        box-shadow: 0 0 10px #ff5722, 0 0 20px #ff9800, 0 0 30px #ffc107;
+        transform: scale(1);
+      }
+      100% {
+        box-shadow: 0 0 20px #ff5722, 0 0 40px #ff9800, 0 0 60px #ffc107;
+        transform: scale(1.1);
+      }
+    }
+    
+    /* Efeito de partículas de fogo */
+    .fire-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      display: none;
+    }
+    
+    .fire-particle {
+      position: absolute;
+      background: radial-gradient(circle, #ff5722 20%, #ff9800 40%, transparent 70%);
+      border-radius: 50%;
+      opacity: 0;
+      animation: rise 2s linear forwards;
+    }
+    
+    @keyframes rise {
+      0% {
+        transform: translateY(0) scale(0);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-100vh) scale(1.5);
+        opacity: 0;
+      }
+    }
+    
     @media(max-width:900px){ 
       .main-container{flex-direction:column;} 
       .sidebar{width:100%; order:2;} 
@@ -624,7 +672,7 @@
             <button class="toolbar-btn"><i class="fas fa-file-pdf"></i> Exportar</button>
           </div>
         </div>
-        <textarea class="rascunho-editor" id="rascunho-editor" placeholder="Escreva suas ideias, anotações и rascunhos aqui..."></textarea>
+        <textarea class="rascunho-editor" id="rascunho-editor" placeholder="Escreva suas ideias, anotações e rascunhos aqui..."></textarea>
       </div>
 
       <!-- ABA BIBLIA -->
@@ -655,7 +703,7 @@
         </div>
       </div>
 
-      <!-- ABA ESCALETA -->
+      <!-- ABA ESCALeta -->
       <div id="escaleta-tab" class="tab-content">
         <div class="escaleta-content">
           <div class="escaleta-section">
@@ -745,6 +793,9 @@
   <button class="fab" id="fofocaBtn"><i class="fas fa-comments"></i></button>
   <button class="fab chama" id="chamaBtn"><i class="fas fa-video"></i></button>
 </div>
+
+<!-- Efeito de partículas de fogo -->
+<div class="fire-particles" id="fire-particles"></div>
 
 <!-- Modal de Configurações -->
 <div class="modal" id="settings-modal">
@@ -906,6 +957,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // FABs - Chat e Chamada de Vídeo
   const chatContainer = document.getElementById('chat-container');
   const videoCallContainer = document.getElementById('video-call-container');
+  const chamaBtn = document.getElementById('chamaBtn');
+  const fireParticles = document.getElementById('fire-particles');
+  let flameActive = false;
+  let flameInterval;
   
   document.getElementById('fofocaBtn').addEventListener('click', () => {
     // Esconder video se estiver aberto
@@ -918,17 +973,55 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  document.getElementById('chamaBtn').addEventListener('click', () => {
-    // Esconder chat se estiver aberto
-    chatContainer.style.display = 'none';
-    // Alternar visibilidade do video
-    if (videoCallContainer.style.display === 'flex') {
-      videoCallContainer.style.display = 'none';
-    } else {
+  chamaBtn.addEventListener('click', () => {
+    if (!flameActive) {
+      // Ativar a chama
+      chamaBtn.classList.add('flame-active');
+      fireParticles.style.display = 'block';
+      flameActive = true;
+      
+      // Iniciar efeito de partículas
+      flameInterval = setInterval(createFireParticle, 100);
+      
+      // Mostrar chamada de vídeo
       videoCallContainer.style.display = 'flex';
-      showNotification('Chamada de vídeo iniciada');
+      showNotification('Chama acesa! Chamada de vídeo iniciada');
+    } else {
+      // Desativar a chama
+      chamaBtn.classList.remove('flame-active');
+      fireParticles.style.display = 'none';
+      flameActive = false;
+      
+      // Parar efeito de partículas
+      clearInterval(flameInterval);
+      
+      // Esconder chamada de vídeo
+      videoCallContainer.style.display = 'none';
+      showNotification('Chama apagada! Chamada de vídeo encerrada');
     }
   });
+  
+  // Criar partículas de fogo
+  function createFireParticle() {
+    const particle = document.createElement('div');
+    particle.classList.add('fire-particle');
+    
+    // Posição aleatória na parte inferior da tela
+    const posX = Math.random() * window.innerWidth;
+    const size = Math.random() * 20 + 5;
+    
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    particle.style.left = `${posX}px`;
+    particle.style.bottom = '0';
+    
+    fireParticles.appendChild(particle);
+    
+    // Remover a partícula após a animação
+    setTimeout(() => {
+      particle.remove();
+    }, 2000);
+  }
   
   // Fechar chat e video
   document.getElementById('close-chat').addEventListener('click', () => {
@@ -937,6 +1030,12 @@ document.addEventListener('DOMContentLoaded', function() {
   
   document.getElementById('close-video').addEventListener('click', () => {
     videoCallContainer.style.display = 'none';
+    if (flameActive) {
+      chamaBtn.classList.remove('flame-active');
+      fireParticles.style.display = 'none';
+      flameActive = false;
+      clearInterval(flameInterval);
+    }
     showNotification('Chamada de vídeo encerrada');
   });
   
@@ -1002,6 +1101,12 @@ document.addEventListener('DOMContentLoaded', function() {
   
   document.getElementById('end-call').addEventListener('click', () => {
     videoCallContainer.style.display = 'none';
+    if (flameActive) {
+      chamaBtn.classList.remove('flame-active');
+      fireParticles.style.display = 'none';
+      flameActive = false;
+      clearInterval(flameInterval);
+    }
     showNotification('Chamada encerrada');
   });
 
