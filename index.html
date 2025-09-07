@@ -544,6 +544,204 @@
       }
     }
     
+    /* Estilos para a aba de projetos */
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+      margin-top: 20px;
+    }
+    
+    .project-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .project-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .project-card-header {
+      background: var(--primary);
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .project-card-body {
+      padding: 20px;
+    }
+    
+    .project-card-title {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+    
+    .project-card-details {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+    
+    .project-card-meta {
+      display: flex;
+      justify-content: space-between;
+      color: #888;
+      font-size: 0.85rem;
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+      margin-top: 15px;
+    }
+    
+    .project-card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: var(--secondary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #c0392b;
+    }
+    
+    .btn-secondary {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #2980b9;
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+    
+    .btn-outline:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .recent-projects {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      margin-bottom: 30px;
+    }
+    
+    .recent-projects h2 {
+      margin-bottom: 20px;
+      color: var(--primary);
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .project-list {
+      list-style: none;
+    }
+    
+    .project-list-item {
+      padding: 15px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s;
+    }
+    
+    .project-list-item:hover {
+      background: #f9f9f9;
+    }
+    
+    .project-list-item:last-child {
+      border-bottom: none;
+    }
+    
+    .project-info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .project-name {
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .project-date {
+      font-size: 0.85rem;
+      color: #888;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #888;
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: #ccc;
+    }
+    
+    .empty-state p {
+      margin-bottom: 20px;
+    }
+    
+    .filter-options {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+      padding: 8px 15px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    .filter-btn:hover {
+      border-color: var(--primary);
+    }
+    
     @media(max-width:900px){ 
       .main-container{flex-direction:column;} 
       .sidebar{width:100%; order:2;} 
@@ -567,6 +765,9 @@
         width: 90%;
         right: 5%;
         left: 5%;
+      }
+      .project-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -605,9 +806,9 @@
     </div>
     <div class="sidebar-section">
       <h3><i class="fas fa-project-diagram"></i> Projeto</h3>
-      <button class="sidebar-btn"><i class="fas fa-folder-plus"></i> Novo Projeto</button>
-      <button class="sidebar-btn"><i class="fas fa-folder-open"></i> Abrir Projeto</button>
-      <button class="sidebar-btn"><i class="fas fa-history"></i> Histórico</button>
+      <button class="sidebar-btn" id="new-project-sidebar-btn"><i class="fas fa-folder-plus"></i> Novo Projeto</button>
+      <button class="sidebar-btn" id="open-project-sidebar-btn"><i class="fas fa-folder-open"></i> Abrir Projeto</button>
+      <button class="sidebar-btn" id="project-history-btn"><i class="fas fa-history"></i> Histórico</button>
     </div>
   </div>
 
@@ -703,7 +904,7 @@
         </div>
       </div>
 
-      <!-- ABA ESCALeta -->
+      <!-- ABA ESCALETA -->
       <div id="escaleta-tab" class="tab-content">
         <div class="escaleta-content">
           <div class="escaleta-section">
@@ -858,6 +1059,106 @@
       <div class="character-item">
         <strong>Carlos</strong> - Antagonista, 45 anos
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Novo Projeto -->
+<div class="modal" id="new-project-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Criar Novo Projeto</h2>
+      <button class="modal-close">&times;</button>
+    </div>
+    <form id="new-project-form">
+      <div class="form-group">
+        <label for="project-name">Nome do Projeto</label>
+        <input type="text" id="project-name" class="form-control" placeholder="Ex: Meu Roteiro Incrível" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="project-type">Tipo de Projeto</label>
+        <select id="project-type" class="form-control" required>
+          <option value="">Selecione o tipo...</option>
+          <option value="script">Roteiro</option>
+          <option value="storyboard">Storyboard</option>
+          <option value="bible">Bíblia de Projeto</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="project-template">Modelo</label>
+        <select id="project-template" class="form-control">
+          <option value="blank">Em branco</option>
+          <option value="film">Longa-metragem</option>
+          <option value="short">Curta-metragem</option>
+          <option value="tv">Série de TV</option>
+          <option value="documentary">Documentário</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="project-description">Descrição (opcional)</label>
+        <textarea id="project-description" class="form-control" rows="3" placeholder="Descreva brevemente seu projeto..."></textarea>
+      </div>
+      
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <button type="button" class="btn btn-outline" id="cancel-project">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Criar Projeto</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Abrir Projeto -->
+<div class="modal" id="open-project-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Abrir Projeto</h2>
+      <button class="modal-close">&times;</button>
+    </div>
+    
+    <div class="search-box">
+      <input type="text" placeholder="Buscar projeto...">
+      <button><i class="fas fa-search"></i></button>
+    </div>
+    
+    <div class="project-list">
+      <div class="project-list-item">
+        <div class="project-info">
+          <span class="project-name">O Segredo do Vale</span>
+          <span class="project-date">Modificado: 12/05/2023</span>
+        </div>
+        <button class="btn btn-primary">Abrir</button>
+      </div>
+      
+      <div class="project-list-item">
+        <div class="project-info">
+          <span class="project-name">Noite de Terror</span>
+          <span class="project-date">Modificado: 10/05/2023</span>
+        </div>
+        <button class="btn btn-primary">Abrir</button>
+      </div>
+      
+      <div class="project-list-item">
+        <div class="project-info">
+          <span class="project-name">Amores Urbanos</span>
+          <span class="project-date">Modificado: 05/05/2023</span>
+        </div>
+        <button class="btn btn-primary">Abrir</button>
+      </div>
+      
+      <div class="project-list-item">
+        <div class="project-info">
+          <span class="project-name">Viagem no Tempo</span>
+          <span class="project-date">Modificado: 01/05/2023</span>
+        </div>
+        <button class="btn btn-primary">Abrir</button>
+      </div>
+    </div>
+    
+    <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+      <button class="btn btn-outline" id="cancel-open">Cancelar</button>
     </div>
   </div>
 </div>
@@ -1017,7 +1318,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     fireParticles.appendChild(particle);
     
-    // Remover a partícula após a animação
+    // Remover a partícula após la animación
     setTimeout(() => {
       particle.remove();
     }, 2000);
@@ -1131,6 +1432,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Configurações
   const settingsModal = document.getElementById('settings-modal');
   const charactersModal = document.getElementById('characters-modal');
+  const newProjectModal = document.getElementById('new-project-modal');
+  const openProjectModal = document.getElementById('open-project-modal');
   
   document.getElementById('settings-btn').addEventListener('click', () => {
     settingsModal.style.display = 'flex';
@@ -1148,6 +1451,23 @@ document.addEventListener('DOMContentLoaded', function() {
     charactersModal.style.display = 'none';
   });
   
+  // Gerenciamento de Projetos
+  document.getElementById('new-project-sidebar-btn').addEventListener('click', () => {
+    newProjectModal.style.display = 'flex';
+  });
+  
+  document.getElementById('open-project-sidebar-btn').addEventListener('click', () => {
+    openProjectModal.style.display = 'flex';
+  });
+  
+  document.getElementById('cancel-project').addEventListener('click', () => {
+    newProjectModal.style.display = 'none';
+  });
+  
+  document.getElementById('cancel-open').addEventListener('click', () => {
+    openProjectModal.style.display = 'none';
+  });
+  
   // Fechar modal ao clicar fora
   window.addEventListener('click', (e) => {
     if (e.target === settingsModal) {
@@ -1156,6 +1476,26 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.target === charactersModal) {
       charactersModal.style.display = 'none';
     }
+    if (e.target === newProjectModal) {
+      newProjectModal.style.display = 'none';
+    }
+    if (e.target === openProjectModal) {
+      openProjectModal.style.display = 'none';
+    }
+  });
+
+  // Submissão do formulário de novo projeto
+  document.getElementById('new-project-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const projectName = document.getElementById('project-name').value;
+    const projectType = document.getElementById('project-type').value;
+    
+    // Simular criação do projeto
+    showNotification(`Projeto "${projectName}" criado com sucesso!`);
+    newProjectModal.style.display = 'none';
+    
+    // Limpar formulário
+    document.getElementById('new-project-form').reset();
   });
 
   // Auto-save
