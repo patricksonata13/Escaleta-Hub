@@ -170,430 +170,184 @@
   </style>
 </head>
 <body>
-    <!-- Tela de abertura estilo streaming -->
-    <div class="opening-screen" id="openingScreen">
-        <div class="logo-container">
-            <div class="logo">ESCALETA HUB</div>
-            <div class="tagline">Sua plataforma profissional de criação de roteiros</div>
-        </div>
-        
-        <div class="login-form">
-            <h2>Olá, Roteirista!</h2>
-            <div class="form-group">
-                <label for="email">E-mail</label>
-                <input type="email" id="email" placeholder="seu@email.com">
-            </div>
-            <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" placeholder="Sua senha">
-            </div>
-            <button class="login-btn" id="loginBtn">Entrar</button>
-        </div>
+<!-- Tela de abertura estilo streaming -->
+<div class="opening-screen" id="openingScreen">
+    <div class="logo-container">
+        <div class="logo">ESCALETA HUB</div>
+        <div class="tagline">Sua plataforma profissional de criação de roteiros</div>
     </div>
+    
+    <div class="login-form">
+        <h2>Olá, Roteirista!</h2>
+        <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" placeholder="seu@email.com">
+        </div>
+        <div class="form-group">
+            <label for="password">Senha</label>
+            <input type="password" id="password" placeholder="Sua senha">
+        </div>
+        <button class="login-btn" id="loginBtn">Entrar</button>
+    </div>
+</div>
 
-    <!-- Plataforma principal -->
-    <div class="main-platform" id="mainPlatform">
-        <header>
-            <div class="header-left">
-                <div class="logo-platform"><i class="fas fa-scroll"></i> Escaleta Hub</div>
-                <div class="document-info">
-                    <input type="text" id="document-title-input" class="document-title" value="Roteiro Sem Título">
-                    <div class="document-stats">3 cenas • 2 páginas • Modificado <span id="last-saved">agora</span></div>
-                </div>
+<!-- Plataforma principal -->
+<div class="main-platform" id="mainPlatform">
+    <header>
+        <div class="header-left">
+            <div class="logo-platform"><i class="fas fa-scroll"></i> Escaleta Hub</div>
+            <div class="document-info">
+                <input type="text" id="document-title-input" class="document-title" value="Roteiro Sem Título">
+                <div class="document-stats">3 cenas • 2 páginas • Modificado <span id="last-saved">agora</span></div>
             </div>
-            <div class="header-right">
-                <button class="toolbar-btn" id="save-btn"><i class="fas fa-save"></i> Salvar</button>
-                <button class="toolbar-btn" id="export-btn"><i class="fas fa-file-export"></i> Exportar</button>
-                <button class="toolbar-btn" id="settings-btn"><i class="fas fa-cog"></i> Configurações</button>
-            </div>
-        </header>
+        </div>
+        <div class="header-right">
+            <button class="toolbar-btn" id="save-btn"><i class="fas fa-save"></i> Salvar</button>
+            <button class="toolbar-btn" id="export-btn"><i class="fas fa-file-export"></i> Exportar</button>
+            <button class="toolbar-btn" id="settings-btn"><i class="fas fa-cog"></i> Configurações</button>
+        </div>
+    </header>
 
-        <div class="main-container">
-            <div class="sidebar">
-                <div class="sidebar-section">
-                    <h3><i class="fas fa-film"></i> Elementos</h3>
-                    <button class="sidebar-btn active" data-tab="roteiro-tab"><i class="fas fa-file-alt"></i> Roteiro</button>
-                    <button class="sidebar-btn" data-tab="rascunho-tab"><i class="fas fa-edit"></i> Rascunho</button>
-                    <button class="sidebar-btn" data-tab="biblia-tab"><i class="fas fa-book"></i> Bíblia</button>
-                    <button class="sidebar-btn" data-tab="escaleta-tab"><i class="fas fa-list-ol"></i> Escaleta</button>
-                    <button class="sidebar-btn" data-tab="storyboard-tab"><i class="fas fa-palette"></i> Storyboard</button>
-                </div>
-                <div class="sidebar-section">
-                    <h3><i class="fas fa-cog"></i> Ferramentas</h3>
-                    <button class="sidebar-btn" id="stats-btn"><i class="fas fa-chart-bar"></i> Estatísticas</button>
-                    <button class="sidebar-btn" id="characters-btn"><i class="fas fa-users"></i> Personagens</button>
-                    <button class="sidebar-btn" id="search-btn"><i class="fas fa-search"></i> Buscar</button>
-                </div>
-                <div class="sidebar-section">
-                    <h3><i class="fas fa-project-diagram"></i> Projeto</h3>
-                    <button class="sidebar-btn" id="new-project-sidebar-btn"><i class="fas fa-folder-plus"></i> Novo Projeto</button>
-                    <button class="sidebar-btn" id="open-project-sidebar-btn"><i class="fas fa-folder-open"></i> Abrir Projeto</button>
-                    <button class="sidebar-btn" id="project-history-btn"><i class="fas fa-history"></i> Histórico</button>
-                </div>
-                <div class="sidebar-section">
-                    <button class="sidebar-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sair</button>
-                </div>
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3><i class="fas fa-film"></i> Elementos</h3>
+                <button class="sidebar-btn active" data-tab="roteiro-tab"><i class="fas fa-file-alt"></i> Roteiro</button>
+                <button class="sidebar-btn" data-tab="rascunho-tab"><i class="fas fa-edit"></i> Rascunho</button>
+                <button class="sidebar-btn" data-tab="biblia-tab"><i class="fas fa-book"></i> Bíblia</button>
+                <button class="sidebar-btn" data-tab="escaleta-tab"><i class="fas fa-list-ol"></i> Escaleta</button>
+                <button class="sidebar-btn" data-tab="storyboard-tab"><i class="fas fa-palette"></i> Storyboard</button>
+            </div>
+        </div>
+
+        <div class="workspace">
+            <div class="tab-header">
+                <!-- Aqui podem aparecer abas dinâmicas -->
             </div>
 
-            <div class="workspace">
-                <div class="tab-header">
-                    <button class="tab-button active" data-tab="roteiro-tab"><i class="fas fa-file-alt"></i> Roteiro</button>
-                    <button class="tab-button" data-tab="rascunho-tab"><i class="fas fa-edit"></i> Rascunho</button>
-                    <button class="tab-button" data-tab="biblia-tab"><i class="fas fa-book"></i> Bíblia do Projeto</button>
-                    <button class="tab-button" data-tab="escaleta-tab"><i class="fas fa-list-ol"></i> Escaleta</button>
-                    <button class="tab-button" data-tab="storyboard-tab"><i class="fas fa-palette"></i> Storyboard</button>
-                </div>
-
+            <div class="tab-content active" id="roteiro-tab">
                 <div class="editor-container">
-                    <!-- ABA ROTEIRO -->
-                    <div id="roteiro-tab" class="tab-content active">
-                        <div class="toolbar">
-                            <div class="toolbar-group">
-                                <button class="toolbar-btn" id="new-scene-btn"><i class="fas fa-plus"></i> Nova Cena</button>
-                                <button class="toolbar-btn" id="delete-btn"><i class="fas fa-trash"></i> Remover</button>
-                                <button class="toolbar-btn" id="duplicate-btn"><i class="fas fa-copy"></i> Duplicar</button>
-                            </div>
-                            <div class="divider"></div>
-                            <div class="toolbar-group">
-                                <button class="toolbar-btn" data-format="bold"><i class="fas fa-bold"></i></button>
-                                <button class="toolbar-btn" data-format="italic"><i class="fas fa-italic"></i></button>
-                                <button class="toolbar-btn" data-format="underline"><i class="fas fa-underline"></i></button>
-                            </div>
-                            <div style="flex:1"></div>
-                            <div class="toolbar-group">
-                                <button class="toolbar-btn" id="night-mode-btn">Modo Noturno</button>
-                                <button class="toolbar-btn" id="focus-mode-btn">Modo Foco</button>
-                                <button class="toolbar-btn" id="normal-mode-btn">Modo Normal</button>
-                            </div>
-                        </div>
-                        <div class="script-editor" contenteditable="true" id="script-editor">
-                            <div class="scene-heading">INT. CASA DE JOÃO - DIA</div>
-                            <div class="action">Uma casa simples. JOÃO mexe em papéis sobre a mesa.</div>
-                            <div class="character">JOÃO</div>
-                            <div class="dialogue">Onde ela está? Já era para ter chegado.</div>
-                            
-                            <div class="scene-heading">EXT. RUA - CONTÍNUO</div>
-                            <div class="action">MARIA caminha apressadamente pela rua, segurando uma pasta.</div>
-                            <div class="character">MARIA</div>
-                            <div class="dialogue">(para si mesma) Espero que ele ainda esteja lá.</div>
-                            
-                            <div class="scene-heading">INT. CASA DE JOÃO - CONTÍNUO</div>
-                            <div class="action">João ouve a campainha tocar e se dirige à porta.</div>
-                            <div class="transition">DESVANEECE PARA:</div>
-                        </div>
+                    <div class="script-editor" contenteditable="true" id="scriptEditor">
+                        <div class="scene-heading">CENA 1 - INTERIOR - DIA</div>
+                        <div class="action">Descrição da ação...</div>
+                        <div class="character">NOME DO PERSONAGEM</div>
+                        <div class="dialogue">Fala do personagem...</div>
+                        <div class="parenthetical">(ação ou tom)</div>
+                        <div class="transition">CORTA PARA:</div>
                     </div>
+                </div>
+            </div>
 
-                    <!-- ABA RASCUNHO -->
-                    <div id="rascunho-tab" class="tab-content">
-                        <div class="toolbar">
-                            <div class="toolbar-group">
-                                <button class="toolbar-btn" data-format="bold"><i class="fas fa-font"></i> Negrito</button>
-                                <button class="toolbar-btn" data-format="italic"><i class="fas fa-italic"></i> Itálico</button>
-                                <button class="toolbar-btn"><i class="fas fa-list-ul"></i> Lista</button>
-                            </div>
-                            <div style="flex:1"></div>
-                            <div class="toolbar-group">
-                                <button class="toolbar-btn"><i class="fas fa-file-pdf"></i> Exportar</button>
-                            </div>
-                        </div>
-                        <textarea class="rascunho-editor" id="rascunho-editor" placeholder="Escreva suas ideias, anotações e rascunhos aqui..."></textarea>
+            <div class="tab-content" id="rascunho-tab">
+                <textarea class="rascunho-editor" placeholder="Escreva seu rascunho aqui..."></textarea>
+            </div>
+
+            <div class="tab-content" id="biblia-tab">
+                <div class="biblia-content">
+                    <div class="biblia-section">
+                        <h4>Personagens</h4>
+                        <p>Adicione informações sobre personagens...</p>
                     </div>
-
-                    <!-- ABA BIBLIA -->
-                    <div id="biblia-tab" class="tab-content">
-                        <div class="biblia-content">
-                            <div class="biblia-section">
-                                <h4>Sinopse</h4>
-                                <p contenteditable="true">Uma história sobre João e Maria, dois personagens em uma jornada emocionante cheia de reviravoltas.</p>
-                            </div>
-                            
-                            <div class="biblia-section">
-                                <h4>Logline</h4>
-                                <p contenteditable="true">Um homem determinado precisa encontrar uma resposta importante antes que seja tarde demais.</p>
-                            </div>
-                            
-                            <div class="biblia-section">
-                                <h4>Personagens</h4>
-                                <p contenteditable="true"><strong>João:</strong> Protagonista, 35 anos, determinado e inteligente.</p>
-                                <p contenteditable="true"><strong>Maria:</strong> Coadjuvante, 32 anos, perspicaz e leal.</p>
-                            </div>
-                            
-                            <div class="biblia-section">
-                                <h4>Storyline</h4>
-                                <p contenteditable="true">1. Introdução dos personagens e do conflito principal.</p>
-                                <p contenteditable="true">2. Desenvolvimento das relações e aumento da tensão.</p>
-                                <p contenteditable="true">3. Clímax e resolução do conflito.</p>
-                            </div>
-                        </div>
+                    <div class="biblia-section">
+                        <h4>Locações</h4>
+                        <p>Adicione informações sobre locações...</p>
                     </div>
+                </div>
+            </div>
 
-                    <!-- ABA ESCALETA -->
-                    <div id="escaleta-tab" class="tab-content">
-                        <div class="escaleta-content">
-                            <div class="escaleta-section">
-                                <h4>Episódio 1: O Início</h4>
-                                <p contenteditable="true"><strong>Cena 1:</strong> INT. CASA DE JOÃO - DIA - João procura por documentos importantes.</p>
-                                <p contenteditable="true"><strong>Cena 2:</strong> EXT. RUA - CONTÍNUO - Maria caminha apressadamente.</p>
-                                <p contenteditable="true"><strong>Cena 3:</strong> INT. CASA DE JOÃO - CONTÍNUO - João atende a porta.</p>
-                            </div>
-                            
-                            <div class="escaleta-section">
-                                <h4>Episódio 2: O Desenvolvimento</h4>
-                                <p contenteditable="true"><strong>Cena 4:</strong> INT. RESTAURANTE - NOITE - João e Maria se encontram.</p>
-                                <p contenteditable="true"><strong>Cena 5:</strong> EXT. PARQUE - DIA - Conversa importante revela segredos.</p>
-                            </div>
-                            
-                            <div class="escaleta-section">
-                                <h4>Episódio 3: O Clímax</h4>
-                                <p contenteditable="true"><strong>Cena 6:</strong> INT. ESCRITÓRIO - TARDE - Confronto com o antagonista.</p>
-                                <p contenteditable="true"><strong>Cena 7:</strong> EXT. ESTacionamento - NOITE - Resolução do conflito.</p>
-                            </div>
-                        </div>
+            <div class="tab-content" id="escaleta-tab">
+                <div class="escaleta-content">
+                    <div class="escaleta-section">
+                        <h4>Ato 1</h4>
+                        <p>Detalhes do ato 1...</p>
                     </div>
+                    <div class="escaleta-section">
+                        <h4>Ato 2</h4>
+                        <p>Detalhes do ato 2...</p>
+                    </div>
+                </div>
+            </div>
 
-                    <!-- ABA STORYBOARD -->
-                    <div id="storyboard-tab" class="tab-content">
-                        <div class="toolbar">
-                            <div class="toolbar-group">
-                                <button class="toolbar-btn" id="new-storyboard-btn"><i class="fas fa-plus"></i> Novo Storyboard</button>
-                                <button class="toolbar-btn" id="draw-btn"><i class="fas fa-pencil-alt"></i> Ferramentas de Desenho</button>
-                                <button class="toolbar-btn" id="color-picker-btn"><i class="fas fa-palette"></i> Cores</button>
-                            </div>
-                            <div style="flex:1"></div>
-                            <div class="toolbar-group">
-                                <button class="toolbar-btn"><i class="fas fa-download"></i> Exportar</button>
-                                <button class="toolbar-btn"><i class="fas fa-print"></i> Imprimir</button>
-                            </div>
-                        </div>
-                        
-                        <div class="storyboard-container">
-                            <div class="storyboard-item">
-                                <div class="storyboard-canvas" id="canvas1">
-                                    <span>Clique para desenhar</span>
-                                </div>
-                                <div class="storyboard-info">
-                                    <p><strong>Cena 1:</strong> INT. CASA DE JOÃO - DIA</p>
-                                    <textarea placeholder="Descrição da cena..." rows="2" style="width:100%; margin-top:5px; padding:5px; font-size:0.8rem;"></textarea>
-                                </div>
-                            </div>
-                            
-                            <div class="storyboard-item">
-                                <div class="storyboard-canvas" id="canvas2">
-                                    <span>Clique para desenhar</span>
-                                </div>
-                                <div class="storyboard-info">
-                                    <p><strong>Cena 2:</strong> EXT. RUA - CONTÍNUO</p>
-                                    <textarea placeholder="Descrição da cena..." rows="2" style="width:100%; margin-top:5px; padding:5px; font-size:0.8rem;"></textarea>
-                                </div>
-                            </div>
-                            
-                            <div class="storyboard-item">
-                                <div class="storyboard-canvas" id="canvas3">
-                                    <span>Clique para desenhar</span>
-                                </div>
-                                <div class="storyboard-info">
-                                    <p><strong>Cena 3:</strong> INT. CASA DE JOÃO - CONTÍNUO</p>
-                                    <textarea placeholder="Descrição da cena..." rows="2" style="width:100%; margin-top:5px; padding:5px; font-size:0.8rem;"></textarea>
-                                </div>
-                            </div>
-                        </div>
+            <div class="tab-content" id="storyboard-tab">
+                <div class="storyboard-container">
+                    <div class="storyboard-item">
+                        <div class="storyboard-canvas">Cenário 1</div>
+                        <div class="storyboard-info">Descrição breve...</div>
+                    </div>
+                    <div class="storyboard-item">
+                        <div class="storyboard-canvas">Cenário 2</div>
+                        <div class="storyboard-info">Descrição breve...</div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <footer>
-            <div class="footer-left">
-                <div><i class="fas fa-keyboard"></i> <kbd>Ctrl+S</kbd> Salvar | <kbd>Ctrl+N</kbd> Nova Cena</div>
-                <div><i class="fas fa-info-circle"></i> <span id="current-tab">Roteiro</span> | <span id="word-count">0</span> palavras</div>
-            </div>
-            <div class="footer-right">
-                <div>Modificado: <span id="last-saved-time">agora</span></div>
-                <div id="autosave-status"><i class="fas fa-sync-alt"></i> Auto-salvo</div>
-            </div>
-        </footer>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const openingScreen = document.getElementById('openingScreen');
-            const mainPlatform = document.getElementById('mainPlatform');
-            const loginBtn = document.getElementById('loginBtn');
-            const logoutBtn = document.getElementById('logoutBtn');
-            
-            // Simular login
-            loginBtn.addEventListener('click', function() {
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                
-                // Validação simples
-                if (email && password) {
-                    // Efeito de fade out na tela de abertura
-                    openingScreen.style.opacity = '0';
-                    
-                    // Após a transição, esconder a tela de abertura e mostrar a plataforma
-                    setTimeout(function() {
-                        openingScreen.style.display = 'none';
-                        mainPlatform.style.display = 'flex';
-                    }, 1000);
-                } else {
-                    alert('Por favor, preencha todos os campos.');
-                }
+    <footer>
+        <div class="footer-left">© 2025 Escaleta Hub | Todos os direitos reservados</div>
+        <div class="footer-right">
+            <div>Último salvamento: <span id="footer-last-saved">agora</span></div>
+        </div>
+    </footer>
+</div>
+
+<script>
+    // ===== ABERTURA / LOGIN =====
+    const openingScreen = document.getElementById('openingScreen');
+    const mainPlatform = document.getElementById('mainPlatform');
+    const loginBtn = document.getElementById('loginBtn');
+
+    loginBtn.addEventListener('click', () => {
+        // Aqui poderia entrar validação real
+        openingScreen.style.opacity = 0;
+        setTimeout(() => {
+            openingScreen.style.display = 'none';
+            mainPlatform.style.display = 'flex';
+        }, 1000);
+    });
+
+    // ===== ABAS =====
+    const sidebarBtns = document.querySelectorAll('.sidebar-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    sidebarBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            sidebarBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const target = btn.getAttribute('data-tab');
+            tabContents.forEach(tab => {
+                tab.classList.remove('active');
+                if(tab.id === target) tab.classList.add('active');
             });
-            
-            // Logout
-            logoutBtn.addEventListener('click', function() {
-                mainPlatform.style.display = 'none';
-                openingScreen.style.display = 'flex';
-                openingScreen.style.opacity = '1';
-                document.getElementById('email').value = '';
-                document.getElementById('password').value = '';
-            });
-            
-            // Controle de abas
-            const switchTab = (tabId) => {
-                // Esconder todas as abas
-                document.querySelectorAll('.tab-content').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                
-                // Mostrar a aba selecionada
-                document.getElementById(tabId).classList.add('active');
-                
-                // Atualizar botões da aba
-                document.querySelectorAll('.tab-button').forEach(button => {
-                    button.classList.remove('active');
-                });
-                document.querySelectorAll(`.tab-button[data-tab="${tabId}"]`).forEach(button => {
-                    button.classList.add('active');
-                });
-                
-                // Atualizar botões da sidebar
-                document.querySelectorAll('.sidebar-btn').forEach(button => {
-                    button.classList.remove('active');
-                });
-                document.querySelectorAll(`.sidebar-btn[data-tab="${tabId}"]`).forEach(button => {
-                    button.classList.add('active');
-                });
-                
-                // Atualizar informação no footer
-                const tabName = document.querySelector(`.tab-button[data-tab="${tabId}"]`).textContent.trim();
-                document.getElementById('current-tab').textContent = tabName;
-            };
-            
-            // Adicionar event listeners para os botões de aba
-            document.querySelectorAll('.tab-button, .sidebar-btn[data-tab]').forEach(button => {
-                button.addEventListener('click', () => {
-                    const tabId = button.getAttribute('data-tab');
-                    switchTab(tabId);
-                });
-            });
-            
-            // Contador de palavras
-            function updateWordCount() {
-                const text = document.getElementById('script-editor').innerText;
-                const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-                document.getElementById('word-count').textContent = wordCount;
-            }
-            
-            document.getElementById('script-editor').addEventListener('input', updateWordCount);
-            updateWordCount();
-            
-            // Formatação de texto
-            document.querySelectorAll('[data-format]').forEach(button => {
-                button.addEventListener('click', () => {
-                    const format = button.getAttribute('data-format');
-                    document.execCommand(format);
-                });
-            });
-            
-            // Nova cena
-            document.getElementById('new-scene-btn').addEventListener('click', () => {
-                const editor = document.getElementById('script-editor');
-                const newScene = document.createElement('div');
-                newScene.className = 'scene-heading';
-                newScene.contentEditable = true;
-                newScene.textContent = 'INT. NOVA CENA - DIA';
-                editor.appendChild(newScene);
-                newScene.focus();
-            });
-            
-            // Storyboard drawing
-            const canvases = document.querySelectorAll('.storyboard-canvas');
-            canvases.forEach(canvas => {
-                canvas.addEventListener('click', () => {
-                    const drawingCanvas = document.createElement('canvas');
-                    drawingCanvas.width = canvas.offsetWidth;
-                    drawingCanvas.height = canvas.offsetHeight;
-                    drawingCanvas.style.width = '100%';
-                    drawingCanvas.style.height = '100%';
-                    drawingCanvas.style.cursor = 'crosshair';
-                    
-                    canvas.innerHTML = '';
-                    canvas.appendChild(drawingCanvas);
-                    
-                    const ctx = drawingCanvas.getContext('2d');
-                    ctx.lineWidth = 2;
-                    ctx.lineCap = 'round';
-                    ctx.strokeStyle = '#000';
-                    
-                    let drawing = false;
-                    
-                    drawingCanvas.addEventListener('mousedown', e => {
-                        drawing = true;
-                        const rect = drawingCanvas.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
-                        ctx.beginPath();
-                        ctx.moveTo(x, y);
-                    });
-                    
-                    drawingCanvas.addEventListener('mousemove', e => {
-                        if(drawing) {
-                            const rect = drawingCanvas.getBoundingClientRect();
-                            const x = e.clientX - rect.left;
-                            const y = e.clientY - rect.top;
-                            ctx.lineTo(x, y);
-                            ctx.stroke();
-                        }
-                    });
-                    
-                    drawingCanvas.addEventListener('mouseup', () => drawing = false);
-                    drawingCanvas.addEventListener('mouseleave', () => drawing = false);
-                });
-            });
-            
-            // Modos de visualização
-            document.getElementById('night-mode-btn').addEventListener('click', () => {
-                document.body.classList.add('dark-mode');
-                document.body.classList.remove('focus-mode');
-            });
-            
-            document.getElementById('focus-mode-btn').addEventListener('click', () => {
-                document.body.classList.add('focus-mode');
-                document.body.classList.remove('dark-mode');
-            });
-            
-            document.getElementById('normal-mode-btn').addEventListener('click', () => {
-                document.body.classList.remove('dark-mode', 'focus-mode');
-            });
-            
-            // Auto-save
-            let autosaveInterval = setInterval(saveDocument, 300000); // 5 minutos padrão
-            
-            function saveDocument() {
-                document.getElementById('last-saved-time').textContent = new Date().toLocaleTimeString();
-                document.getElementById('autosave-status').innerHTML = '<i class="fas fa-sync-alt"></i> Auto-salvo';
-                setTimeout(() => {
-                    document.getElementById('autosave-status').innerHTML = '';
-                }, 3000);
-            }
-            
-            document.getElementById('save-btn').addEventListener('click', saveDocument);
         });
-    </script>
+    });
+
+    // ===== AUTO-SAVE SIMPLIFICADO =====
+    const scriptEditor = document.getElementById('scriptEditor');
+    const lastSaved = document.getElementById('last-saved');
+    const footerLastSaved = document.getElementById('footer-last-saved');
+
+    function autoSave(){
+        const content = scriptEditor.innerHTML;
+        localStorage.setItem('scriptContent', content);
+        const now = new Date().toLocaleTimeString();
+        lastSaved.textContent = now;
+        footerLastSaved.textContent = now;
+    }
+
+    scriptEditor.addEventListener('input', () => {
+        clearTimeout(window.saveTimeout);
+        window.saveTimeout = setTimeout(autoSave, 2000);
+    });
+
+    // Restaurar conteúdo salvo
+    const savedContent = localStorage.getItem('scriptContent');
+    if(savedContent) scriptEditor.innerHTML = savedContent;
+</script>
 </body>
 </html>
+
 
 
 
