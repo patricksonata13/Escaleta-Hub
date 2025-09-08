@@ -6,150 +6,165 @@
 <title>Escaleta Hub - Editor de Roteiro Profissional</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  /* === ESTILOS GERAIS === */
-  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-  body { background:#f9f9f9; color:#2c3e50; display:flex; flex-direction:column; min-height:100vh; transition: all 0.3s ease; }
-  button { cursor:pointer; }
+    /* Reset básico */
+    * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+    body, html { height:100%; overflow:hidden; }
 
-  /* === LOGIN === */
-  #login-container {
-    position: fixed; top:0; left:0; width:100%; height:100%;
-    display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); z-index:9999;
-  }
-  #login-box {
-    background:white; padding:40px; border-radius:10px; width:320px; box-shadow:0 5px 20px rgba(0,0,0,0.3); text-align:center;
-  }
-  #login-box h2 { margin-bottom:20px; }
-  #login-box input { width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; }
-  #login-box button { width:100%; padding:10px; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold; }
-  #login-error { color:red; font-size:0.9rem; margin-bottom:10px; display:none; }
+    /* === Estrutura do primeiro código (layout) === */
+    .app-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        background: #1a1a1a;
+        color: #fff;
+    }
+    header {
+        background:#111;
+        padding:1rem;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+    }
+    header h1 { font-size:1.5rem; color:#f5a623; }
+    .main { flex:1; display:flex; overflow:hidden; }
+    nav { width:250px; background:#222; padding:1rem; }
+    nav ul { list-style:none; }
+    nav ul li { margin:1rem 0; cursor:pointer; transition:0.3s; }
+    nav ul li:hover { color:#f5a623; }
+    section { flex:1; padding:1rem; overflow-y:auto; background:#1a1a1a; }
 
-  /* === ESCALATOR HUB === */
-  body.logged-in header, body.logged-in .main-container, body.logged-in footer, body.logged-in .fab-container {
-    display:flex;
-  }
-  header, footer { padding:1rem 2rem; background:#2c3e50; color:white; display:flex; justify-content:space-between; align-items:center; }
-  .main-container { flex:1; display:flex; overflow:hidden; }
+    /* Botão flutuante (FAB) */
+    .fab {
+        position:fixed;
+        bottom:30px;
+        right:30px;
+        width:60px;
+        height:60px;
+        border-radius:50%;
+        background:#f5a623;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        font-size:1.5rem;
+        cursor:pointer;
+        box-shadow:0 5px 15px rgba(0,0,0,0.3);
+        transition:0.3s;
+    }
+    .fab:hover { background:#ffa726; }
 
-  /* Sidebar */
-  .sidebar { width:250px; background:#34495e; color:#ecf0f1; padding:1rem; display:flex; flex-direction:column; }
-  .sidebar-btn { background:transparent; border:none; color:#ecf0f1; text-align:left; padding:0.7rem; margin-bottom:0.3rem; border-radius:4px; display:flex; align-items:center; gap:0.5rem; }
-  .sidebar-btn.active { background:#e74c3c; }
+    /* === Estilos do segundo código (abertura interativa) === */
+    #opening {
+        position:absolute;
+        width:100%;
+        height:100%;
+        background:#111;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        flex-direction:column;
+        z-index:999;
+    }
+    #opening h1 {
+        font-size:3rem;
+        color:#f5a623;
+        animation: flicker 1.5s infinite;
+    }
+    #opening p {
+        color:#fff;
+        margin-top:1rem;
+        cursor:pointer;
+        transition:0.3s;
+    }
+    #opening p:hover { color:#f5a623; }
 
-  /* Workspace e abas */
-  .workspace { flex:1; display:flex; flex-direction:column; overflow:hidden; }
-  .tab-header { display:flex; background:#ecf0f1; border-bottom:1px solid #ddd; padding:0 20px; }
-  .tab-button { padding:12px 20px; background:transparent; border:none; cursor:pointer; font-weight:500; position:relative; }
-  .tab-button.active { color:#e74c3c; font-weight:bold; }
-  .tab-button.active::after { content:''; position:absolute; bottom:0; left:0; width:100%; height:3px; background:#e74c3c; }
-  .tab-content { flex:1; display:none; overflow:auto; padding:20px; }
-  .tab-content.active { display:block; }
-  .script-editor { flex:1; padding:2rem; background:white; color:black; overflow-y:auto; font-family:'Courier New', monospace; font-size:12pt; line-height:1.5; }
-  .rascunho-editor { width:100%; height:400px; padding:1rem; border:1px solid #ccc; border-radius:5px; }
+    /* Efeito de "chama" */
+    @keyframes flicker {
+        0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity:1; }
+        20%, 22%, 24%, 55% { opacity:0.4; }
+    }
 
-  /* FABs */
-  .fab-container { position:fixed; bottom:25px; right:25px; display:flex; flex-direction:column; gap:15px; z-index:1000; }
-  .fab { width:60px; height:60px; border-radius:50%; background:#e74c3c; color:white; border:none; display:flex; align-items:center; justify-content:center; font-size:1.5rem; box-shadow:0 5px 15px rgba(0,0,0,0.3); }
-  .fab.chama { background:#3498db; }
+    /* Partículas de fogo */
+    .particle {
+        position:absolute;
+        width:4px;
+        height:4px;
+        background:orange;
+        border-radius:50%;
+        pointer-events:none;
+        animation: rise 2s linear infinite;
+    }
+    @keyframes rise {
+        0% { transform: translateY(0) scale(1); opacity:1; }
+        100% { transform: translateY(-200px) scale(0); opacity:0; }
+    }
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="login-container">
-  <div id="login-box">
-    <h2>Login Escaleta Hub</h2>
-    <div id="login-error">Usuário ou senha incorretos!</div>
-    <input type="text" id="username" placeholder="Usuário">
-    <input type="password" id="password" placeholder="Senha">
-    <button id="login-btn">Entrar</button>
-  </div>
+<!-- === Abertura interativa do segundo código === -->
+<div id="opening">
+    <h1>Escaleta Hub</h1>
+    <p>Clique para entrar</p>
 </div>
 
-<!-- ESCALATOR HUB -->
-<header style="display:none">
-  <div class="logo"><i class="fas fa-scroll"></i> Escaleta Hub</div>
-  <div>
-    <button class="toolbar-btn" id="save-btn"><i class="fas fa-save"></i> Salvar</button>
-    <button class="toolbar-btn" id="export-btn"><i class="fas fa-file-export"></i> Exportar</button>
-  </div>
-</header>
-
-<div class="main-container" style="display:none">
-  <div class="sidebar">
-    <button class="sidebar-btn active" data-tab="roteiro-tab"><i class="fas fa-file-alt"></i> Roteiro</button>
-    <button class="sidebar-btn" data-tab="rascunho-tab"><i class="fas fa-edit"></i> Rascunho</button>
-    <button class="sidebar-btn" data-tab="biblia-tab"><i class="fas fa-book"></i> Bíblia</button>
-    <button class="sidebar-btn" data-tab="storyboard-tab"><i class="fas fa-photo-video"></i> Storyboard</button>
-  </div>
-  <div class="workspace">
-    <div class="tab-header">
-      <button class="tab-button active" data-tab="roteiro-tab">Roteiro</button>
-      <button class="tab-button" data-tab="rascunho-tab">Rascunho</button>
-      <button class="tab-button" data-tab="biblia-tab">Bíblia</button>
-      <button class="tab-button" data-tab="storyboard-tab">Storyboard</button>
+<!-- === Estrutura do primeiro código === -->
+<div class="app-container">
+    <header>
+        <h1>Escaleta Hub</h1>
+        <i class="fa fa-user"></i>
+    </header>
+    <div class="main">
+        <nav>
+            <ul>
+                <li onclick="showSection('editor')">Editor</li>
+                <li onclick="showSection('sobre')">Sobre</li>
+                <li onclick="showSection('config')">Configurações</li>
+            </ul>
+        </nav>
+        <section id="editor">
+            <h2>Editor de Roteiro</h2>
+            <textarea style="width:100%;height:80vh;background:#333;color:#fff;padding:1rem;border:none;resize:none;"></textarea>
+        </section>
+        <section id="sobre" style="display:none;">
+            <h2>Sobre</h2>
+            <p>Escaleta Hub é uma plataforma de roteiro profissional feita para roteiristas de todas as origens. Clique em “Editor” para começar a escrever.</p>
+        </section>
+        <section id="config" style="display:none;">
+            <h2>Configurações</h2>
+            <p>Aqui você pode ajustar preferências do editor e da interface.</p>
+        </section>
     </div>
-
-    <div id="roteiro-tab" class="tab-content active">
-      <div class="script-editor" contenteditable="true">
-        <div class="scene-heading">INT. CASA DE JOÃO - DIA</div>
-        <div class="action">Uma casa simples. JOÃO mexe em papéis sobre a mesa.</div>
-        <div class="character">JOÃO</div>
-        <div class="dialogue">Onde ela está? Já era para ter chegado.</div>
-      </div>
-    </div>
-
-    <div id="rascunho-tab" class="tab-content">
-      <textarea class="rascunho-editor">Escreva suas ideias aqui...</textarea>
-    </div>
-
-    <div id="biblia-tab" class="tab-content">
-      <div class="script-editor" contenteditable="true">Bíblia do projeto: personagens, cenas e notas.</div>
-    </div>
-
-    <div id="storyboard-tab" class="tab-content">
-      <div class="script-editor" contenteditable="true">Storyboard: imagens e descrições de cada cena.</div>
-    </div>
-  </div>
-</div>
-
-<div class="fab-container" style="display:none">
-  <button class="fab" id="fofocaBtn"><i class="fas fa-comments"></i></button>
-  <button class="fab chama" id="chamaBtn"><i class="fas fa-video"></i></button>
+    <div class="fab"><i class="fa fa-plus"></i></div>
 </div>
 
 <script>
-  // === LOGIN ===
-  const loginBtn = document.getElementById('login-btn');
-  loginBtn.addEventListener('click', () => {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
-    if(username === 'admin' && password === '1234'){
-      document.body.classList.add('logged-in');
-      document.getElementById('login-container').style.display='none';
-      document.querySelector('header').style.display='flex';
-      document.querySelector('.main-container').style.display='flex';
-      document.querySelector('.fab-container').style.display='flex';
-    } else {
-      document.getElementById('login-error').style.display='block';
+    // === Função para alternar seções ===
+    function showSection(id) {
+        document.querySelectorAll('.main section').forEach(sec => sec.style.display='none');
+        document.getElementById(id).style.display='block';
     }
-  });
 
-  // === TABS ===
-  const tabButtons = document.querySelectorAll('.tab-button, .sidebar-btn');
-  const tabContents = document.querySelectorAll('.tab-content');
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tab = btn.dataset.tab;
-      tabContents.forEach(tc => tc.classList.remove('active'));
-      tabButtons.forEach(tb => tb.classList.remove('active'));
-      document.getElementById(tab).classList.add('active');
-      btn.classList.add('active');
+    // === Abrir o app após clicar na abertura ===
+    const opening = document.getElementById('opening');
+    opening.querySelector('p').addEventListener('click', () => {
+        opening.style.display='none';
     });
-  });
+
+    // === Partículas de fogo ===
+    function createParticle() {
+        const particle = document.createElement('div');
+        particle.className='particle';
+        particle.style.left = Math.random()*window.innerWidth + 'px';
+        particle.style.top = Math.random()*window.innerHeight + 'px';
+        document.body.appendChild(particle);
+        setTimeout(()=>particle.remove(),2000);
+    }
+    setInterval(createParticle,100);
 </script>
+
 </body>
 </html>
+
 
 
 
