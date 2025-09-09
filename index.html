@@ -167,6 +167,241 @@
       resize: vertical;
     }
 
+    /* ===== NOVOS ESTILOS PARA ESCALETA (Google Docs Style) ===== */
+    .escaleta-doc {
+      width: 100%;
+      background: white;
+      min-height: 100%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 40px;
+      position: relative;
+    }
+    
+    .escaleta-page {
+      width: 21cm;
+      min-height: 29.7cm;
+      padding: 2cm;
+      margin: 0 auto;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    
+    .escaleta-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px solid #e74c3c;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .escaleta-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    
+    .escaleta-scene {
+      margin-bottom: 20px;
+      padding: 15px;
+      border-left: 4px solid #3498db;
+      background: #f9f9f9;
+    }
+    
+    .escaleta-scene-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    
+    .escaleta-scene-title {
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    
+    .escaleta-scene-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .escaleta-scene-action {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    
+    .escaleta-scene-content {
+      color: #555;
+    }
+    
+    .escaleta-toolbar {
+      padding: 10px;
+      background: #f5f5f5;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      gap: 15px;
+    }
+    
+    .escaleta-toolbar-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .escaleta-toolbar-btn:hover {
+      background: #e9e9e9;
+    }
+    
+    /* ===== ÍCONES FLUTUANTES ===== */
+    .floating-icons {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 999;
+    }
+    
+    .floating-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .floating-icon:hover {
+      transform: scale(1.1);
+    }
+    
+    .icon-video {
+      background: #e74c3c;
+    }
+    
+    .icon-chat {
+      background: #3498db;
+    }
+    
+    /* ===== MODAIS ===== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 8px;
+      width: 400px;
+      max-width: 90%;
+      overflow: hidden;
+    }
+    
+    .modal-header {
+      background: #2c3e50;
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-body {
+      padding: 20px;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    
+    .chat-messages {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #f9f9f9;
+    }
+    
+    .chat-input {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    .chat-input button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .video-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .video-placeholder {
+      width: 100%;
+      height: 200px;
+      background: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      border-radius: 4px;
+    }
+    
+    .video-controls {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .video-controls button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #2c3e50;
+      color: white;
+    }
+
     @media(max-width:900px){ 
         .main-container{flex-direction:column;} 
         .sidebar{width:100%; order:2;} 
@@ -176,6 +411,7 @@
         .header-right { flex-direction:column; gap:0.5rem; }
         .toolbar { padding:0.5rem; }
         .toolbar-group { flex-wrap:wrap; }
+        .escaleta-page { width: 100%; padding: 1cm; }
     }
   </style>
 </head>
@@ -268,7 +504,7 @@
                             <div class="divider"></div>
                             <div class="toolbar-group">
                                 <button class="toolbar-btn" data-format="bold"><i class="fas fa-bold"></i></button>
-                                <button class="toolbar-btn" data-format="italic"><i class="fas fa-italic"></i></button>
+                                <button class="toolbar-btn" data-format="italic"><i class="fas fa-italic"></i> Itálico</button>
                                 <button class="toolbar-btn" data-format="underline"><i class="fas fa-underline"></i></button>
                             </div>
                             <div style="flex:1"></div>
@@ -295,7 +531,7 @@
                         </div>
                     </div>
 
-                    <!-- ABA ARGUMENTO (NOVA ABA) -->
+                    <!-- ABA ARGUMENTO -->
                     <div id="argumento-tab" class="tab-content">
                         <div class="toolbar">
                             <div class="toolbar-group">
@@ -373,26 +609,61 @@
                         </div>
                     </div>
 
-                    <!-- ABA ESCALETA -->
+                    <!-- ABA ESCALETA (NOVO LAYOUT) -->
                     <div id="escaleta-tab" class="tab-content">
-                        <div class="escaleta-content">
-                            <div class="escaleta-section">
-                                <h4>Episódio 1: O Início</h4>
-                                <p contenteditable="true"><strong>Cena 1:</strong> INT. CASA DE JOÃO - DIA - João procura por documentos importantes.</p>
-                                <p contenteditable="true"><strong>Cena 2:</strong> EXT. RUA - CONTÍNUO - Maria caminha apressadamente.</p>
-                                <p contenteditable="true"><strong>Cena 3:</strong> INT. CASA DE JOÃO - CONTÍNUO - João atende a porta.</p>
-                            </div>
-                            
-                            <div class="escaleta-section">
-                                <h4>Episódio 2: O Desenvolvimento</h4>
-                                <p contenteditable="true"><strong>Cena 4:</strong> INT. RESTAURANTE - NOITE - João e Maria se encontram.</p>
-                                <p contenteditable="true"><strong>Cena 5:</strong> EXT. PARQUE - DIA - Conversa importante revela segredos.</p>
-                            </div>
-                            
-                            <div class="escaleta-section">
-                                <h4>Episódio 3: O Clímax</h4>
-                                <p contenteditable="true"><strong>Cena 6:</strong> INT. ESCRITÓRIO - TARDE - Confronto com o antagonista.</p>
-                                <p contenteditable="true"><strong>Cena 7:</strong> EXT. ESTacionamento - NOITE - Resolução do conflito.</p>
+                        <div class="escaleta-toolbar">
+                            <button class="escaleta-toolbar-btn"><i class="fas fa-plus"></i> Adicionar Cena</button>
+                            <button class="escaleta-toolbar-btn"><i class="fas fa-trash"></i> Remover</button>
+                            <button class="escaleta-toolbar-btn"><i class="fas fa-arrows-alt-v"></i> Reordenar</button>
+                            <button class="escaleta-toolbar-btn"><i class="fas fa-print"></i> Imprimir</button>
+                            <button class="escaleta-toolbar-btn"><i class="fas fa-download"></i> Exportar</button>
+                        </div>
+                        
+                        <div class="escaleta-doc">
+                            <div class="escaleta-page">
+                                <div class="escaleta-header">
+                                    <div class="escaleta-title">Escaleta - Episódio 1: O Início</div>
+                                    <div class="escaleta-info">3 cenas • 2 páginas</div>
+                                </div>
+                                
+                                <div class="escaleta-scene">
+                                    <div class="escaleta-scene-header">
+                                        <div class="escaleta-scene-title">Cena 1: INT. CASA DE JOÃO - DIA</div>
+                                        <div class="escaleta-scene-actions">
+                                            <button class="escaleta-scene-action"><i class="fas fa-edit"></i></button>
+                                            <button class="escaleta-scene-action"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="escaleta-scene-content">
+                                        João procura por documentos importantes. Ele parece ansioso e preocupado.
+                                    </div>
+                                </div>
+                                
+                                <div class="escaleta-scene">
+                                    <div class="escaleta-scene-header">
+                                        <div class="escaleta-scene-title">Cena 2: EXT. RUA - CONTÍNUO</div>
+                                        <div class="escaleta-scene-actions">
+                                            <button class="escaleta-scene-action"><i class="fas fa-edit"></i></button>
+                                            <button class="escaleta-scene-action"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="escaleta-scene-content">
+                                        Maria caminha apressadamente pela rua, segurando uma pasta. Ela olha no relógio e acelera o passo.
+                                    </div>
+                                </div>
+                                
+                                <div class="escaleta-scene">
+                                    <div class="escaleta-scene-header">
+                                        <div class="escaleta-scene-title">Cena 3: INT. CASA DE JOÃO - CONTÍNUO</div>
+                                        <div class="escaleta-scene-actions">
+                                            <button class="escaleta-scene-action"><i class="fas fa-edit"></i></button>
+                                            <button class="escaleta-scene-action"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="escaleta-scene-content">
+                                        João ouve a campainha tocar e se dirige à porta. Ele parece esperançoso.
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -458,6 +729,66 @@
                 <div id="autosave-status"><i class="fas fa-sync-alt"></i> Auto-salvo</div>
             </div>
         </footer>
+        
+        <!-- Ícones flutuantes -->
+        <div class="floating-icons">
+            <div class="floating-icon icon-video" id="video-icon">
+                <i class="fas fa-video"></i>
+            </div>
+            <div class="floating-icon icon-chat" id="chat-icon">
+                <i class="fas fa-comment-dots"></i>
+            </div>
+        </div>
+        
+        <!-- Modal de Video -->
+        <div class="modal" id="video-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Chamada de Vídeo</h3>
+                    <button class="modal-close" id="close-video">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="video-container">
+                        <div class="video-placeholder">
+                            <i class="fas fa-video" style="font-size: 48px;"></i>
+                            <p>Visualização da câmera</p>
+                        </div>
+                        <div class="video-controls">
+                            <button><i class="fas fa-microphone"></i> Áudio</button>
+                            <button><i class="fas fa-video"></i> Vídeo</button>
+                            <button style="background: #e74c3c;"><i class="fas fa-phone"></i> Sair</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal de Chat -->
+        <div class="modal" id="chat-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Chat de Colaboração</h3>
+                    <button class="modal-close" id="close-chat">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="chat-messages">
+                        <div class="message">
+                            <strong>João:</strong> Olá, como está o desenvolvimento da cena 3?
+                        </div>
+                        <div class="message">
+                            <strong>Maria:</strong> Estou finalizando os diálogos. Precisamos conversar sobre o clímax.
+                        </div>
+                        <div class="message">
+                            <strong>Você:</strong> Podemos marcar uma reunião amanhã para alinharmos.
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Digite sua mensagem...">
+                        <button>Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -636,6 +967,40 @@
             }
             
             document.getElementById('save-btn').addEventListener('click', saveDocument);
+            
+            // Ícones flutuantes - funcionalidades
+            const videoIcon = document.getElementById('video-icon');
+            const chatIcon = document.getElementById('chat-icon');
+            const videoModal = document.getElementById('video-modal');
+            const chatModal = document.getElementById('chat-modal');
+            const closeVideo = document.getElementById('close-video');
+            const closeChat = document.getElementById('close-chat');
+            
+            videoIcon.addEventListener('click', () => {
+                videoModal.style.display = 'flex';
+            });
+            
+            chatIcon.addEventListener('click', () => {
+                chatModal.style.display = 'flex';
+            });
+            
+            closeVideo.addEventListener('click', () => {
+                videoModal.style.display = 'none';
+            });
+            
+            closeChat.addEventListener('click', () => {
+                chatModal.style.display = 'none';
+            });
+            
+            // Fechar modais clicando fora deles
+            window.addEventListener('click', (e) => {
+                if (e.target === videoModal) {
+                    videoModal.style.display = 'none';
+                }
+                if (e.target === chatModal) {
+                    chatModal.style.display = 'none';
+                }
+            });
         });
     </script>
 </body>
