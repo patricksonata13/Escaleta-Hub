@@ -6,57 +6,37 @@
   <title>Escaleta Hub - Plataforma de Roteiristas</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* ===== NOVA PALETA DE CORES ===== */
-    :root {
-      --primary: #2a5a78;      /* Azul principal */
-      --secondary: #9c6ade;    /* Roxo para destaques */
-      --accent: #41b883;       /* Verde água para realces */
-      --light: #f0f7ff;        /* Azul muito claro */
-      --dark: #1a3650;         /* Azul escuro */
-      --text: #2c3e50;         /* Texto escuro */
-      --bg: #f8fbff;           /* Fundo claro */
-      --header-bg: linear-gradient(135deg, #2a5a78 0%, #1a3650 100%);
-      --sidebar-bg: #3a4f66;
-      --editor-bg: #ffffff;
-      --editor-text: #2c3e50;
-      --footer-bg: #2a5a78;
-      --footer-text: #e0f0ff;
-      --success: #41b883;
-      --warning: #ffba5a;
-      --danger: #ff6b6b;
-    }
-
     /* ===== ESTILOS GERAIS ===== */
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color:#f5f9ff; color:var(--text); overflow-x:hidden; }
+    body { background-color:#141414; color:#fff; overflow-x:hidden; }
 
     /* ===== ABERTURA ESTILO STREAMING ===== */
     .opening-screen {
         position: fixed; top:0; left:0; width:100%; height:100%;
-        background: linear-gradient(to bottom, rgba(42, 90, 120, 0.8) 0%, rgba(26, 54, 80, 0.9) 100%);
+        background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.9) 100%), #000;
         display:flex; flex-direction:column; justify-content:center; align-items:center;
         z-index:1000; transition: opacity 1s ease-out;
     }
     .logo-container { margin-bottom:40px; text-align:center; animation:fadeIn 2s ease forwards; }
-    .logo { font-size:48px; font-weight:bold; color:#9c6ade; text-transform:uppercase; letter-spacing:5px; margin-bottom:10px; }
-    .tagline { font-size:18px; color:#d0e4ff; margin-top:10px; }
+    .logo { font-size:48px; font-weight:bold; color:#e50914; text-transform:uppercase; letter-spacing:5px; margin-bottom:10px; }
+    .tagline { font-size:18px; color:#aaa; margin-top:10px; }
     .login-form {
-        background-color: rgba(26, 54, 80, 0.85); padding:40px; border-radius:8px; width:100%; max-width:450px;
+        background-color: rgba(0,0,0,0.75); padding:40px; border-radius:8px; width:100%; max-width:450px;
         animation: scaleUp 0.5s ease forwards;
     }
-    .login-form h2 { margin-bottom:28px; font-size:32px; font-weight:500; text-align:center; color:white; }
+    .login-form h2 { margin-bottom:28px; font-size:32px; font-weight:500; text-align:center; }
     .form-group { margin-bottom:16px; }
-    .form-group label { display:block; margin-bottom:8px; font-size:14px; color:#a8c6ff; }
+    .form-group label { display:block; margin-bottom:8px; font-size:14px; color:#aaa; }
     .form-group input {
-        width:100%; height:50px; padding:0 16px; background:#2a5a78; border:1px solid #3a6a90; border-radius:4px;
+        width:100%; height:50px; padding:0 16px; background:#333; border:none; border-radius:4px;
         color:#fff; font-size:16px;
     }
-    .form-group input:focus { background:#3a6a90; outline:none; border-color:#9c6ade; }
+    .form-group input:focus { background:#454545; outline:none; }
     .login-btn {
-        width:100%; height:50px; background:#9c6ade; color:#fff; border:none; border-radius:4px;
+        width:100%; height:50px; background:#e50914; color:#fff; border:none; border-radius:4px;
         font-size:16px; font-weight:bold; margin-top:24px; cursor:pointer; transition: background 0.2s;
     }
-    .login-btn:hover { background:#8c5acd; }
+    .login-btn:hover { background:#f40612; }
 
     @keyframes fadeIn { from {opacity:0;} to{opacity:1;} }
     @keyframes scaleUp { from{transform:scale(0.8); opacity:0;} to{transform:scale(1); opacity:1;} }
@@ -64,9 +44,19 @@
     /* ===== PLATAFORMA PRINCIPAL ===== */
     .main-platform { display:none; height:100vh; flex-direction:column; }
 
+    /* ===== VARIÁVEIS DE CORES ===== */
+    :root {
+        --primary:#2c3e50; --secondary:#e74c3c; --accent:#3498db; --light:#ecf0f1; --dark:#2c3e50;
+        --success:#2ecc71; --warning:#f39c12; --danger:#e74c3c; --text:#2c3e50; --bg:#f9f9f9;
+        --header-bg:linear-gradient(135deg,#e74c3c 0%,#c0392b 100%); --sidebar-bg:#34495e;
+        --editor-bg:#ffffff; --editor-text:#000000; --footer-bg:#2c3e50; --footer-text:#ecf0f1;
+    }
+    body.dark-mode { --text:#ecf0f1; --bg:#1a2a3a; --header-bg:linear-gradient(135deg,#c0392b 0%,#922b21 100%); --sidebar-bg:#2c3e50; --editor-bg:#1e2a38; --editor-text:#ecf0f1; --footer-bg:#1a252f; --footer-text:#bdc3c7; }
+    body.focus-mode { --text:#3498db; --bg:#1e2a38; --header-bg:linear-gradient(135deg,#2980b9 0%,#1c5d8a 100%); --sidebar-bg:#2c3e50; --editor-bg:#14212e; --editor-text:#3498db; --footer-bg:#1a252f; --footer-text:#3498db; }
+
     /* ===== ESTRUTURA PRINCIPAL ===== */
     .main-container { display:flex; flex:1; overflow:hidden; }
-    header { background:var(--header-bg); color:white; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+    header { background:var(--header-bg); color:white; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 10px rgba(0,0,0,0.2); }
     .header-left { display:flex; align-items:center; gap:1rem; }
     .logo-platform { font-size:2rem; font-weight:bold; display:flex; align-items:center; gap:0.5rem; }
     .document-info { display:flex; flex-direction:column; }
@@ -75,22 +65,22 @@
 
     .header-right { display:flex; gap:1rem; }
     .toolbar-btn { padding:0.5rem 1rem; background:var(--primary); color:white; border:none; border-radius:4px; cursor:pointer; display:flex; align-items:center; gap:0.5rem; font-size:0.9rem; transition:all 0.2s; }
-    .toolbar-btn:hover { background:#3a6a90; }
+    .toolbar-btn:hover { background:#34495e; }
     .toolbar-btn.active { background:var(--secondary); }
 
-    .sidebar { width:250px; background:var(--sidebar-bg); color:#e0f0ff; padding:1rem; display:flex; flex-direction:column; box-shadow:2px 0 5px rgba(0,0,0,0.1); }
+    .sidebar { width:250px; background:var(--sidebar-bg); color:#ecf0f1; padding:1rem; display:flex; flex-direction:column; box-shadow:2px 0 5px rgba(0,0,0,0.1); }
     .sidebar-section { margin-bottom:1.5rem; }
-    .sidebar-section h3 { margin-bottom:0.8rem; font-size:1rem; color:#a8c6ff; display:flex; align-items:center; gap:0.5rem; }
-    .sidebar-btn { display:flex; align-items:center; gap:0.5rem; padding:0.7rem; width:100%; background:transparent; border:none; color:#e0f0ff; text-align:left; border-radius:4px; cursor:pointer; transition:background 0.2s; margin-bottom:0.3rem; font-weight:bold; }
-    .sidebar-btn:hover { background:#4a5f76; }
-    .sidebar-btn.active { background:#9c6ade; }
+    .sidebar-section h3 { margin-bottom:0.8rem; font-size:1rem; color:#bdc3c7; display:flex; align-items:center; gap:0.5rem; }
+    .sidebar-btn { display:flex; align-items:center; gap:0.5rem; padding:0.7rem; width:100%; background:transparent; border:none; color:#ecf0f1; text-align:left; border-radius:4px; cursor:pointer; transition:background 0.2s; margin-bottom:0.3rem; font-weight:bold; }
+    .sidebar-btn:hover { background:#3d5066; }
+    .sidebar-btn.active { background:#e74c3c; }
 
-    .workspace { flex:1; display:flex; flex-direction:column; overflow:hidden; background:var(--bg); }
-    .toolbar { padding:0.8rem 1.5rem; background:var(--light); display:flex; gap:1rem; flex-wrap:wrap; border-bottom:1px solid #d0e0f0; }
+    .workspace { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .toolbar { padding:0.8rem 1.5rem; background:var(--light); display:flex; gap:1rem; flex-wrap:wrap; border-bottom:1px solid #ddd; }
     .toolbar-group { display:flex; gap:0.5rem; align-items:center; }
-    .divider { width:1px; background:#d0e0f0; height:24px; }
+    .divider { width:1px; background:#ddd; height:24px; }
 
-    .tab-header { display:flex; background:var(--light); border-bottom:1px solid #d0e0f0; padding:0 20px; }
+    .tab-header { display:flex; background:var(--light); border-bottom:1px solid #ddd; padding:0 20px; }
     .tab-button { padding:12px 20px; background:transparent; border:none; cursor:pointer; font-weight:500; color:var(--text); position:relative; }
     .tab-button.active { color:var(--secondary); font-weight:bold; }
     .tab-button.active::after { content:''; position:absolute; bottom:0; left:0; width:100%; height:3px; background:var(--secondary); }
@@ -99,7 +89,7 @@
 
     .editor-container { flex:1; display:flex; overflow:hidden; }
     .script-editor { flex:1; padding:2rem; background:var(--editor-bg); color:var(--editor-text); overflow-y:auto; font-family:'Courier New', monospace; font-size:12pt; line-height:1.5; }
-    .scene-heading { font-weight:bold; text-transform:uppercase; margin-top:1.5rem; color:#2a5a78; cursor:pointer; }
+    .scene-heading { font-weight:bold; text-transform:uppercase; margin-top:1.5rem; color:#3498db; cursor:pointer; }
     .action,.character,.dialogue,.parenthetical,.transition { margin:0.8rem 0; cursor:pointer; }
     .character { text-align:center; width:50%; margin:0.8rem auto; font-weight:bold; }
     .dialogue { width:60%; margin:0 auto; }
@@ -119,17 +109,15 @@
     }
     
     .storyboard-item {
-      border: 1px solid #d0e0f0;
-      border-radius: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
       overflow: hidden;
-      background: white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
     
     .storyboard-canvas {
       width: 100%;
       height: 150px;
-      background: #f0f7ff;
+      background: #f5f5f5;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -147,11 +135,10 @@
       height: 100%;
       min-height: 400px;
       padding: 15px;
-      border: 1px solid #d0e0f0;
-      border-radius: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       resize: none;
-      background: white;
     }
     
     .biblia-content, .escaleta-content, .argumento-content {
@@ -161,10 +148,8 @@
     .biblia-section, .escaleta-section, .argumento-section {
       margin-bottom: 20px;
       padding: 15px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      border-left: 4px solid var(--secondary);
+      background: var(--light);
+      border-radius: 4px;
     }
     
     .biblia-section h4, .escaleta-section h4, .argumento-section h4 {
@@ -176,11 +161,10 @@
       width: 100%;
       min-height: 300px;
       padding: 15px;
-      border: 1px solid #d0e0f0;
-      border-radius: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       resize: vertical;
-      background: white;
     }
 
     /* ===== NOVA ABA ESCALETA NO ESTILO GOOGLE DOCS ===== */
@@ -188,7 +172,7 @@
       display: flex;
       flex-direction: column;
       height: 100%;
-      background: var(--bg);
+      background: #f8f9fa;
     }
     
     .docs-menu-bar {
@@ -196,7 +180,7 @@
       align-items: center;
       padding: 8px 16px;
       background: white;
-      border-bottom: 1px solid #d0e0f0;
+      border-bottom: 1px solid #e0e0e0;
     }
     
     .docs-title-input {
@@ -206,7 +190,7 @@
       padding: 8px 12px;
       margin-right: auto;
       background: transparent;
-      color: var(--text);
+      color: #202124;
       width: 300px;
     }
     
@@ -224,7 +208,7 @@
     }
     
     .docs-menu-item:hover {
-      background: #f0f7ff;
+      background: #f1f3f4;
     }
     
     .docs-toolbar {
@@ -232,7 +216,7 @@
       flex-wrap: wrap;
       padding: 8px 16px;
       background: white;
-      border-bottom: 1px solid #d0e0f0;
+      border-bottom: 1px solid #e0e0e0;
     }
     
     .docs-toolbar-group {
@@ -258,7 +242,7 @@
     }
     
     .docs-toolbar-button:hover {
-      background: #f0f7ff;
+      background: #f1f3f4;
     }
     
     .docs-toolbar-select {
@@ -276,19 +260,18 @@
       flex: 1;
       display: flex;
       overflow: auto;
-      background: var(--bg);
+      background: #f8f9fa;
       justify-content: center;
       padding: 20px;
     }
     
     .docs-editor {
-      width: 816px;
+      width: 816px; /* Tamanho A4 em pixels na escala 96dpi */
       min-height: 1056px;
       padding: 96px;
       background: white;
       box-shadow: 0 1px 3px 1px rgba(60, 64, 67, 0.15);
       margin-bottom: 20px;
-      border-radius: 8px;
     }
     
     .docs-editor-content {
@@ -297,7 +280,7 @@
       outline: none;
       font-size: 12pt;
       line-height: 1.5;
-      color: var(--text);
+      color: #202124;
     }
     
     .docs-status-bar {
@@ -305,7 +288,7 @@
       align-items: center;
       padding: 8px 16px;
       background: white;
-      border-top: 1px solid #d0e0f0;
+      border-top: 1px solid #e0e0e0;
       color: #5f6368;
       font-size: 12px;
     }
@@ -331,7 +314,7 @@
     }
     
     .docs-page-button:hover {
-      background: #f0f7ff;
+      background: #f1f3f4;
     }
 
     /* ===== ÍCONES FLUTUANTES ===== */
@@ -355,7 +338,7 @@
       color: white;
       font-size: 24px;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       transition: all 0.3s ease;
     }
     
@@ -364,11 +347,11 @@
     }
     
     .icon-video {
-      background: var(--secondary);
+      background: #e74c3c;
     }
     
     .icon-chat {
-      background: var(--accent);
+      background: #3498db;
     }
     
     /* ===== MODAIS ===== */
@@ -379,7 +362,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.7);
       z-index: 1000;
       align-items: center;
       justify-content: center;
@@ -387,15 +370,14 @@
     
     .modal-content {
       background: white;
-      border-radius: 12px;
+      border-radius: 8px;
       width: 400px;
       max-width: 90%;
       overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
     
     .modal-header {
-      background: var(--primary);
+      background: #2c3e50;
       color: white;
       padding: 15px;
       display: flex;
@@ -418,11 +400,10 @@
     .chat-messages {
       height: 300px;
       overflow-y: auto;
-      border: 1px solid #d0e0f0;
+      border: 1px solid #ddd;
       padding: 10px;
       margin-bottom: 10px;
-      background: var(--light);
-      border-radius: 6px;
+      background: #f9f9f9;
     }
     
     .chat-input {
@@ -433,16 +414,16 @@
     .chat-input input {
       flex: 1;
       padding: 10px;
-      border: 1px solid #d0e0f0;
-      border-radius: 6px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
     }
     
     .chat-input button {
-      background: var(--accent);
+      background: #3498db;
       color: white;
       border: none;
       padding: 10px 15px;
-      border-radius: 6px;
+      border-radius: 4px;
       cursor: pointer;
     }
     
@@ -456,12 +437,12 @@
     .video-placeholder {
       width: 100%;
       height: 200px;
-      background: var(--dark);
+      background: #333;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
-      border-radius: 8px;
+      border-radius: 4px;
     }
     
     .video-controls {
@@ -472,9 +453,9 @@
     .video-controls button {
       padding: 10px 15px;
       border: none;
-      border-radius: 6px;
+      border-radius: 4px;
       cursor: pointer;
-      background: var(--primary);
+      background: #2c3e50;
       color: white;
     }
 
@@ -663,7 +644,7 @@
                         <div class="biblia-content">
                             <div class="biblia-section">
                                 <h4>Sinopse</h4>
-                                <p contenteditable="true">Uma história sobre João e Maria, dois personagens em uma jornada emocionante cheia de reviravoltas.</p>
+                                <p contenteditable="true">Uma história sobre João и Maria, dois personagens em uma jornada emocionante cheia de reviravoltas.</p>
                             </div>
                             
                             <div class="biblia-section">
@@ -859,7 +840,7 @@
                         <div class="video-controls">
                             <button><i class="fas fa-microphone"></i> Áudio</button>
                             <button><i class="fas fa-video"></i> Vídeo</button>
-                            <button style="background: var(--secondary);"><i class="fas fa-phone"></i> Sair</button>
+                            <button style="background: #e74c3c;"><i class="fas fa-phone"></i> Sair</button>
                         </div>
                     </div>
                 </div>
@@ -1015,7 +996,7 @@
                     const ctx = drawingCanvas.getContext('2d');
                     ctx.lineWidth = 2;
                     ctx.lineCap = 'round';
-                    ctx.strokeStyle = '#2a5a78';
+                    ctx.strokeStyle = '#000';
                     
                     let drawing = false;
                     
