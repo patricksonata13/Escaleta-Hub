@@ -1,694 +1,1130 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Escaleta Hub — Clean Blue</title>
-
-  <!-- Font Awesome -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escaleta Hub - Plataforma de Roteiristas</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
   <style>
-    /* ---------- Reset + base ---------- */
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background:linear-gradient(180deg,#f3f6fb 0%, #eef4fb 100%);
-      color:#0f1724;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      overflow:hidden;
+    /* ===== NOVA PALETA DE CORES ===== */
+    :root {
+      --primary: #2a5a78;      /* Azul principal */
+      --secondary: #9c6ade;    /* Roxo para destaques */
+      --accent: #41b883;       /* Verde água para realces */
+      --light: #f0f7ff;        /* Azul muito claro */
+      --dark: #1a3650;         /* Azul escuro */
+      --text: #2c3e50;         /* Texto escuro */
+      --bg: #f8fbff;           /* Fundo claro */
+      --header-bg: linear-gradient(135deg, #2a5a78 0%, #1a3650 100%);
+      --sidebar-bg: #3a4f66;
+      --editor-bg: #ffffff;
+      --editor-text: #2c3e50;
+      --footer-bg: #2a5a78;
+      --footer-text: #e0f0ff;
+      --success: #41b883;
+      --warning: #ffba5a;
+      --danger: #ff6b6b;
     }
 
-    /* ---------- Layout ---------- */
-    .opening-screen{
-      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-      background:linear-gradient(180deg, rgba(7,27,77,0.85), rgba(8,29,77,0.95));
-      color:white; z-index:999;
+    /* ===== ESTILOS GERAIS ===== */
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color:#f5f9ff; color:var(--text); overflow-x:hidden; }
+
+    /* ===== ABERTURA ESTILO STREAMING ===== */
+    .opening-screen {
+        position: fixed; top:0; left:0; width:100%; height:100%;
+        background: linear-gradient(to bottom, rgba(42, 90, 120, 0.8) 0%, rgba(26, 54, 80, 0.9) 100%);
+        display:flex; flex-direction:column; justify-content:center; align-items:center;
+        z-index:1000; transition: opacity 1s ease-out;
     }
-    .open-card{
-      width:96%; max-width:520px; background:rgba(255,255,255,0.04); border-radius:12px; padding:28px;
-      box-shadow: 0 10px 30px rgba(2,6,23,0.5); border:1px solid rgba(255,255,255,0.06);
+    .logo-container { margin-bottom:40px; text-align:center; animation:fadeIn 2s ease forwards; }
+    .logo { font-size:48px; font-weight:bold; color:#9c6ade; text-transform:uppercase; letter-spacing:5px; margin-bottom:10px; }
+    .tagline { font-size:18px; color:#d0e4ff; margin-top:10px; }
+    .login-form {
+        background-color: rgba(26, 54, 80, 0.85); padding:40px; border-radius:8px; width:100%; max-width:450px;
+        animation: scaleUp 0.5s ease forwards;
     }
-    .logo{font-weight:700; letter-spacing:3px; color:#9ed0ff; font-size:34px}
-    .tagline{color:rgba(255,255,255,0.85); margin-top:6px; font-size:14px}
-    .login-form{margin-top:18px}
+    .login-form h2 { margin-bottom:28px; font-size:32px; font-weight:500; text-align:center; color:white; }
+    .form-group { margin-bottom:16px; }
+    .form-group label { display:block; margin-bottom:8px; font-size:14px; color:#a8c6ff; }
+    .form-group input {
+        width:100%; height:50px; padding:0 16px; background:#2a5a78; border:1px solid #3a6a90; border-radius:4px;
+        color:#fff; font-size:16px;
+    }
+    .form-group input:focus { background:#3a6a90; outline:none; border-color:#9c6ade; }
+    .login-btn {
+        width:100%; height:50px; background:#9c6ade; color:#fff; border:none; border-radius:4px;
+        font-size:16px; font-weight:bold; margin-top:24px; cursor:pointer; transition: background 0.2s;
+    }
+    .login-btn:hover { background:#8c5acd; }
 
-    .login-form label{display:block; font-size:13px; color:rgba(255,255,255,0.8); margin-bottom:6px}
-    .login-input{width:100%; padding:12px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.03); color:white}
-    .login-btn{
-      width:100%; margin-top:14px; padding:12px 14px; border-radius:10px; border:none; cursor:pointer;
-      background:linear-gradient(90deg,#2563eb,#1d4ed8); color:white; font-weight:600;
-      box-shadow: 0 6px 18px rgba(37,99,235,0.18);
+    @keyframes fadeIn { from {opacity:0;} to{opacity:1;} }
+    @keyframes scaleUp { from{transform:scale(0.8); opacity:0;} to{transform:scale(1); opacity:1;} }
+
+    /* ===== PLATAFORMA PRINCIPAL ===== */
+    .main-platform { display:none; height:100vh; flex-direction:column; }
+
+    /* ===== ESTRUTURA PRINCIPAL ===== */
+    .main-container { display:flex; flex:1; overflow:hidden; }
+    header { background:var(--header-bg); color:white; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+    .header-left { display:flex; align-items:center; gap:1rem; }
+    .logo-platform { font-size:2rem; font-weight:bold; display:flex; align-items:center; gap:0.5rem; }
+    .document-info { display:flex; flex-direction:column; }
+    .document-title { font-weight:bold; font-size:1.2rem; border:none; background:none; color:white; width:200px; }
+    .document-stats { font-size:0.9rem; opacity:0.9; }
+
+    .header-right { display:flex; gap:1rem; }
+    .toolbar-btn { padding:0.5rem 1rem; background:var(--primary); color:white; border:none; border-radius:4px; cursor:pointer; display:flex; align-items:center; gap:0.5rem; font-size:0.9rem; transition:all 0.2s; }
+    .toolbar-btn:hover { background:#3a6a90; }
+    .toolbar-btn.active { background:var(--secondary); }
+
+    .sidebar { width:250px; background:var(--sidebar-bg); color:#e0f0ff; padding:1rem; display:flex; flex-direction:column; box-shadow:2px 0 5px rgba(0,0,0,0.1); }
+    .sidebar-section { margin-bottom:1.5rem; }
+    .sidebar-section h3 { margin-bottom:0.8rem; font-size:1rem; color:#a8c6ff; display:flex; align-items:center; gap:0.5rem; }
+    .sidebar-btn { display:flex; align-items:center; gap:0.5rem; padding:0.7rem; width:100%; background:transparent; border:none; color:#e0f0ff; text-align:left; border-radius:4px; cursor:pointer; transition:background 0.2s; margin-bottom:0.3rem; font-weight:bold; }
+    .sidebar-btn:hover { background:#4a5f76; }
+    .sidebar-btn.active { background:#9c6ade; }
+
+    .workspace { flex:1; display:flex; flex-direction:column; overflow:hidden; background:var(--bg); }
+    .toolbar { padding:0.8rem 1.5rem; background:var(--light); display:flex; gap:1rem; flex-wrap:wrap; border-bottom:1px solid #d0e0f0; }
+    .toolbar-group { display:flex; gap:0.5rem; align-items:center; }
+    .divider { width:1px; background:#d0e0f0; height:24px; }
+
+    .tab-header { display:flex; background:var(--light); border-bottom:1px solid #d0e0f0; padding:0 20px; }
+    .tab-button { padding:12px 20px; background:transparent; border:none; cursor:pointer; font-weight:500; color:var(--text); position:relative; }
+    .tab-button.active { color:var(--secondary); font-weight:bold; }
+    .tab-button.active::after { content:''; position:absolute; bottom:0; left:0; width:100%; height:3px; background:var(--secondary); }
+    .tab-content { flex:1; display:none; overflow:auto; padding:20px; }
+    .tab-content.active { display:block; }
+
+    .editor-container { flex:1; display:flex; overflow:hidden; }
+    .script-editor { flex:1; padding:2rem; background:var(--editor-bg); color:var(--editor-text); overflow-y:auto; font-family:'Courier New', monospace; font-size:12pt; line-height:1.5; }
+    .scene-heading { font-weight:bold; text-transform:uppercase; margin-top:1.5rem; color:#2a5a78; cursor:pointer; }
+    .action,.character,.dialogue,.parenthetical,.transition { margin:0.8rem 0; cursor:pointer; }
+    .character { text-align:center; width:50%; margin:0.8rem auto; font-weight:bold; }
+    .dialogue { width:60%; margin:0 auto; }
+    .parenthetical { width:50%; margin:0 auto; padding-left:2rem; }
+    .transition { text-align:right; margin-top:1rem; text-transform:uppercase; font-weight:bold; }
+
+    footer { background:var(--footer-bg); color:var(--footer-text); padding:0.8rem 1.5rem; display:flex; justify-content:space-between; align-items:center; font-size:0.9rem; }
+    .footer-left { display:flex; gap:1.5rem; }
+    .footer-right { display:flex; gap:0.8rem; }
+
+    /* Estilos para storyboard */
+    .storyboard-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 15px;
+    }
+    
+    .storyboard-item {
+      border: 1px solid #d0e0f0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    
+    .storyboard-canvas {
+      width: 100%;
+      height: 150px;
+      background: #f0f7ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    
+    .storyboard-info {
+      padding: 10px;
+      background: var(--light);
     }
 
-    /* Main platform */
-    .main-platform{display:none; height:100vh; width:100%; display:flex; flex-direction:column;}
-    header{
-      display:flex; align-items:center; justify-content:space-between;
-      padding:18px 26px; background:linear-gradient(90deg,#1e3a8a,#2563eb);
-      color:white; box-shadow: 0 6px 18px rgba(2,6,23,0.12);
+    /* Estilos para outras abas */
+    .rascunho-editor {
+      width: 100%;
+      height: 100%;
+      min-height: 400px;
+      padding: 15px;
+      border: 1px solid #d0e0f0;
+      border-radius: 8px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      resize: none;
+      background: white;
     }
-    .header-left{display:flex; align-items:center; gap:18px}
-    .title-brand{display:flex; gap:12px; align-items:center}
-    .brand-mark{width:44px;height:44px;border-radius:8px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-weight:700;color:#e6f0ff}
-    .app-title{font-weight:700; font-size:18px}
-    .document-info input{background:transparent;border:none;color:rgba(255,255,255,0.95); font-weight:600; width:220px}
-    .header-right{display:flex; gap:10px; align-items:center}
-    .btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
-    .btn-ghost{background:rgba(255,255,255,0.06); color:white}
-    .btn-primary{background:linear-gradient(90deg,#60a5fa,#3b82f6); color:white; box-shadow:0 6px 16px rgba(59,130,246,0.16)}
-
-    .container{
-      display:flex; flex:1; height:calc(100vh - 72px); overflow:hidden;
+    
+    .biblia-content, .escaleta-content, .argumento-content {
+      padding: 15px;
+    }
+    
+    .biblia-section, .escaleta-section, .argumento-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      border-left: 4px solid var(--secondary);
+    }
+    
+    .biblia-section h4, .escaleta-section h4, .argumento-section h4 {
+      margin-bottom: 10px;
+      color: var(--secondary);
+    }
+    
+    .argumento-editor {
+      width: 100%;
+      min-height: 300px;
+      padding: 15px;
+      border: 1px solid #d0e0f0;
+      border-radius: 8px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      resize: vertical;
+      background: white;
     }
 
-    /* Sidebar */
-    .sidebar{
-      width:260px; background:#0f1724; color:#e6eef8; padding:18px; display:flex; flex-direction:column; gap:12px;
-      border-right: 1px solid rgba(255,255,255,0.03);
+    /* ===== NOVA ABA ESCALETA NO ESTILO GOOGLE DOCS ===== */
+    .docs-style-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: var(--bg);
     }
-    .sidebar h3{margin:0; font-size:13px; color:#9fb7de; padding-left:6px; margin-bottom:6px}
-    .nav-btn{display:flex; gap:12px; align-items:center; padding:10px; border-radius:8px; cursor:pointer; border:none; background:transparent; color:inherit; text-align:left; font-weight:700}
-    .nav-btn:hover{background:rgba(255,255,255,0.02)}
-    .nav-btn.active{background:linear-gradient(90deg, rgba(96,165,250,0.12), rgba(59,130,246,0.06)); color:#cfe8ff}
-    .nav-btn i{width:20px; text-align:center; font-size:16px}
-
-    .sidebar .grow{flex:1}
-    .small-muted{font-size:12px; color:#93b0db}
-
-    /* Workspace */
-    .workspace{flex:1; display:flex; flex-direction:column; overflow:hidden; padding:18px}
-    .tab-header{display:flex; gap:10px; align-items:center; margin-bottom:12px}
-    .tab-button{padding:10px 14px; border-radius:8px; background:transparent; border:none; cursor:pointer; font-weight:700; color:#0b1220}
-    .tab-button.active{background:#fff; box-shadow: 0 8px 18px rgba(2,6,23,0.06)}
-    .editor-area{flex:1; display:flex; overflow:hidden; gap:16px}
-
-    /* editor column */
-    .editor-column{flex:1; display:flex; flex-direction:column; gap:12px; overflow:hidden}
-    .panel{background:#fff; border-radius:10px; padding:16px; border:1px solid rgba(15,23,36,0.06); box-shadow:0 8px 18px rgba(2,6,23,0.04); overflow:auto}
-    .panel h4{margin:0 0 8px 0; font-size:15px; color:#0f1724}
-    .panel p{color:#334155}
-
-    /* script editor (roteiro) */
-    .script-editor{
-      padding:20px; background:#ffffff; color:#0f1724; min-height:300px; font-family: "Courier New", monospace; font-size:14px; line-height:1.6;
-      border-radius:8px; border:1px solid rgba(2,6,23,0.04); overflow:auto;
+    
+    .docs-menu-bar {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      background: white;
+      border-bottom: 1px solid #d0e0f0;
     }
-    .scene-heading{font-weight:800; color:#2563eb; text-transform:uppercase; margin-top:12px}
-    .action, .dialogue, .character{margin:8px 0}
+    
+    .docs-title-input {
+      font-size: 18px;
+      font-weight: 500;
+      border: none;
+      padding: 8px 12px;
+      margin-right: auto;
+      background: transparent;
+      color: var(--text);
+      width: 300px;
+    }
+    
+    .docs-menu-item {
+      display: flex;
+      align-items: center;
+      padding: 6px 12px;
+      margin: 0 4px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 4px;
+      color: #5f6368;
+      font-size: 14px;
+    }
+    
+    .docs-menu-item:hover {
+      background: #f0f7ff;
+    }
+    
+    .docs-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 8px 16px;
+      background: white;
+      border-bottom: 1px solid #d0e0f0;
+    }
+    
+    .docs-toolbar-group {
+      display: flex;
+      align-items: center;
+      margin-right: 16px;
+      padding-right: 16px;
+      border-right: 1px solid #e0e0e0;
+    }
+    
+    .docs-toolbar-button {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #5f6368;
+      margin: 0 2px;
+    }
+    
+    .docs-toolbar-button:hover {
+      background: #f0f7ff;
+    }
+    
+    .docs-toolbar-select {
+      height: 36px;
+      border: none;
+      background: transparent;
+      padding: 0 8px;
+      margin: 0 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #5f6368;
+    }
+    
+    .docs-editor-container {
+      flex: 1;
+      display: flex;
+      overflow: auto;
+      background: var(--bg);
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .docs-editor {
+      width: 816px;
+      min-height: 1056px;
+      padding: 96px;
+      background: white;
+      box-shadow: 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+    
+    .docs-editor-content {
+      width: 100%;
+      min-height: 100%;
+      outline: none;
+      font-size: 12pt;
+      line-height: 1.5;
+      color: var(--text);
+    }
+    
+    .docs-status-bar {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      background: white;
+      border-top: 1px solid #d0e0f0;
+      color: #5f6368;
+      font-size: 12px;
+    }
+    
+    .docs-page-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+    }
+    
+    .docs-page-button {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #5f6368;
+      margin: 0 2px;
+    }
+    
+    .docs-page-button:hover {
+      background: #f0f7ff;
+    }
 
-    /* argumento (textarea) */
-    .argumento-editor{width:100%; min-height:260px; padding:12px; border-radius:8px; border:1px solid rgba(15,23,36,0.06); resize:vertical; font-size:14px; color:#0f1724}
+    /* ===== ÍCONES FLUTUANTES ===== */
+    .floating-icons {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 999;
+    }
+    
+    .floating-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .floating-icon:hover {
+      transform: scale(1.1);
+    }
+    
+    .icon-video {
+      background: var(--secondary);
+    }
+    
+    .icon-chat {
+      background: var(--accent);
+    }
+    
+    /* ===== MODAIS ===== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      width: 400px;
+      max-width: 90%;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    
+    .modal-header {
+      background: var(--primary);
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-body {
+      padding: 20px;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    
+    .chat-messages {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #d0e0f0;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: var(--light);
+      border-radius: 6px;
+    }
+    
+    .chat-input {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #d0e0f0;
+      border-radius: 6px;
+    }
+    
+    .chat-input button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    
+    .video-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .video-placeholder {
+      width: 100%;
+      height: 200px;
+      background: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      border-radius: 8px;
+    }
+    
+    .video-controls {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .video-controls button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: var(--primary);
+      color: white;
+    }
 
-    /* toolbar for escaleta */
-    .format-toolbar{display:flex; gap:8px; align-items:center; background:#f8fafc; padding:8px; border-radius:8px; border:1px solid rgba(15,23,36,0.04)}
-    .format-toolbar button{background:transparent;border:none;padding:8px;border-radius:6px;cursor:pointer; font-size:14px}
-    .format-toolbar button:hover{background:rgba(37,99,235,0.06)}
-    .escaleta-editor{min-height:300px; padding:16px; border-radius:8px; border:1px solid rgba(15,23,36,0.06); background:white; color:#0f1724; overflow:auto}
-
-    /* storyboard */
-    .storyboard-container{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px}
-    .storyboard-item{background:#fff;border-radius:8px; overflow:hidden; border:1px solid rgba(2,6,23,0.04)}
-    .storyboard-canvas{height:160px;background:#eef2ff; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#334155}
-
-    /* footer */
-    footer{height:56px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; background:transparent; color:#334155; font-size:13px}
-
-    /* floating buttons */
-    .floating-buttons{position:fixed; right:22px; bottom:22px; display:flex; flex-direction:column; gap:12px; z-index:1200}
-    .float-btn{width:56px;height:56px;border-radius:14px;border:none;background:linear-gradient(180deg,#2563eb,#1e40af); color:white; font-size:18px; cursor:pointer; box-shadow:0 8px 26px rgba(37,99,235,0.18)}
-    .float-window{position:fixed; right:22px; bottom:100px; width:340px; max-height:520px; background:white; border-radius:10px; box-shadow:0 18px 50px rgba(2,6,23,0.18); overflow:hidden; display:none; flex-direction:column; z-index:1300}
-    .float-window header{padding:10px 12px; background:linear-gradient(90deg,#2563eb,#1e40af); color:white; display:flex; justify-content:space-between; align-items:center}
-    .float-body{padding:12px; display:flex; flex-direction:column; gap:8px; overflow:auto}
-    .chat-messages{max-height:340px; overflow:auto; display:flex; flex-direction:column; gap:8px}
-    .message{padding:8px 10px; border-radius:8px; max-width:80%}
-    .message.user{align-self:flex-end; background:linear-gradient(90deg,#60a5fa,#3b82f6); color:white}
-    .message.bot{align-self:flex-start; background:#f1f5f9; color:#0f1724}
-    .chat-input{display:flex; gap:8px; padding:10px; border-top:1px solid rgba(2,6,23,0.04)}
-    .chat-input input{flex:1; padding:10px; border-radius:8px; border:1px solid rgba(2,6,23,0.06)}
-
-    /* responsive */
-    @media (max-width:980px){
-      .sidebar{display:none}
-      .container{flex-direction:column}
-      .main-platform header .document-info input{width:120px}
+    @media(max-width:900px){ 
+        .main-container{flex-direction:column;} 
+        .sidebar{width:100%; order:2;} 
+        .editor-container{flex-direction:column;} 
+        .right-panel{width:100%; order:3;} 
+        .tab-header { overflow-x:auto; white-space:nowrap; }
+        .header-right { flex-direction:column; gap:0.5rem; }
+        .toolbar { padding:0.5rem; }
+        .toolbar-group { flex-wrap:wrap; }
+        .docs-editor { width: 100%; padding: 20px; }
+        .docs-toolbar-group { margin-right: 8px; padding-right: 8px; }
     }
   </style>
 </head>
 <body>
-  <!-- opening -->
-  <div class="opening-screen" id="openingScreen">
-    <div class="open-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div class="logo">ESCALETA HUB</div>
-          <div class="tagline">Sua plataforma profissional de criação de roteiros — versão clean</div>
+    <!-- Tela de abertura estilo streaming -->
+    <div class="opening-screen" id="openingScreen">
+        <div class="logo-container">
+            <div class="logo">ESCALETA HUB</div>
+            <div class="tagline">Sua plataforma profissional de criação de roteiros</div>
         </div>
-        <div style="text-align:right">
-          <div style="font-size:12px;color:rgba(255,255,255,0.7)">v.1.0 — Clean Blue</div>
+        
+        <div class="login-form">
+            <h2>Olá, Roteirista!</h2>
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" placeholder="Sua senha">
+            </div>
+            <button class="login-btn" id="loginBtn">Entrar</button>
         </div>
-      </div>
-
-      <div class="login-form">
-        <label for="email">E-mail</label>
-        <input id="email" class="login-input" type="email" placeholder="seu@email.com">
-        <label for="password" style="margin-top:10px">Senha</label>
-        <input id="password" class="login-input" type="password" placeholder="Sua senha">
-        <button id="loginBtn" class="login-btn">Entrar</button>
-      </div>
     </div>
-  </div>
 
-  <!-- main -->
-  <div class="main-platform" id="mainPlatform">
-    <header>
-      <div class="header-left">
-        <div class="title-brand">
-          <div class="brand-mark">EH</div>
-          <div>
-            <div class="app-title">Escaleta Hub</div>
-            <div class="small-muted" id="header-sub">Editor de roteiros</div>
-          </div>
-        </div>
-
-        <div class="document-info" style="margin-left:18px">
-          <input id="documentTitle" value="Roteiro Sem Título" />
-        </div>
-      </div>
-
-      <div class="header-right">
-        <button id="saveBtn" class="btn btn-ghost"><i class="fas fa-save"></i> Salvar</button>
-        <button id="exportBtn" class="btn btn-ghost"><i class="fas fa-file-export"></i> Exportar</button>
-        <button id="modeToggle" class="btn btn-ghost"><i class="fas fa-adjust"></i> Tema</button>
-      </div>
-    </header>
-
-    <div class="container">
-      <aside class="sidebar">
-        <h3><i class="fas fa-film"></i> Elementos</h3>
-
-        <button class="nav-btn active" data-tab="roteiro-tab"><i class="fas fa-file-alt"></i> Roteiro</button>
-        <button class="nav-btn" data-tab="argumento-tab"><i class="fas fa-feather-alt"></i> Argumento</button>
-        <button class="nav-btn" data-tab="rascunho-tab"><i class="fas fa-edit"></i> Rascunho</button>
-        <button class="nav-btn" data-tab="biblia-tab"><i class="fas fa-book"></i> Bíblia</button>
-        <button class="nav-btn" data-tab="escaleta-tab"><i class="fas fa-list-ol"></i> Escaleta</button>
-        <button class="nav-btn" data-tab="storyboard-tab"><i class="fas fa-palette"></i> Storyboard</button>
-
-        <div class="grow"></div>
-
-        <div class="small-muted">Projeto • Escaleta Hub</div>
-      </aside>
-
-      <main class="workspace">
-        <!-- tabs -->
-        <div class="tab-header">
-          <button class="tab-button active" data-tab="roteiro-tab">Roteiro</button>
-          <button class="tab-button" data-tab="argumento-tab">Argumento</button>
-          <button class="tab-button" data-tab="rascunho-tab">Rascunho</button>
-          <button class="tab-button" data-tab="biblia-tab">Bíblia</button>
-          <button class="tab-button" data-tab="escaleta-tab">Escaleta</button>
-          <button class="tab-button" data-tab="storyboard-tab">Storyboard</button>
-        </div>
-
-        <div class="editor-area">
-          <!-- Roteiro -->
-          <section id="roteiro-tab" class="panel" style="display:block;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
-              <h4>Editor de Roteiro</h4>
-              <div style="font-size:13px; color:#64748b">Palavras: <span id="roteiro-wordcount">0</span></div>
-            </div>
-            <div id="scriptEditor" class="script-editor" contenteditable="true" spellcheck="true">
-<div class="scene-heading">INT. CASA DE JOÃO - DIA</div>
-<div class="action">Uma casa simples. JOÃO mexe em papéis sobre a mesa.</div>
-<div class="character">JOÃO</div>
-<div class="dialogue">Onde ela está? Já era para ter chegado.</div>
-            </div>
-          </section>
-
-          <!-- Argumento -->
-          <section id="argumento-tab" class="panel" style="display:none;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
-              <h4>Argumento</h4>
-              <div style="font-size:13px; color:#64748b">Palavras: <span id="argumento-wordcount">0</span></div>
-            </div>
-
-            <textarea id="argumentoEditor" class="argumento-editor" placeholder="Escreva o argumento geral do seu roteiro..."></textarea>
-
-            <div style="margin-top:12px;">
-              <div style="display:flex; gap:8px; flex-wrap:wrap">
-                <button class="btn btn-ghost" id="argumento-export"><i class="fas fa-download"></i> Exportar</button>
-                <button class="btn btn-ghost" id="argumento-clear">Limpar</button>
-              </div>
-            </div>
-          </section>
-
-          <!-- Rascunho -->
-          <section id="rascunho-tab" class="panel" style="display:none;">
-            <h4>Rascunho</h4>
-            <textarea id="rascunhoEditor" class="argumento-editor" placeholder="Anote ideias soltas, frases e testes..."></textarea>
-            <div style="margin-top:10px; display:flex; gap:8px"><button class="btn btn-ghost" id="rascunho-save">Salvar</button><button class="btn btn-ghost" id="rascunho-clear">Limpar</button></div>
-          </section>
-
-          <!-- Biblia -->
-          <section id="biblia-tab" class="panel" style="display:none;">
-            <h4>Bíblia do Projeto</h4>
-            <div contenteditable="true" id="bibliaEditor" style="min-height:260px; padding:12px; border-radius:8px; border:1px solid rgba(15,23,36,0.06); background:white; color:#0f1724">
-              <h3>Sinopse</h3>
-              <p>Uma história sobre João e Maria, dois personagens em uma jornada emocionante cheia de reviravoltas.</p>
-              <h3>Personagens</h3>
-              <p><strong>João:</strong> Protagonista, 35 anos.</p>
-            </div>
-          </section>
-
-          <!-- Escaleta -->
-          <section id="escaleta-tab" class="panel" style="display:none;">
-            <h4>Escaleta</h4>
-
-            <div class="format-toolbar" style="margin-bottom:10px; align-items:center;">
-              <button data-cmd="bold" title="Negrito (Ctrl/Cmd+B)"><i class="fas fa-bold"></i></button>
-              <button data-cmd="italic" title="Itálico (Ctrl/Cmd+I)"><i class="fas fa-italic"></i></button>
-              <button data-cmd="underline" title="Sublinhado (Ctrl/Cmd+U)"><i class="fas fa-underline"></i></button>
-              <button data-cmd="insertUnorderedList" title="Lista"><i class="fas fa-list-ul"></i></button>
-              <button data-cmd="insertOrderedList" title="Lista ordenada"><i class="fas fa-list-ol"></i></button>
-              <div style="flex:1"></div>
-              <button class="btn btn-ghost" id="escaleta-export"><i class="fas fa-download"></i> Exportar</button>
-            </div>
-
-            <div id="escaletaEditor" class="escaleta-editor" contenteditable="true">Organize a sequência das cenas aqui...</div>
-          </section>
-
-          <!-- Storyboard -->
-          <section id="storyboard-tab" class="panel" style="display:none;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
-              <h4>Storyboard</h4>
-              <div style="display:flex; gap:8px">
-                <button class="btn btn-ghost" id="addStoryboard">Adicionar quadro</button>
-                <button class="btn btn-ghost" id="storyboard-export">Exportar imagens</button>
-              </div>
-            </div>
-
-            <div class="storyboard-container" id="storyboardContainer">
-              <div class="storyboard-item">
-                <div class="storyboard-canvas" data-id="1"><span>Clique para desenhar</span></div>
-                <div class="storyboard-info" style="padding:12px">
-                  <p><strong>Cena 1:</strong> INT. CASA DE JOÃO - DIA</p>
-                  <textarea placeholder="Descrição..." rows="2" style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(2,6,23,0.06)"></textarea>
+    <!-- Plataforma principal -->
+    <div class="main-platform" id="mainPlatform">
+        <header>
+            <div class="header-left">
+                <div class="logo-platform"><i class="fas fa-scroll"></i> Escaleta Hub</div>
+                <div class="document-info">
+                    <input type="text" id="document-title-input" class="document-title" value="Roteiro Sem Título">
+                    <div class="document-stats">3 cenas • 2 páginas • Modificado <span id="last-saved">agora</span></div>
                 </div>
-              </div>
-
-              <div class="storyboard-item">
-                <div class="storyboard-canvas" data-id="2"><span>Clique para desenhar</span></div>
-                <div class="storyboard-info" style="padding:12px">
-                  <p><strong>Cena 2:</strong> EXT. RUA - CONTÍNUO</p>
-                  <textarea placeholder="Descrição..." rows="2" style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(2,6,23,0.06)"></textarea>
-                </div>
-              </div>
             </div>
-          </section>
+            <div class="header-right">
+                <button class="toolbar-btn" id="save-btn"><i class="fas fa-save"></i> Salvar</button>
+                <button class="toolbar-btn" id="export-btn"><i class="fas fa-file-export"></i> Exportar</button>
+                <button class="toolbar-btn" id="settings-btn"><i class="fas fa-cog"></i> Configurações</button>
+            </div>
+        </header>
 
+        <div class="main-container">
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-film"></i> Elementos</h3>
+                    <button class="sidebar-btn active" data-tab="roteiro-tab"><i class="fas fa-file-alt"></i> Roteiro</button>
+                    <button class="sidebar-btn" data-tab="argumento-tab"><i class="fas fa-feather-alt"></i> Argumento</button>
+                    <button class="sidebar-btn" data-tab="rascunho-tab"><i class="fas fa-edit"></i> Rascunho</button>
+                    <button class="sidebar-btn" data-tab="biblia-tab"><i class="fas fa-book"></i> Bíblia</button>
+                    <button class="sidebar-btn" data-tab="escaleta-tab"><i class="fas fa-list-ol"></i> Escaleta</button>
+                    <button class="sidebar-btn" data-tab="storyboard-tab"><i class="fas fa-palette"></i> Storyboard</button>
+                </div>
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-cog"></i> Ferramentas</h3>
+                    <button class="sidebar-btn" id="stats-btn"><i class="fas fa-chart-bar"></i> Estatísticas</button>
+                    <button class="sidebar-btn" id="characters-btn"><i class="fas fa-users"></i> Personagens</button>
+                    <button class="sidebar-btn" id="search-btn"><i class="fas fa-search"></i> Buscar</button>
+                </div>
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-project-diagram"></i> Projeto</h3>
+                    <button class="sidebar-btn" id="new-project-sidebar-btn"><i class="fas fa-folder-plus"></i> Novo Projeto</button>
+                    <button class="sidebar-btn" id="open-project-sidebar-btn"><i class="fas fa-folder-open"></i> Abrir Projeto</button>
+                    <button class="sidebar-btn" id="project-history-btn"><i class="fas fa-history"></i> Histórico</button>
+                </div>
+                <div class="sidebar-section">
+                    <button class="sidebar-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                </div>
+            </div>
+
+            <div class="workspace">
+                <div class="tab-header">
+                    <button class="tab-button active" data-tab="roteiro-tab"><i class="fas fa-file-alt"></i> Roteiro</button>
+                    <button class="tab-button" data-tab="argumento-tab"><i class="fas fa-feather-alt"></i> Argumento</button>
+                    <button class="tab-button" data-tab="rascunho-tab"><i class="fas fa-edit"></i> Rascunho</button>
+                    <button class="tab-button" data-tab="biblia-tab"><i class="fas fa-book"></i> Bíblia do Projeto</button>
+                    <button class="tab-button" data-tab="escaleta-tab"><i class="fas fa-list-ol"></i> Escaleta</button>
+                    <button class="tab-button" data-tab="storyboard-tab"><i class="fas fa-palette"></i> Storyboard</button>
+                </div>
+
+                <div class="editor-container">
+                    <!-- ABA ROTEIRO -->
+                    <div id="roteiro-tab" class="tab-content active">
+                        <div class="toolbar">
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn" id="new-scene-btn"><i class="fas fa-plus"></i> Nova Cena</button>
+                                <button class="toolbar-btn" id="delete-btn"><i class="fas fa-trash"></i> Remover</button>
+                                <button class="toolbar-btn" id="duplicate-btn"><i class="fas fa-copy"></i> Duplicar</button>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn" data-format="bold"><i class="fas fa-bold"></i></button>
+                                <button class="toolbar-btn" data-format="italic"><i class="fas fa-italic"></i> Itálico</button>
+                                <button class="toolbar-btn" data-format="underline"><i class="fas fa-underline"></i></button>
+                            </div>
+                            <div style="flex:1"></div>
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn" id="night-mode-btn">Modo Noturno</button>
+                                <button class="toolbar-btn" id="focus-mode-btn">Modo Foco</button>
+                                <button class="toolbar-btn" id="normal-mode-btn">Modo Normal</button>
+                            </div>
+                        </div>
+                        <div class="script-editor" contenteditable="true" id="script-editor">
+                            <div class="scene-heading">INT. CASA DE JOÃO - DIA</div>
+                            <div class="action">Uma casa simples. JOÃO mexe em papéis sobre a mesa.</div>
+                            <div class="character">JOÃO</div>
+                            <div class="dialogue">Onde ela está? Já era para ter chegado.</div>
+                            
+                            <div class="scene-heading">EXT. RUA - CONTÍNUO</div>
+                            <div class="action">MARIA caminha apressadamente pela rua, segurando uma pasta.</div>
+                            <div class="character">MARIA</div>
+                            <div class="dialogue">(para si mesma) Espero que ele ainda esteja lá.</div>
+                            
+                            <div class="scene-heading">INT. CASA DE JOÃO - CONTÍNUO</div>
+                            <div class="action">João ouve a campainha tocar e se dirige à porta.</div>
+                            <div class="transition">DESVANEECE PARA:</div>
+                        </div>
+                    </div>
+
+                    <!-- ABA ARGUMENTO -->
+                    <div id="argumento-tab" class="tab-content">
+                        <div class="toolbar">
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn" data-format="bold"><i class="fas fa-font"></i> Negrito</button>
+                                <button class="toolbar-btn" data-format="italic"><i class="fas fa-italic"></i> Itálico</button>
+                                <button class="toolbar-btn"><i class="fas fa-list-ul"></i> Lista</button>
+                            </div>
+                            <div style="flex:1"></div>
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn"><i class="fas fa-file-pdf"></i> Exportar</button>
+                            </div>
+                        </div>
+                        
+                        <div class="argumento-content">
+                            <div class="argumento-section">
+                                <h4>Desenvolvimento do Argumento</h4>
+                                <textarea class="argumento-editor" id="argumento-editor" placeholder="Desenvolva aqui o argumento da sua história..."></textarea>
+                            </div>
+                            
+                            <div class="argumento-section">
+                                <h4>Pontos Principais</h4>
+                                <div contenteditable="true">
+                                    <p><strong>Premissa:</strong> [Descreva a premissa central da sua história]</p>
+                                    <p><strong>Protagonista:</strong> [Quem é o personagem principal e o que ele quer?]</p>
+                                    <p><strong>Conflito Principal:</strong> [Qual é o obstáculo central?]</p>
+                                    <p><strong>Jornada:</strong> [Como o personagem evolui ao longo da história?]</p>
+                                    <p><strong>Clímax:</strong> [Qual é o ponto de virada decisivo?]</p>
+                                    <p><strong>Resolução:</strong> [Como a história se conclui?]</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ABA RASCUNHO -->
+                    <div id="rascunho-tab" class="tab-content">
+                        <div class="toolbar">
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn" data-format="bold"><i class="fas fa-font"></i> Negrito</button>
+                                <button class="toolbar-btn" data-format="italic"><i class="fas fa-italic"></i> Itálico</button>
+                                <button class="toolbar-btn"><i class="fas fa-list-ul"></i> Lista</button>
+                            </div>
+                            <div style="flex:1"></div>
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn"><i class="fas fa-file-pdf"></i> Exportar</button>
+                            </div>
+                        </div>
+                        <textarea class="rascunho-editor" id="rascunho-editor" placeholder="Escreva suas ideias, anotações e rascunhos aqui..."></textarea>
+                    </div>
+
+                    <!-- ABA BIBLIA -->
+                    <div id="biblia-tab" class="tab-content">
+                        <div class="biblia-content">
+                            <div class="biblia-section">
+                                <h4>Sinopse</h4>
+                                <p contenteditable="true">Uma história sobre João e Maria, dois personagens em uma jornada emocionante cheia de reviravoltas.</p>
+                            </div>
+                            
+                            <div class="biblia-section">
+                                <h4>Logline</h4>
+                                <p contenteditable="true">Um homem determinado precisa encontrar uma resposta importante antes que seja tarde demais.</p>
+                            </div>
+                            
+                            <div class="biblia-section">
+                                <h4>Personagens</h4>
+                                <p contenteditable="true"><strong>João:</strong> Protagonista, 35 anos, determinado e inteligente.</p>
+                                <p contenteditable="true"><strong>Maria:</strong> Coadjuvante, 32 anos, perspicaz e leal.</p>
+                            </div>
+                            
+                            <div class="biblia-section">
+                                <h4>Storyline</h4>
+                                <p contenteditable="true">1. Introdução dos personagens e do conflito principal.</p>
+                                <p contenteditable="true">2. Desenvolvimento das relações e aumento da tensão.</p>
+                                <p contenteditable="true">3. Clímax e resolução do conflito.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ABA ESCALETA (NOVO ESTILO GOOGLE DOCS) -->
+                    <div id="escaleta-tab" class="tab-content">
+                        <div class="docs-style-container">
+                            <div class="docs-menu-bar">
+                                <input type="text" class="docs-title-input" value="Minha Escaleta" placeholder="Digite o título da escaleta">
+                                <button class="docs-menu-item"><i class="fas fa-file"></i> Arquivo</button>
+                                <button class="docs-menu-item"><i class="fas fa-edit"></i> Editar</button>
+                                <button class="docs-menu-item"><i class="fas fa-eye"></i> Visualizar</button>
+                                <button class="docs-menu-item"><i class="fas fa-share-alt"></i> Compartilhar</button>
+                            </div>
+                            
+                            <div class="docs-toolbar">
+                                <div class="docs-toolbar-group">
+                                    <select class="docs-toolbar-select">
+                                        <option>Fonte</option>
+                                        <option>Arial</option>
+                                        <option>Times New Roman</option>
+                                        <option>Courier New</option>
+                                    </select>
+                                    <select class="docs-toolbar-select">
+                                        <option>12</option>
+                                        <option>14</option>
+                                        <option>16</option>
+                                        <option>18</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="docs-toolbar-group">
+                                    <button class="docs-toolbar-button" title="Negrito"><i class="fas fa-bold"></i></button>
+                                    <button class="docs-toolbar-button" title="Itálico"><i class="fas fa-italic"></i></button>
+                                    <button class="docs-toolbar-button" title="Sublinhado"><i class="fas fa-underline"></i></button>
+                                    <button class="docs-toolbar-button" title="Cor do texto"><i class="fas fa-palette"></i></button>
+                                </div>
+                                
+                                <div class="docs-toolbar-group">
+                                    <button class="docs-toolbar-button" title="Alinhar à esquerda"><i class="fas fa-align-left"></i></button>
+                                    <button class="docs-toolbar-button" title="Centralizar"><i class="fas fa-align-center"></i></button>
+                                    <button class="docs-toolbar-button" title="Alinhar à direita"><i class="fas fa-align-right"></i></button>
+                                    <button class="docs-toolbar-button" title="Justificar"><i class="fas fa-align-justify"></i></button>
+                                </div>
+                                
+                                <div class="docs-toolbar-group">
+                                    <button class="docs-toolbar-button" title="Lista com marcadores"><i class="fas fa-list-ul"></i></button>
+                                    <button class="docs-toolbar-button" title="Lista numerada"><i class="fas fa-list-ol"></i></button>
+                                    <button class="docs-toolbar-button" title="Recuo menor"><i class="fas fa-outdent"></i></button>
+                                    <button class="docs-toolbar-button" title="Recuo maior"><i class="fas fa-indent"></i></button>
+                                </div>
+                                
+                                <div class="docs-toolbar-group">
+                                    <button class="docs-toolbar-button" title="Inserir link"><i class="fas fa-link"></i></button>
+                                    <button class="docs-toolbar-button" title="Inserir comentário"><i class="fas fa-comment"></i></button>
+                                    <button class="docs-toolbar-button" title="Inserir imagem"><i class="fas fa-image"></i></button>
+                                </div>
+                            </div>
+                            
+                            <div class="docs-editor-container">
+                                <div class="docs-editor">
+                                    <div class="docs-editor-content" contenteditable="true">
+                                        <h1>Escaleta - Episódio 1: O Início</h1>
+                                        <p><strong>Cena 1:</strong> INT. CASA DE JOÃO - DIA</p>
+                                        <p>João procura por documentos importantes. Ele parece ansioso e preocupado.</p>
+                                        <p><strong>Cena 2:</strong> EXT. RUA - CONTÍNUO</p>
+                                        <p>Maria caminha apressadamente pela rua, segurando uma pasta. Ela olha no relógio e acelera o passo.</p>
+                                        <p><strong>Cena 3:</strong> INT. CASA DE JOÃO - CONTÍNUO</p>
+                                        <p>João ouve a campainha tocar e se dirige à porta. Ele parece esperançoso.</p>
+                                        <p><strong>Cena 4:</strong> INT. RESTAURANTE - NOITE</p>
+                                        <p>João e Maria se encontram. Eles conversam sobre os documentos perdidos.</p>
+                                        <p><strong>Cena 5:</strong> EXT. PARQUE - DIA</p>
+                                        <p>Conversa importante revela segredos do passado de ambos.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="docs-status-bar">
+                                <span>Modificado agora mesmo</span>
+                                <div class="docs-page-actions">
+                                    <span>100%</span>
+                                    <button class="docs-page-button"><i class="fas fa-minus"></i></button>
+                                    <button class="docs-page-button"><i class="fas fa-plus"></i></button>
+                                    <button class="docs-page-button"><i class="fas fa-cog"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ABA STORYBOARD -->
+                    <div id="storyboard-tab" class="tab-content">
+                        <div class="toolbar">
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn" id="new-storyboard-btn"><i class="fas fa-plus"></i> Novo Storyboard</button>
+                                <button class="toolbar-btn" id="draw-btn"><i class="fas fa-pencil-alt"></i> Ferramentas de Desenho</button>
+                                <button class="toolbar-btn" id="color-picker-btn"><i class="fas fa-palette"></i> Cores</button>
+                            </div>
+                            <div style="flex:1"></div>
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn"><i class="fas fa-download"></i> Exportar</button>
+                                <button class="toolbar-btn"><i class="fas fa-print"></i> Imprimir</button>
+                            </div>
+                        </div>
+                        
+                        <div class="storyboard-container">
+                            <div class="storyboard-item">
+                                <div class="storyboard-canvas" id="canvas1">
+                                    <span>Clique para desenhar</span>
+                                </div>
+                                <div class="storyboard-info">
+                                    <p><strong>Cena 1:</strong> INT. CASA DE JOÃO - DIA</p>
+                                    <textarea placeholder="Descrição da cena..." rows="2" style="width:100%; margin-top:5px; padding:5px; font-size:0.8rem;"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="storyboard-item">
+                                <div class="storyboard-canvas" id="canvas2">
+                                    <span>Clique para desenhar</span>
+                                </div>
+                                <div class="storyboard-info">
+                                    <p><strong>Cena 2:</strong> EXT. RUA - CONTÍNUO</p>
+                                    <textarea placeholder="Descrição da cena..." rows="2" style="width:100%; margin-top:5px; padding:5px; font-size:0.8rem;"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="storyboard-item">
+                                <div class="storyboard-canvas" id="canvas3">
+                                    <span>Clique para desenhar</span>
+                                </div>
+                                <div class="storyboard-info">
+                                    <p><strong>Cena 3:</strong> INT. CASA DE JOÃO - CONTÍNUO</p>
+                                    <textarea placeholder="Descrição da cena..." rows="2" style="width:100%; margin-top:5px; padding:5px; font-size:0.8rem;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </main>
+
+        <footer>
+            <div class="footer-left">
+                <div><i class="fas fa-keyboard"></i> <kbd>Ctrl+S</kbd> Salvar | <kbd>Ctrl+N</kbd> Nova Cena</div>
+                <div><i class="fas fa-info-circle"></i> <span id="current-tab">Roteiro</span> | <span id="word-count">0</span> palavras</div>
+            </div>
+            <div class="footer-right">
+                <div>Modificado: <span id="last-saved-time">agora</span></div>
+                <div id="autosave-status"><i class="fas fa-sync-alt"></i> Auto-salvo</div>
+            </div>
+        </footer>
+        
+        <!-- Ícones flutuantes -->
+        <div class="floating-icons">
+            <div class="floating-icon icon-video" id="video-icon">
+                <i class="fas fa-video"></i>
+            </div>
+            <div class="floating-icon icon-chat" id="chat-icon">
+                <i class="fas fa-comment-dots"></i>
+            </div>
+        </div>
+        
+        <!-- Modal de Video -->
+        <div class="modal" id="video-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Chamada de Vídeo</h3>
+                    <button class="modal-close" id="close-video">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="video-container">
+                        <div class="video-placeholder">
+                            <i class="fas fa-video" style="font-size: 48px;"></i>
+                            <p>Visualização da câmera</p>
+                        </div>
+                        <div class="video-controls">
+                            <button><i class="fas fa-microphone"></i> Áudio</button>
+                            <button><i class="fas fa-video"></i> Vídeo</button>
+                            <button style="background: var(--secondary);"><i class="fas fa-phone"></i> Sair</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal de Chat -->
+        <div class="modal" id="chat-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Chat de Colaboração</h3>
+                    <button class="modal-close" id="close-chat">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="chat-messages">
+                        <div class="message">
+                            <strong>João:</strong> Olá, como está o desenvolvimento da cena 3?
+                        </div>
+                        <div class="message">
+                            <strong>Maria:</strong> Estou finalizando os diálogos. Precisamos conversar sobre o clímax.
+                        </div>
+                        <div class="message">
+                            <strong>Você:</strong> Podemos marcar uma reunião amanhã para alinharmos.
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Digite sua mensagem...">
+                        <button>Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <footer>
-      <div><i class="fas fa-keyboard"></i> <kbd>Ctrl+S</kbd> salvar | <kbd>Ctrl+N</kbd> nova cena</div>
-      <div id="footerStatus">Auto-salvo: <span id="lastSaved">agora</span></div>
-    </footer>
-  </div>
-
-  <!-- Floating Buttons -->
-  <div class="floating-buttons">
-    <button id="openChat" class="float-btn" title="Chat"><i class="fas fa-comments"></i></button>
-    <button id="openVideo" class="float-btn" title="Chamada de Vídeo"><i class="fas fa-video"></i></button>
-  </div>
-
-  <!-- Chat Window -->
-  <div class="float-window" id="chatWindow" style="right:22px; bottom:100px; display:none; flex-direction:column;">
-    <header>
-      <div>Chat — Assistente</div>
-      <div><button id="closeChat" style="background:none;border:none;color:white;font-size:18px">&times;</button></div>
-    </header>
-
-    <div class="float-body">
-      <div class="chat-messages" id="chatMessages"></div>
-    </div>
-
-    <div class="chat-input">
-      <input id="chatInput" placeholder="Digite uma mensagem..." />
-      <button id="chatSend" class="btn btn-primary">Enviar</button>
-    </div>
-  </div>
-
-  <!-- Video Window -->
-  <div class="float-window" id="videoWindow" style="right:380px; bottom:100px; width:360px; display:none; flex-direction:column;">
-    <header>
-      <div>Chamada de Vídeo</div>
-      <div><button id="closeVideo" style="background:none;border:none;color:white;font-size:18px">&times;</button></div>
-    </header>
-    <div style="height:260px; background:#111; display:flex; align-items:center; justify-content:center;">
-      <video id="videoEl" autoplay playsinline style="width:100%; height:100%; object-fit:cover; background:#000"></video>
-    </div>
-    <div style="padding:10px; display:flex; gap:8px; align-items:center; justify-content:flex-end;">
-      <button id="toggleMic" class="btn btn-ghost">Microfone</button>
-      <button id="toggleCam" class="btn btn-ghost">Câmera</button>
-    </div>
-  </div>
-
-  <script>
-    // ---------- Helpers ----------
-    const $ = (sel, ctx=document) => ctx.querySelector(sel);
-    const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
-
-    // ---------- Login / Open ----------
-    const openingScreen = $('#openingScreen');
-    const mainPlatform = $('.main-platform');
-    const loginBtn = $('#loginBtn');
-    loginBtn.addEventListener('click', () => {
-      const email = $('#email').value.trim();
-      const pass = $('#password').value.trim();
-      if(!email || !pass){ alert('Preencha e-mail e senha'); return; }
-      openingScreen.style.display = 'none';
-      document.querySelector('.main-platform').style.display = 'flex';
-      // load saved data
-      loadAll();
-    });
-
-    // ---------- Tabs (sidebar + top) ----------
-    function activateTab(tabId){
-      // panels
-      const panels = ['roteiro-tab','argumento-tab','rascunho-tab','biblia-tab','escaleta-tab','storyboard-tab'];
-      panels.forEach(p => {
-        const el = document.getElementById(p);
-        if(el) el.style.display = (p===tabId) ? 'block' : 'none';
-      });
-      // top buttons
-      $$('.tab-button').forEach(b => b.classList.toggle('active', b.dataset.tab===tabId));
-      // sidebar
-      $$('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===tabId));
-      // header subtitle
-      const label = $(`.tab-button[data-tab="${tabId}"]`).textContent.trim();
-      $('#header-sub').textContent = label;
-      // update counters
-      updateWordCounts();
-    }
-    // top and sidebar wiring
-    $$('.tab-button').forEach(b => b.addEventListener('click', ()=>activateTab(b.dataset.tab)));
-    $$('.nav-btn').forEach(b => b.addEventListener('click', ()=>activateTab(b.dataset.tab)));
-
-    // ---------- Word counters ----------
-    function countWords(text){
-      const clean = text.replace(/\s+/g,' ').trim();
-      if(!clean) return 0;
-      return clean.split(' ').length;
-    }
-
-    function updateWordCounts(){
-      const roteiroText = $('#scriptEditor').innerText || '';
-      $('#roteiro-wordcount').textContent = countWords(roteiroText);
-      const argText = $('#argumentoEditor').value || '';
-      $('#argumento-wordcount').textContent = countWords(argText);
-    }
-    $('#scriptEditor').addEventListener('input', updateWordCounts);
-    $('#argumentoEditor').addEventListener('input', updateWordCounts);
-
-    // ---------- Formatting toolbar (escaleta) ----------
-    $$('.format-toolbar button').forEach(b => {
-      b.addEventListener('click', ()=> {
-        const cmd = b.dataset.cmd;
-        document.execCommand(cmd, false, null);
-        $('#escaletaEditor').focus();
-      });
-    });
-
-    // keyboard shortcuts for formatting (Ctrl/Cmd + B/I/U)
-    function handleFormattingShortcuts(e){
-      const key = e.key.toLowerCase();
-      if((e.ctrlKey || e.metaKey) && ['b','i','u'].includes(key)){
-        e.preventDefault();
-        if(key==='b') document.execCommand('bold');
-        if(key==='i') document.execCommand('italic');
-        if(key==='u') document.execCommand('underline');
-      }
-      // Ctrl+S save
-      if((e.ctrlKey || e.metaKey) && key==='s'){
-        e.preventDefault();
-        saveAll();
-      }
-      // Ctrl+N new scene (in roteiro)
-      if((e.ctrlKey || e.metaKey) && key==='n'){
-        if(document.activeElement && document.activeElement.id==='scriptEditor'){
-          e.preventDefault();
-          addNewScene();
-        }
-      }
-    }
-    document.addEventListener('keydown', handleFormattingShortcuts);
-
-    // ---------- New Scene (Roteiro) ----------
-    function addNewScene(){
-      const editor = $('#scriptEditor');
-      const el = document.createElement('div');
-      el.className = 'scene-heading';
-      el.contentEditable = 'true';
-      el.textContent = 'INT. NOVA CENA - DIA';
-      editor.appendChild(el);
-      const action = document.createElement('div');
-      action.className = 'action';
-      action.contentEditable = 'true';
-      action.textContent = 'Descrição da cena...';
-      editor.appendChild(action);
-      editor.focus();
-      saveAll();
-      updateWordCounts();
-    }
-    // bind ctrl+n via key handler above
-
-    // ---------- Storyboard drawing ----------
-    function makeCanvasDrawable(wrapper){
-      wrapper.addEventListener('click', () => {
-        // avoid creating multiple canvases
-        if(wrapper.querySelector('canvas')) return;
-        const c = document.createElement('canvas');
-        c.width = wrapper.clientWidth;
-        c.height = wrapper.clientHeight;
-        c.style.width = '100%';
-        c.style.height = '100%';
-        c.style.cursor = 'crosshair';
-        wrapper.innerHTML = '';
-        wrapper.appendChild(c);
-        const ctx = c.getContext('2d');
-        ctx.lineWidth = 2.5;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = '#0f1724';
-
-        let drawing = false;
-        function pos(e){
-          const rect = c.getBoundingClientRect();
-          const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-          const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-          return {x,y};
-        }
-
-        c.addEventListener('mousedown', e => { drawing = true; const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); });
-        c.addEventListener('touchstart', e => { drawing = true; const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); });
-
-        c.addEventListener('mousemove', e => { if(!drawing) return; const p=pos(e); ctx.lineTo(p.x,p.y); ctx.stroke();});
-        c.addEventListener('touchmove', e => { if(!drawing) return; const p=pos(e); ctx.lineTo(p.x,p.y); ctx.stroke();});
-
-        ['mouseup','mouseleave','touchend','touchcancel'].forEach(ev => c.addEventListener(ev, ()=> drawing=false));
-      });
-    }
-    // Attach to existing canvases
-    $$('.storyboard-canvas').forEach(makeCanvasDrawable);
-
-    // Add new storyboard item
-    $('#addStoryboard').addEventListener('click', ()=>{
-      const container = $('#storyboardContainer');
-      const wrapper = document.createElement('div');
-      wrapper.className = 'storyboard-item';
-      wrapper.innerHTML = `<div class="storyboard-canvas"><span>Clique para desenhar</span></div>
-        <div class="storyboard-info" style="padding:12px">
-          <p><strong>Cena:</strong></p>
-          <textarea placeholder="Descrição..." rows="2" style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(2,6,23,0.06)"></textarea>
-        </div>`;
-      container.appendChild(wrapper);
-      makeCanvasDrawable(wrapper.querySelector('.storyboard-canvas'));
-    });
-
-    // ---------- Exports ----------
-    function download(filename, text){
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([text], {type:'text/plain'}));
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
-    $('#exportBtn').addEventListener('click', ()=> {
-      const title = $('#documentTitle').value || 'roteiro';
-      const content = $('#scriptEditor').innerText;
-      download(`${title}.txt`, content);
-    });
-    $('#argumento-export').addEventListener('click', ()=> {
-      const content = $('#argumentoEditor').value || '';
-      download('argumento.txt', content);
-    });
-    $('#escaleta-export').addEventListener('click', ()=> download('escaleta.txt', $('#escaletaEditor').innerText || ''));
-
-    // storyboard export (images)
-    $('#storyboard-export').addEventListener('click', ()=>{
-      const canvases = $$('.storyboard-canvas canvas');
-      if(canvases.length===0){ alert('Nenhum desenho encontrado. Crie um quadro primeiro.'); return; }
-      canvases.forEach((c, idx)=>{
-        c.toBlob(blob => {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url; a.download = `storyboard-${idx+1}.png`; document.body.appendChild(a); a.click(); a.remove();
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const openingScreen = document.getElementById('openingScreen');
+            const mainPlatform = document.getElementById('mainPlatform');
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            // Simular login
+            loginBtn.addEventListener('click', function() {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                // Validação simples
+                if (email && password) {
+                    // Efeito de fade out na tela de abertura
+                    openingScreen.style.opacity = '0';
+                    
+                    // Após a transição, esconder a tela de abertura e mostrar a plataforma
+                    setTimeout(function() {
+                        openingScreen.style.display = 'none';
+                        mainPlatform.style.display = 'flex';
+                    }, 1000);
+                } else {
+                    alert('Por favor, preencha todos os campos.');
+                }
+            });
+            
+            // Logout
+            logoutBtn.addEventListener('click', function() {
+                mainPlatform.style.display = 'none';
+                openingScreen.style.display = 'flex';
+                openingScreen.style.opacity = '1';
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+            });
+            
+            // Controle de abas
+            const switchTab = (tabId) => {
+                // Esconder todas as abas
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // Mostrar a aba selecionada
+                document.getElementById(tabId).classList.add('active');
+                
+                // Atualizar botões da aba
+                document.querySelectorAll('.tab-button').forEach(button => {
+                    button.classList.remove('active');
+                });
+                document.querySelectorAll(`.tab-button[data-tab="${tabId}"]`).forEach(button => {
+                    button.classList.add('active');
+                });
+                
+                // Atualizar botões da sidebar
+                document.querySelectorAll('.sidebar-btn').forEach(button => {
+                    button.classList.remove('active');
+                });
+                document.querySelectorAll(`.sidebar-btn[data-tab="${tabId}"]`).forEach(button => {
+                    button.classList.add('active');
+                });
+                
+                // Atualizar informação no footer
+                const tabName = document.querySelector(`.tab-button[data-tab="${tabId}"]`).textContent.trim();
+                document.getElementById('current-tab').textContent = tabName;
+            };
+            
+            // Adicionar event listeners para os botões de aba
+            document.querySelectorAll('.tab-button, .sidebar-btn[data-tab]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+            
+            // Contador de palavras
+            function updateWordCount() {
+                const text = document.getElementById('script-editor').innerText;
+                const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+                document.getElementById('word-count').textContent = wordCount;
+            }
+            
+            document.getElementById('script-editor').addEventListener('input', updateWordCount);
+            updateWordCount();
+            
+            // Formatação de texto
+            document.querySelectorAll('[data-format]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const format = button.getAttribute('data-format');
+                    document.execCommand(format);
+                });
+            });
+            
+            // Nova cena
+            document.getElementById('new-scene-btn').addEventListener('click', () => {
+                const editor = document.getElementById('script-editor');
+                const newScene = document.createElement('div');
+                newScene.className = 'scene-heading';
+                newScene.contentEditable = true;
+                newScene.textContent = 'INT. NOVA CENA - DIA';
+                editor.appendChild(newScene);
+                newScene.focus();
+            });
+            
+            // Storyboard drawing
+            const canvases = document.querySelectorAll('.storyboard-canvas');
+            canvases.forEach(canvas => {
+                canvas.addEventListener('click', () => {
+                    const drawingCanvas = document.createElement('canvas');
+                    drawingCanvas.width = canvas.offsetWidth;
+                    drawingCanvas.height = canvas.offsetHeight;
+                    drawingCanvas.style.width = '100%';
+                    drawingCanvas.style.height = '100%';
+                    drawingCanvas.style.cursor = 'crosshair';
+                    
+                    canvas.innerHTML = '';
+                    canvas.appendChild(drawingCanvas);
+                    
+                    const ctx = drawingCanvas.getContext('2d');
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = '#2a5a78';
+                    
+                    let drawing = false;
+                    
+                    drawingCanvas.addEventListener('mousedown', e => {
+                        drawing = true;
+                        const rect = drawingCanvas.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        ctx.beginPath();
+                        ctx.moveTo(x, y);
+                    });
+                    
+                    drawingCanvas.addEventListener('mousemove', e => {
+                        if(drawing) {
+                            const rect = drawingCanvas.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            ctx.lineTo(x, y);
+                            ctx.stroke();
+                        }
+                    });
+                    
+                    drawingCanvas.addEventListener('mouseup', () => drawing = false);
+                    drawingCanvas.addEventListener('mouseleave', () => drawing = false);
+                });
+            });
+            
+            // Modos de visualização
+            document.getElementById('night-mode-btn').addEventListener('click', () => {
+                document.body.classList.add('dark-mode');
+                document.body.classList.remove('focus-mode');
+            });
+            
+            document.getElementById('focus-mode-btn').addEventListener('click', () => {
+                document.body.classList.add('focus-mode');
+                document.body.classList.remove('dark-mode');
+            });
+            
+            document.getElementById('normal-mode-btn').addEventListener('click', () => {
+                document.body.classList.remove('dark-mode', 'focus-mode');
+            });
+            
+            // Auto-save
+            let autosaveInterval = setInterval(saveDocument, 300000); // 5 minutos padrão
+            
+            function saveDocument() {
+                document.getElementById('last-saved-time').textContent = new Date().toLocaleTimeString();
+                document.getElementById('autosave-status').innerHTML = '<i class="fas fa-sync-alt"></i> Auto-salvo';
+                setTimeout(() => {
+                    document.getElementById('autosave-status').innerHTML = '';
+                }, 3000);
+            }
+            
+            document.getElementById('save-btn').addEventListener('click', saveDocument);
+            
+            // Ícones flutuantes - funcionalidades
+            const videoIcon = document.getElementById('video-icon');
+            const chatIcon = document.getElementById('chat-icon');
+            const videoModal = document.getElementById('video-modal');
+            const chatModal = document.getElementById('chat-modal');
+            const closeVideo = document.getElementById('close-video');
+            const closeChat = document.getElementById('close-chat');
+            
+            videoIcon.addEventListener('click', () => {
+                videoModal.style.display = 'flex';
+            });
+            
+            chatIcon.addEventListener('click', () => {
+                chatModal.style.display = 'flex';
+            });
+            
+            closeVideo.addEventListener('click', () => {
+                videoModal.style.display = 'none';
+            });
+            
+            closeChat.addEventListener('click', () => {
+                chatModal.style.display = 'none';
+            });
+            
+            // Fechar modais clicando fora deles
+            window.addEventListener('click', (e) => {
+                if (e.target === videoModal) {
+                    videoModal.style.display = 'none';
+                }
+                if (e.target === chatModal) {
+                    chatModal.style.display = 'none';
+                }
+            });
+            
+            // Formatação de texto na aba Escaleta (Google Docs style)
+            const docsToolbarButtons = document.querySelectorAll('.docs-toolbar-button');
+            docsToolbarButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const command = button.getAttribute('title');
+                    if (command === 'Negrito') document.execCommand('bold');
+                    if (command === 'Itálico') document.execCommand('italic');
+                    if (command === 'Sublinhado') document.execCommand('underline');
+                    if (command === 'Lista com marcadores') document.execCommand('insertUnorderedList');
+                    if (command === 'Lista numerada') document.execCommand('insertOrderedList');
+                    if (command === 'Recuo menor') document.execCommand('outdent');
+                    if (command === 'Recuo maior') document.execCommand('indent');
+                    if (command === 'Alinhar à esquerda') document.execCommand('justifyLeft');
+                    if (command === 'Centralizar') document.execCommand('justifyCenter');
+                    if (command === 'Alinhar à direita') document.execCommand('justifyRight');
+                    if (command === 'Justificar') document.execCommand('justifyFull');
+                });
+            });
         });
-      });
-    });
-
-    // ---------- Autosave & localStorage ----------
-    const LS_KEYS = {
-      ROTEIRO: 'eh_roteiro',
-      ARGUMENTO: 'eh_argumento',
-      ESCALETA: 'eh_escaleta',
-      RASCUNHO: 'eh_rascunho',
-      BIBLIA: 'eh_biblia',
-      TITLE: 'eh_title'
-    };
-
-    function saveAll(){
-      localStorage.setItem(LS_KEYS.ROTEIRO, $('#scriptEditor').innerHTML);
-      localStorage.setItem(LS_KEYS.ARGUMENTO, $('#argumentoEditor').value);
-      localStorage.setItem(LS_KEYS.ESCALETA, $('#escaletaEditor').innerHTML);
-      localStorage.setItem(LS_KEYS.RASCUNHO, $('#rascunhoEditor').value);
-      localStorage.setItem(LS_KEYS.BIBLIA, $('#bibliaEditor').innerHTML);
-      localStorage.setItem(LS_KEYS.TITLE, $('#documentTitle').value);
-      $('#lastSaved').textContent = new Date().toLocaleTimeString();
-      $('#footerStatus').style.opacity = 1;
-      setTimeout(()=> { $('#footerStatus').style.opacity = 0.6 }, 1800);
-    }
-
-    function loadAll(){
-      const r = localStorage.getItem(LS_KEYS.ROTEIRO);
-      if(r) $('#scriptEditor').innerHTML = r;
-      const a = localStorage.getItem(LS_KEYS.ARGUMENTO);
-      if(a) $('#argumentoEditor').value = a;
-      const e = localStorage.getItem(LS_KEYS.ESCALETA);
-      if(e) $('#escaletaEditor').innerHTML = e;
-      const rc = localStorage.getItem(LS_KEYS.RASCUNHO);
-      if(rc) $('#rascunhoEditor').value = rc;
-      const b = localStorage.getItem(LS_KEYS.BIBLIA);
-      if(b) $('#bibliaEditor').innerHTML = b;
-      const t = localStorage.getItem(LS_KEYS.TITLE);
-      if(t) $('#documentTitle').value = t;
-      updateWordCounts();
-    }
-
-    // auto-save interval
-    setInterval(saveAll, 120000); // 2 minutos
-    $('#saveBtn').addEventListener('click', saveAll);
-
-    // small save buttons
-    $('#rascunho-save').addEventListener('click', ()=> { localStorage.setItem(LS_KEYS.RASCUNHO, $('#rascunhoEditor').value); alert('Rascunho salvo');});
-    $('#rascunho-clear').addEventListener('click', ()=> { $('#rascunhoEditor').value=''; localStorage.removeItem(LS_KEYS.RASCUNHO); });
-    $('#argumento-clear').addEventListener && $('#argumento-clear').addEventListener('click', ()=> { $('#argumentoEditor').value=''; });
-
-    // ---------- Chat (floating) with auto-responses ----------
-    const chatWindow = $('#chatWindow');
-    const chatMessages = $('#chatMessages');
-    const chatInput = $('#chatInput');
-    $('#openChat').addEventListener('click', ()=> chatWindow.style.display = 'flex');
-    $('#closeChat').addEventListener('click', ()=> chatWindow.style.display = 'none');
-
-    function appendMessage(text, who='bot'){
-      const d = document.createElement('div');
-      d.className = 'message ' + (who==='user' ? 'user' : 'bot');
-      d.textContent = text;
-      chatMessages.appendChild(d);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    // simple assistant responses
-    function assistantReply(userText){
-      // very simple rule-based replies
-      const txt = userText.toLowerCase();
-      if(txt.includes('salvar') || txt.includes('save')) return "Para salvar, clique em Salvar no topo ou pressione Ctrl+S. Posso salvar por você agora se quiser.";
-      if(txt.includes('export') || txt.includes('exportar')) return "Você pode exportar o documento com o botão Exportar. Quer que eu gere um .txt do roteiro agora?";
-      if(txt.includes('escaleta')) return "A Escaleta está disponível na aba 'Escaleta'. Use os botões de formatação ou Ctrl+B/Ctrl+I/Ctrl+U.";
-      if(txt.includes('ajuda') || txt.includes('help')) return "Me diga o que precisa: salvar, exportar, criar cena, abrir storyboard, ou dicas de estrutura.";
-      // fallback
-      return "Interessante — posso ajudar com: salvar, exportar, criar nova cena, abrir storyboard. Pergunte algo específico 😊";
-    }
-
-    $('#chatSend').addEventListener('click', ()=> {
-      const v = chatInput.value.trim();
-      if(!v) return;
-      appendMessage(v,'user');
-      chatInput.value = '';
-      // bot reply with slight delay
-      setTimeout(()=> {
-        const reply = assistantReply(v);
-        appendMessage(reply,'bot');
-      }, 700 + Math.random()*900);
-    });
-    chatInput.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); $('#chatSend').click(); }});
-
-    // ---------- Video call ----------
-    const videoWindow = $('#videoWindow');
-    const videoEl = $('#videoEl');
-    let streamRef = null;
-
-    $('#openVideo').addEventListener('click', async ()=>{
-      // show window
-      videoWindow.style.display = 'flex';
-      try{
-        streamRef = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
-        videoEl.srcObject = streamRef;
-      }catch(err){
-        alert('Erro ao ativar câmera/mic: ' + err.message);
-      }
-    });
-    $('#closeVideo').addEventListener('click', ()=>{
-      videoWindow.style.display = 'none';
-      if(streamRef){
-        streamRef.getTracks().forEach(t => t.stop());
-        streamRef = null;
-      }
-    });
-
-    // toggle cam/mic
-    $('#toggleCam').addEventListener('click', ()=>{
-      if(!streamRef) return alert('Ative a chamada primeiro.');
-      const videoTrack = streamRef.getVideoTracks()[0];
-      videoTrack.enabled = !videoTrack.enabled;
-      $('#toggleCam').textContent = videoTrack.enabled ? 'Câmera' : 'Câmera (off)';
-    });
-    $('#toggleMic').addEventListener('click', ()=>{
-      if(!streamRef) return alert('Ative a chamada primeiro.');
-      const audioTrack = streamRef.getAudioTracks()[0];
-      audioTrack.enabled = !audioTrack.enabled;
-      $('#toggleMic').textContent = audioTrack.enabled ? 'Microfone' : 'Microfone (off)';
-    });
-
-    // ---------- Misc UI binds ----------
-    $('#documentTitle').addEventListener('change', saveAll);
-
-    // initialize defaults
-    (function init(){
-      // show main when script loads? keep opening screen as gate
-      // attach formatting click fallback if toolbar exists
-      // ensure initial word count
-      updateWordCounts();
-    })();
-
-    // load any autosaved content if platform already visible
-    // (we load on login intentionally)
-  </script>
+    </script>
 </body>
 </html>
 
