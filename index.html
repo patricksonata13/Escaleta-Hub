@@ -141,20 +141,30 @@
       resize: none;
     }
     
-    .biblia-content, .escaleta-content {
+    .biblia-content, .escaleta-content, .argumento-content {
       padding: 15px;
     }
     
-    .biblia-section, .escaleta-section {
+    .biblia-section, .escaleta-section, .argumento-section {
       margin-bottom: 20px;
       padding: 15px;
       background: var(--light);
       border-radius: 4px;
     }
     
-    .biblia-section h4, .escaleta-section h4 {
+    .biblia-section h4, .escaleta-section h4, .argumento-section h4 {
       margin-bottom: 10px;
       color: var(--secondary);
+    }
+    
+    .argumento-editor {
+      width: 100%;
+      min-height: 300px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      resize: vertical;
     }
 
     @media(max-width:900px){ 
@@ -213,6 +223,7 @@
                 <div class="sidebar-section">
                     <h3><i class="fas fa-film"></i> Elementos</h3>
                     <button class="sidebar-btn active" data-tab="roteiro-tab"><i class="fas fa-file-alt"></i> Roteiro</button>
+                    <button class="sidebar-btn" data-tab="argumento-tab"><i class="fas fa-feather-alt"></i> Argumento</button>
                     <button class="sidebar-btn" data-tab="rascunho-tab"><i class="fas fa-edit"></i> Rascunho</button>
                     <button class="sidebar-btn" data-tab="biblia-tab"><i class="fas fa-book"></i> Bíblia</button>
                     <button class="sidebar-btn" data-tab="escaleta-tab"><i class="fas fa-list-ol"></i> Escaleta</button>
@@ -238,6 +249,7 @@
             <div class="workspace">
                 <div class="tab-header">
                     <button class="tab-button active" data-tab="roteiro-tab"><i class="fas fa-file-alt"></i> Roteiro</button>
+                    <button class="tab-button" data-tab="argumento-tab"><i class="fas fa-feather-alt"></i> Argumento</button>
                     <button class="tab-button" data-tab="rascunho-tab"><i class="fas fa-edit"></i> Rascunho</button>
                     <button class="tab-button" data-tab="biblia-tab"><i class="fas fa-book"></i> Bíblia do Projeto</button>
                     <button class="tab-button" data-tab="escaleta-tab"><i class="fas fa-list-ol"></i> Escaleta</button>
@@ -280,6 +292,40 @@
                             <div class="scene-heading">INT. CASA DE JOÃO - CONTÍNUO</div>
                             <div class="action">João ouve a campainha tocar e se dirige à porta.</div>
                             <div class="transition">DESVANEECE PARA:</div>
+                        </div>
+                    </div>
+
+                    <!-- ABA ARGUMENTO (NOVA ABA) -->
+                    <div id="argumento-tab" class="tab-content">
+                        <div class="toolbar">
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn" data-format="bold"><i class="fas fa-font"></i> Negrito</button>
+                                <button class="toolbar-btn" data-format="italic"><i class="fas fa-italic"></i> Itálico</button>
+                                <button class="toolbar-btn"><i class="fas fa-list-ul"></i> Lista</button>
+                            </div>
+                            <div style="flex:1"></div>
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn"><i class="fas fa-file-pdf"></i> Exportar</button>
+                            </div>
+                        </div>
+                        
+                        <div class="argumento-content">
+                            <div class="argumento-section">
+                                <h4>Desenvolvimento do Argumento</h4>
+                                <textarea class="argumento-editor" id="argumento-editor" placeholder="Desenvolva aqui o argumento da sua história..."></textarea>
+                            </div>
+                            
+                            <div class="argumento-section">
+                                <h4>Pontos Principais</h4>
+                                <div contenteditable="true">
+                                    <p><strong>Premissa:</strong> [Descreva a premissa central da sua história]</p>
+                                    <p><strong>Protagonista:</strong> [Quem é o personagem principal e o que ele quer?]</p>
+                                    <p><strong>Conflito Principal:</strong> [Qual é o obstáculo central?]</p>
+                                    <p><strong>Jornada:</strong> [Como o personagem evolui ao longo da história?]</p>
+                                    <p><strong>Clímax:</strong> [Qual é o ponto de virada decisivo?]</p>
+                                    <p><strong>Resolução:</strong> [Como a história se conclui?]</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
