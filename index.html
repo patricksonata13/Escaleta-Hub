@@ -328,15 +328,6 @@
                 font-size: 0.9rem;
             }
         }
-        
-        /* Melhorias de acessibilidade */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
     </style>
 </head>
 <body>
@@ -530,7 +521,7 @@
                 <div class="content">
                     <div class="card">
                         <h2><i class="fas fa-user-circle"></i> Informações Pessoais</h2>
-                        <p>Gerencie suas informações de perfil, foto e preferências.</p>
+                        <p>Gerencie suas informações de perfil, foto and preferências.</p>
                         <a href="#" class="btn">Editar Perfil</a>
                     </div>
                     
@@ -564,3 +555,11 @@
                 <i class="fas fa-home"></i>
                 <span>Início</span>
             </a>
+            <a href="#" class="menu-item" data-tab="aulas">
+                <i class="fas fa-book"></i>
+                <span>Aulas</span>
+            </a>
+            <a href="#" class="menu-item" data-tab="recursos">
+                <i class="fas fa-download"></i>
+                <span>Recursos</span>
+ 
