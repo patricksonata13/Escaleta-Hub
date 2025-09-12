@@ -3,205 +3,157 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Escaleta Hub - Aplicativo</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-/* ===== RESET ===== */
-* { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif;}
-body { background:#1c1c1c; color:#fff;}
-header { background:#111; padding:10px 20px; display:flex; justify-content:space-between; align-items:center;}
-header h1 { font-size:1.5em; color:#f39c12;}
-nav { display:flex; gap:10px;}
-nav button { background:#222; border:none; color:#fff; padding:8px 12px; cursor:pointer; border-radius:5px;}
-nav button.active { background:#f39c12; color:#111;}
-main { padding:20px;}
-.tab { display:none;}
-.tab.active { display:block;}
-textarea { width:100%; height:400px; background:#222; color:#fff; border:none; padding:10px; border-radius:5px; resize:none; font-family: monospace;}
-
-/* ===== STORYBOARD ===== */
-.section { margin-bottom:30px;}
-.section h2 { color:#f39c12; margin-bottom:10px; font-size:1.5em;}
-.section p { color:#ccc; margin-bottom:20px;}
-.editor-controls { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;}
-.btn { background:#333; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; display:flex; align-items:center; gap:5px; transition: background 0.3s;}
-.btn:hover { background:#444;}
-.btn-primary { background:#f39c12; color:black;}
-.btn-primary:hover { background:#e67e22;}
-.btn.active { background:#e74c3c;}
-.canvas-container { position:relative; margin:20px 0; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.3);}
-#storyboardCanvas { background:#222; display:block; cursor:crosshair; width:100%; border-radius:8px;}
-#canvasStatus { position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.7); color:white; padding:5px 10px; border-radius:4px; font-size:12px;}
-.color-picker { display:flex; gap:10px; align-items:center; margin:15px 0; padding:15px; background:#222; border-radius:8px; flex-wrap:wrap;}
-.color-picker span { color:#ccc;}
-#drawingColor { width:40px; height:40px; border:none; border-radius:5px; cursor:pointer;}
-#brushSize { width:100px;}
-
-/* ===== CHAT FOF0CA ===== */
-#fofoca { position:fixed; bottom:20px; right:20px; width:300px; max-height:400px; background:#222; border-radius:10px; box-shadow:0 0 10px #000; display:flex; flex-direction:column;}
-#fofoca-header { padding:10px; background:#111; cursor:pointer; display:flex; justify-content:space-between; align-items:center; border-top-left-radius:10px; border-top-right-radius:10px;}
-#fofoca-body { flex:1; display:none; flex-direction:column; padding:10px; overflow-y:auto;}
-#fofoca-body textarea { height:100px; margin-top:10px;}
-
-/* ===== CHAMADA DE VÍDEO ===== */
-#chama { position:fixed; bottom:20px; left:20px; width:250px; max-height:350px; background:#222; border-radius:10px; box-shadow:0 0 10px #000; display:flex; flex-direction:column;}
-#chama-header { padding:10px; background:#111; cursor:pointer; display:flex; justify-content:space-between; align-items:center; border-top-left-radius:10px; border-top-right-radius:10px;}
-#chama-body { flex:1; display:none; padding:10px;}
-#chama-body video { width:100%; border-radius:5px; background:#000;}
-
-/* ===== RESPONSIVIDADE ===== */
-@media (max-width: 900px) { #storyboardCanvas { height:400px !important;} }
-@media (max-width: 600px) { .editor-controls { flex-direction:column; } .btn { width:100%; justify-content:center; } .color-picker { flex-direction:column; align-items:flex-start; } #storyboardCanvas { height:300px !important; } }
-</style>
+<title>Escaleta Hub</title>
+<link rel="stylesheet" href="style.css">
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
 <header>
-    <h1>Escaleta Hub</h1>
-    <nav>
-        <button class="active" data-tab="inicio">Início</button>
-        <button data-tab="aulas">Aulas</button>
-        <button data-tab="recursos">Recursos</button>
-        <button data-tab="storyboard">Storyboard</button>
-        <button data-tab="comunidade">Comunidade</button>
-    </nav>
+  <h1 class="logo">Escaleta Hub</h1>
+  <nav>
+    <button class="tab-btn active" data-tab="inicio">Início</button>
+    <button class="tab-btn" data-tab="aulas">Aulas</button>
+    <button class="tab-btn" data-tab="recursos">Recursos</button>
+    <button class="tab-btn" data-tab="storyboard">Storyboard</button>
+    <button class="tab-btn" data-tab="comunidade">Comunidade</button>
+  </nav>
 </header>
 
 <main>
-    <!-- ABA INÍCIO -->
-    <div id="inicio" class="tab active">
-        <h2>Bem-vindo ao Escaleta Hub!</h2>
-        <p>Aprenda escaleta, explore recursos e interaja com a comunidade.</p>
-    </div>
+  <div id="inicio" class="tab active">
+    <h2>Bem-vindo ao Escaleta Hub</h2>
+    <p>Seu centro para recursos musicais e aulas de escaleta!</p>
+  </div>
 
-    <!-- ABA AULAS -->
-    <div id="aulas" class="tab">
-        <h2>Aulas</h2>
-        <p>Conteúdo de aulas vai aqui.</p>
-    </div>
+  <div id="aulas" class="tab">
+    <h2>Aulas</h2>
+    <p>Aprenda a tocar escaleta do iniciante ao avançado.</p>
+  </div>
 
-    <!-- ABA RECURSOS -->
-    <div id="recursos" class="tab">
-        <h2>Recursos</h2>
-        <p>Partituras, tablaturas e materiais exclusivos.</p>
-    </div>
+  <div id="recursos" class="tab">
+    <h2>Recursos</h2>
+    <p>Baixe partituras, tablaturas e materiais exclusivos.</p>
+  </div>
 
-    <!-- ABA STORYBOARD -->
-    <div id="storyboard" class="tab">
-        <div class="section">
-            <h2>Storyboard</h2>
-            <p>Desenhe e planeje suas ideias aqui.</p>
-        </div>
-        <div class="editor-controls">
-            <input type="color" id="drawingColor" value="#f39c12">
-            <input type="range" id="brushSize" min="1" max="50" value="5">
-        </div>
-        <div class="canvas-container">
-            <canvas id="storyboardCanvas" width="800" height="400"></canvas>
-            <div id="canvasStatus">Tamanho do pincel: 5px</div>
-        </div>
+  <div id="storyboard" class="tab">
+    <h2>Storyboard</h2>
+    <div class="canvas-container">
+      <canvas id="storyboardCanvas" width="800" height="400"></canvas>
+      <div class="editor-controls">
+        <input type="color" id="drawingColor" value="#ffdd40">
+        <input type="range" id="brushSize" min="1" max="20" value="4">
+        <button class="btn" id="clearCanvas">Limpar</button>
+        <button class="btn" id="saveCanvas">Salvar Imagem</button>
+      </div>
     </div>
+  </div>
 
-    <!-- ABA COMUNIDADE -->
-    <div id="comunidade" class="tab">
-        <h2>Comunidade</h2>
-        <p>Participe da conversa com outros usuários!</p>
+  <div id="comunidade" class="tab">
+    <h2>Chat Fofoca</h2>
+    <div id="fofoca">
+      <div id="fofoca-header">Fofoca <span id="toggleChat">⬆️</span></div>
+      <div id="fofoca-body">
+        <div id="messages" style="flex:1; overflow-y:auto;"></div>
+        <textarea id="chatInput" placeholder="Escreva sua mensagem..."></textarea>
+        <button id="sendMsg" class="btn btn-primary">Enviar</button>
+      </div>
     </div>
+  </div>
 </main>
 
-<!-- CHAT FOF0CA -->
-<div id="fofoca">
-    <div id="fofoca-header"><span>Chat Fofoca</span><i class="fas fa-chevron-down"></i></div>
-    <div id="fofoca-body">
-        <textarea placeholder="Digite sua mensagem..."></textarea>
-        <button class="btn btn-primary">Enviar</button>
-    </div>
-</div>
-
-<!-- CHAMADA DE VÍDEO -->
-<div id="chama">
-    <div id="chama-header"><span>Chamada de Vídeo</span><i class="fas fa-chevron-down"></i></div>
-    <div id="chama-body">
-        <video controls src=""></video>
-    </div>
-</div>
-
 <script>
-// ===== ABAS =====
-document.addEventListener("DOMContentLoaded", () => {
-    const tabs = document.querySelectorAll("nav button");
-    const tabContents = document.querySelectorAll(".tab");
+  // ================== FIREBASE CONFIG ==================
+  const firebaseConfig = {
+    apiKey: "SEU_API_KEY",
+    authDomain: "SEU_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://SEU_PROJECT_ID-default-rtdb.firebaseio.com",
+    projectId: "SEU_PROJECT_ID",
+    storageBucket: "SEU_PROJECT_ID.appspot.com",
+    messagingSenderId: "SEU_SENDER_ID",
+    appId: "SEU_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
 
-    tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-            tabs.forEach(t => t.classList.remove("active"));
-            tab.classList.add("active");
-
-            tabContents.forEach(content => content.classList.remove("active"));
-            const activeTab = document.getElementById(tab.dataset.tab);
-            if(activeTab) activeTab.classList.add("active");
-        });
+  // ================== ABAS ==================
+  const tabs = document.querySelectorAll(".tab-btn");
+  const contents = document.querySelectorAll(".tab");
+  tabs.forEach(btn => {
+    btn.addEventListener("click", () => {
+      tabs.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const target = btn.dataset.tab;
+      contents.forEach(c => c.classList.remove("active"));
+      document.getElementById(target).classList.add("active");
     });
+  });
 
-    // ===== CHAT FOF0CA =====
-    const fofocaHeader = document.getElementById("fofoca-header");
-    const fofocaBody = document.getElementById("fofoca-body");
-    fofocaHeader.addEventListener("click", () => {
-        fofocaBody.style.display = fofocaBody.style.display === "flex" ? "none" : "flex";
-    });
+  // ================== CANVAS ==================
+  const canvas = document.getElementById("storyboardCanvas");
+  const ctx = canvas.getContext("2d");
+  let painting = false;
+  canvas.addEventListener("mousedown", () => painting=true);
+  canvas.addEventListener("mouseup", () => painting=false);
+  canvas.addEventListener("mousemove", draw);
 
-    // ===== CHAMADA DE VÍDEO =====
-    const chamaHeader = document.getElementById("chama-header");
-    const chamaBody = document.getElementById("chama-body");
-    chamaHeader.addEventListener("click", () => {
-        chamaBody.style.display = chamaBody.style.display === "block" ? "none" : "block";
-    });
+  function draw(e){
+    if(!painting) return;
+    ctx.lineWidth = document.getElementById("brushSize").value;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = document.getElementById("drawingColor").value;
+    const rect = canvas.getBoundingClientRect();
+    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  }
 
-    // ===== CANVAS STORYBOARD =====
-    const canvas = document.getElementById("storyboardCanvas");
-    const ctx = canvas.getContext("2d");
-    const colorPicker = document.getElementById("drawingColor");
-    const brushSizeInput = document.getElementById("brushSize");
-    const canvasStatus = document.getElementById("canvasStatus");
+  document.getElementById("clearCanvas").onclick = () => ctx.clearRect(0,0,canvas.width,canvas.height);
+  document.getElementById("saveCanvas").onclick = () => {
+    const link = document.createElement("a");
+    link.download = "storyboard.png";
+    link.href = canvas.toDataURL();
+    link.click();
+  }
 
-    let drawing = false;
-    let currentColor = colorPicker.value;
-    let brushSize = brushSizeInput.value;
+  // ================== CHAT ==================
+  const chatBody = document.getElementById("fofoca-body");
+  const toggleChat = document.getElementById("toggleChat");
+  toggleChat.addEventListener("click", ()=> {
+    chatBody.style.display = chatBody.style.display === "flex" ? "none" : "flex";
+  });
 
-    colorPicker.addEventListener("input", e => currentColor = e.target.value);
-    brushSizeInput.addEventListener("input", e => {
-        brushSize = e.target.value;
-        canvasStatus.textContent = `Tamanho do pincel: ${brushSize}px`;
-    });
+  const messagesDiv = document.getElementById("messages");
+  const chatInput = document.getElementById("chatInput");
+  const sendBtn = document.getElementById("sendMsg");
 
-    const startDrawing = e => { drawing = true; draw(e); };
-    const stopDrawing = () => { drawing = false; ctx.beginPath(); };
-    const draw = e => {
-        if(!drawing) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX || e.touches[0].clientX) - rect.left;
-        const y = (e.clientY || e.touches[0].clientY) - rect.top;
+  sendBtn.addEventListener("click", sendMessage);
+  chatInput.addEventListener("keypress", e => { if(e.key==="Enter"){ e.preventDefault(); sendMessage(); }});
 
-        ctx.lineWidth = brushSize;
-        ctx.lineCap = "round";
-        ctx.strokeStyle = currentColor;
+  function sendMessage(){
+    const msg = chatInput.value.trim();
+    if(!msg) return;
+    db.ref("chat").push({message: msg, time: Date.now()});
+    chatInput.value="";
+  }
 
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    };
-
-    canvas.addEventListener("mousedown", startDrawing);
-    canvas.addEventListener("mouseup", stopDrawing);
-    canvas.addEventListener("mouseout", stopDrawing);
-    canvas.addEventListener("mousemove", draw);
-
-    canvas.addEventListener("touchstart", e => { e.preventDefault(); startDrawing(e.touches[0]); });
-    canvas.addEventListener("touchmove", e => { e.preventDefault(); draw(e.touches[0]); });
-    canvas.addEventListener("touchend", stopDrawing);
-});
+  // Escuta mensagens em tempo real
+  db.ref("chat").on("child_added", snapshot => {
+    const data = snapshot.val();
+    const div = document.createElement("div");
+    div.textContent = data.message;
+    div.style.marginBottom = "6px";
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  });
 </script>
+
 </body>
 </html>
+
 
