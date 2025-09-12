@@ -21,6 +21,10 @@
     <button class="tab-btn" data-tab="storyboard">Storyboard</button>
     <button class="tab-btn" data-tab="comunidade">Comunidade</button>
   </nav>
+  <div id="userPanel">
+    <span id="userName" style="color:#ffdd40; margin-right:10px;"></span>
+    <button id="logoutBtn" class="btn" style="display:none;">Logout</button>
+  </div>
 </header>
 
 <main>
@@ -54,7 +58,13 @@
 
   <div id="comunidade" class="tab">
     <h2>Chat Fofoca</h2>
-    <div id="fofoca">
+    <div id="authSection">
+      <input type="email" id="email" placeholder="E-mail">
+      <input type="password" id="password" placeholder="Senha">
+      <button id="loginBtn" class="btn btn-primary">Login</button>
+      <button id="signupBtn" class="btn">Criar Conta</button>
+    </div>
+    <div id="fofoca" style="display:none;">
       <div id="fofoca-header">Fofoca <span id="toggleChat">⬆️</span></div>
       <div id="fofoca-body">
         <div id="messages" style="flex:1; overflow-y:auto;"></div>
@@ -98,7 +108,7 @@
   const ctx = canvas.getContext("2d");
   let painting = false;
   canvas.addEventListener("mousedown", () => painting=true);
-  canvas.addEventListener("mouseup", () => painting=false);
+  canvas.addEventListener("mouseup", () => {painting=false; ctx.beginPath();});
   canvas.addEventListener("mousemove", draw);
 
   function draw(e){
@@ -121,6 +131,44 @@
     link.click();
   }
 
+  // ================== AUTH ==================
+  const loginBtn = document.getElementById("loginBtn");
+  const signupBtn = document.getElementById("signupBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const userName = document.getElementById("userName");
+  const authSection = document.getElementById("authSection");
+  const fofocaDiv = document.getElementById("fofoca");
+
+  loginBtn.addEventListener("click", () => {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+    auth.signInWithEmailAndPassword(email, pass)
+    .catch(err => alert(err.message));
+  });
+
+  signupBtn.addEventListener("click", () => {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+    auth.createUserWithEmailAndPassword(email, pass)
+    .catch(err => alert(err.message));
+  });
+
+  logoutBtn.addEventListener("click", () => auth.signOut());
+
+  auth.onAuthStateChanged(user => {
+    if(user){
+      userName.textContent = user.email;
+      logoutBtn.style.display = "inline-block";
+      authSection.style.display = "none";
+      fofocaDiv.style.display = "flex";
+    } else {
+      userName.textContent = "";
+      logoutBtn.style.display = "none";
+      authSection.style.display = "block";
+      fofocaDiv.style.display = "none";
+    }
+  });
+
   // ================== CHAT ==================
   const chatBody = document.getElementById("fofoca-body");
   const toggleChat = document.getElementById("toggleChat");
@@ -137,23 +185,20 @@
 
   function sendMessage(){
     const msg = chatInput.value.trim();
-    if(!msg) return;
-    db.ref("chat").push({message: msg, time: Date.now()});
+    const user = auth.currentUser;
+    if(!msg || !user) return;
+    db.ref("chat").push({message: msg, user: user.email, time: Date.now()});
     chatInput.value="";
   }
 
-  // Escuta mensagens em tempo real
   db.ref("chat").on("child_added", snapshot => {
     const data = snapshot.val();
     const div = document.createElement("div");
-    div.textContent = data.message;
+    div.textContent = `${data.user}: ${data.message}`;
     div.style.marginBottom = "6px";
     messagesDiv.appendChild(div);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   });
 </script>
-
 </body>
 </html>
-
-
