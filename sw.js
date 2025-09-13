@@ -1,24 +1,31 @@
-const cacheName = "scriptflow-cache-v1";
-const filesToCache = [
-  "./",
-  "./index.html",
-  "./style.css",
-  "./script.js"
-  // adicione aqui outros arquivos essenciais do seu projeto
+const CACHE_NAME = 'escaleta-hub-v1';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/styles.css',
+  '/app.js',
+  '/icon-192x192.png',
+  '/icon-512x512.png'
 ];
 
-self.addEventListener("install", (event) => {
+self.addEventListener('install', function(event) {
   event.waitUntil(
-    caches.open(cacheName).then((cache) => {
-      return cache.addAll(filesToCache);
-    })
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        return cache.addAll(urlsToCache);
+      })
   );
 });
 
-self.addEventListener("fetch", (event) => {
+self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+    caches.match(event.request)
+      .then(function(response) {
+        if (response) {
+          return response;
+        }
+        return fetch(event.request);
+      }
+    )
   );
 });
