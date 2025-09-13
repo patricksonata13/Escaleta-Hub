@@ -1,21 +1,22 @@
 {
   "name": "Escaleta Hub",
   "short_name": "Escaleta",
+  "description": "Sua plataforma profissional de criação de roteiros",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1c1c1c",
-  "theme_color": "#ffdd40",
+  "background_color": "#141414",
+  "theme_color": "#e50914",
+  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "assets/icon-192.png",
+      "src": "icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "assets/icon-512.png",
+      "src": "icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ]
 }
-
