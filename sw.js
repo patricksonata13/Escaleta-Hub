@@ -2,10 +2,10 @@ const CACHE_NAME = 'escaleta-hub-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/icon-192x192.png',
-  '/icon-512x512.png'
+  '/style.css',
+  '/script.js',
+  '/assets/icon-192.png',
+  '/assets/icon-512.png'
 ];
 
 self.addEventListener('install', function(event) {
