@@ -420,7 +420,7 @@
                         <div class="biblia-content">
                             <div class="biblia-section">
                                 <h4>Sinopse</h4>
-                                <p contenteditable="true">Uma história sobre João и Maria, dois personagens em uma jornada emocionante cheia de reviravoltas.</p>
+                                <p contenteditable="true">Uma história sobre João e Maria, dois personagens em uma jornada emocionante cheia de reviravoltas.</p>
                             </div>
                             
                             <div class="biblia-section">
@@ -461,7 +461,7 @@
                             
                             <div class="escaleta-section">
                                 <h4>Episódio 3: O Clímax</h4>
-                                <p contenteditable="true"><strong>Cena 6:</strong> INT. ESCRITÓRIO - TARDE - Confronto com o antagonista.</p>
+                                <p contenteditable="true"><strong>Cena 6:</strong> INT. ESCRITÓRIO - TARDE - Confronto dengan antagonista.</p>
                                 <p contenteditable="true"><strong>Cena 7:</strong> EXT. ESTACIONAMENTO - NOITE - Resolução do conflito.</p>
                             </div>
                         </div>
@@ -576,9 +576,6 @@
                 });
             }
             
-            // Restante do código JavaScript anterior (login, abas, etc.)
-            // ... (manter o código JavaScript anterior aqui)
-            
             // Simular login
             loginBtn.addEventListener('click', function() {
                 const email = document.getElementById('email').value;
@@ -597,6 +594,15 @@
                 } else {
                     alert('Por favor, preencha todos os campos.');
                 }
+            });
+            
+            // Logout
+            logoutBtn.addEventListener('click', function() {
+                mainPlatform.style.display = 'none';
+                openingScreen.style.display = 'flex';
+                openingScreen.style.opacity = '1';
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
             });
             
             // Controle de abas
