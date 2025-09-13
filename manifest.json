@@ -2,7 +2,7 @@
   "name": "Escaleta Hub",
   "short_name": "Escaleta",
   "description": "Sua plataforma profissional de criação de roteiros",
-  "start_url": "/",
+  "start_url": "/Escaleta-Hub/",
   "display": "standalone",
   "background_color": "#141414",
   "theme_color": "#e50914",
