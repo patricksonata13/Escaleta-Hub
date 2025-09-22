@@ -1,1 +1,12 @@
+# CSS básico
+echo "/* CSS básico - Escale Tahub */" > css/style.css
+echo "body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }" >> css/style.css
+echo ".container { max-width: 1200px; margin: 0 auto; }" >> css/style.css
 
+# JavaScript app.js
+echo "// App principal - Escale Tahub" > js/app.js
+echo "console.log('App iniciado');" >> js/app.js
+
+# JavaScript login.js
+echo "// Login functions - Escale Tahub" > js/login.js
+echo "function login() { console.log('Função login'); }" >> js/login.js
