@@ -12,16 +12,16 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyCsi6yy41s8DgT88lPRtlLKQFFYrgAgMSo",
-      authDomain: "escaleta-hub.firebaseapp.com",
-      projectId: "escaleta-hub",
-      storageBucket: "escaleta-hub.appspot.com",
-      messagingSenderId: "825021624145",
-      appId: "1:825021624145:web:1f43b9574d041d8e206d70",
-      measurementId: "G-NC9QFD3063"
-    };
+ const firebaseConfig = {
+  apiKey: "AIzaSyCsi6yy41s8DgT88lPRtlLKQFFYrgAgMSo",
+  authDomain: "escaleta-hub.firebaseapp.com",
+  projectId: "escaleta-hub",
+  storageBucket: "escaleta-hub.appspot.com",
+  messagingSenderId: "825021624145",
+  appId: "1:825021624145:web:1f43b9574d041d8e206d70",
+  measurementId: "G-NC9QFD3063"
+};
+
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
