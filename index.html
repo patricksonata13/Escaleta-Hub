@@ -17,14 +17,104 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Seu conteúdo atual aqui -->
-    
-    <!-- Novos Módulos -->
+    <!-- Tela de abertura estilo streaming -->
+    <div class="opening-screen" id="openingScreen">
+        <div class="logo-container">
+            <div class="logo">ESCALETA HUB</div>
+            <div class="tagline">Sua plataforma profissional de criação de roteiros</div>
+        </div>
+        
+        <div class="login-form">
+            <h2>Olá, Roteirista!</h2>
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" placeholder="Sua senha">
+            </div>
+            <button class="login-btn" id="loginBtn">Entrar</button>
+        </div>
+    </div>
+
+    <!-- Plataforma principal -->
+    <div class="main-platform" id="mainPlatform">
+        <!-- Seu conteúdo principal aqui (header, sidebar, tabs, etc.) -->
+        
+        <!-- Nova aba de Colaboração -->
+        <div id="collab-tab" class="tab-content">
+            <div class="tab-header">
+                <h2><i class="fas fa-users"></i> Colaboração</h2>
+                <div class="tab-actions">
+                    <button id="new-meeting-btn" class="btn-primary">
+                        <i class="fas fa-video"></i> Nova Reunião
+                    </button>
+                    <button id="invite-collab-btn" class="btn-secondary">
+                        <i class="fas fa-user-plus"></i> Convidar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="collab-dashboard">
+                <!-- Estatísticas Rápidas -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-info">
+                            <h3>5</h3>
+                            <span>Membros</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-comments"></i>
+                        <div class="stat-info">
+                            <h3>23</h3>
+                            <span>Mensagens</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-video"></i>
+                        <div class="stat-info">
+                            <h3>3</h3>
+                            <span>Reuniões</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Atividade Recente -->
+                <div class="activity-section">
+                    <h3>Atividade Recente</h3>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <i class="fas fa-edit"></i>
+                            <div class="activity-content">
+                                <strong>Carlos Lima</strong> editou a cena 5
+                                <span>há 10 minutos</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-comment"></i>
+                            <div class="activity-content">
+                                <strong>Maria Santos</strong> comentou no storyboard
+                                <span>há 30 minutos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts no final do body -->
     <script src="./js/auth-system.js"></script>
     <script src="./js/video-call.js"></script>
     <script src="./js/chat-system.js"></script>
     <script src="./js/firebase-setup.js"></script>
     <script src="./js/database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
     
     <!-- Service Worker Registration -->
     <script>
@@ -36,71 +126,3 @@
     </script>
 </body>
 </html>
-<!-- Nova aba de Colaboração -->
-<div id="collab-tab" class="tab-content">
-    <div class="tab-header">
-        <h2><i class="fas fa-users"></i> Colaboração</h2>
-        <div class="tab-actions">
-            <button id="new-meeting-btn" class="btn-primary">
-                <i class="fas fa-video"></i> Nova Reunião
-            </button>
-            <button id="invite-collab-btn" class="btn-secondary">
-                <i class="fas fa-user-plus"></i> Convidar
-            </button>
-        </div>
-    </div>
-    
-    <div class="collab-dashboard">
-        <!-- Estatísticas Rápidas -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <i class="fas fa-users"></i>
-                <div class="stat-info">
-                    <h3>5</h3>
-                    <span>Membros</span>
-                </div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-comments"></i>
-                <div class="stat-info">
-                    <h3>23</h3>
-                    <span>Mensagens</span>
-                </div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-video"></i>
-                <div class="stat-info">
-                    <h3>3</h3>
-                    <span>Reuniões</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Atividade Recente -->
-        <div class="activity-section">
-            <h3>Atividade Recente</h3>
-            <div class="activity-list">
-                <div class="activity-item">
-                    <i class="fas fa-edit"></i>
-                    <div class="activity-content">
-                        <strong>Carlos Lima</strong> editou a cena 5
-                        <span>há 10 minutos</span>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <i class="fas fa-comment"></i>
-                    <div class="activity-content">
-                        <strong>Maria Santos</strong> comentou no storyboard
-                        <span>há 30 minutos</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Adicione antes do </body> -->
-<script src="./js/chat-system.js"></script>
-<script src="./js/firebase-setup.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
