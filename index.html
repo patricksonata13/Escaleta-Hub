@@ -5,23 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escaleta Hub - Plataforma Profissional de Roteiros</title>
     
-    <!-- Meta tags de segurança e SEO -->
-    <meta name="description" content="Plataforma profissional para criação, desenvolvimento e colaboração em roteiros cinematográficos e televisivos">
-    <meta name="keywords" content="roteiro, cinema, televisão, escritor, escaleta, storyboard, plataforma, colaboração">
-    <meta name="author" content="Escaleta Hub">
-    <meta name="robots" content="index, follow">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2a5a78">
+    <!-- PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
-    <!-- Ícone -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Video Chat (WebRTC) -->
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
     
     <style>
-        /* ===== VARIÁVEIS DE CORES ===== */
+        /* SEU CSS COMPLETO AQUI (mantenha todo o estilo anterior) */
         :root {
             --primary: #2a5a78;
             --secondary: #9c6ade;
@@ -30,421 +27,48 @@
             --dark: #1a3650;
             --text: #2c3e50;
             --bg: #f8fbff;
-            --header-bg: linear-gradient(135deg, #2a5a78 0%, #1a3650 100%);
-            --sidebar-bg: #3a4f66;
-            --editor-bg: #ffffff;
-            --editor-text: #2c3e50;
-            --footer-bg: #2a5a78;
-            --footer-text: #e0f0ff;
         }
 
-        /* ===== ESTILOS GERAIS ===== */
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: var(--text); }
         
-        body { 
-            background-color: #f5f9ff; 
-            color: var(--text); 
-            overflow-x: hidden; 
-            line-height: 1.6;
-        }
-
-        /* ===== TELA DE ABERTURA ===== */
-        .opening-screen {
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%;
-            background: linear-gradient(135deg, #2a5a78 0%, #1a3650 100%);
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center;
-            z-index: 1000; 
-            transition: opacity 0.8s ease-out;
-        }
+        /* ... (todo o restante do CSS anterior) ... */
         
-        .logo-container { 
-            margin-bottom: 40px; 
-            text-align: center; 
-            animation: fadeIn 1.5s ease forwards; 
-        }
-        
-        .logo { 
-            font-size: 3rem; 
-            font-weight: bold; 
-            color: #ffffff; 
-            margin-bottom: 15px;
-        }
-        
-        .tagline { 
-            font-size: 1.1rem; 
-            color: #d0e4ff; 
-            opacity: 0.9;
-        }
-        
-        .login-form {
-            background: rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(10px);
-            padding: 30px; 
-            border-radius: 12px; 
-            width: 100%; 
-            max-width: 400px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .login-form h2 { 
-            margin-bottom: 20px; 
-            text-align: center; 
-            color: white; 
-        }
-        
-        .form-group { 
-            margin-bottom: 15px; 
-        }
-        
-        .form-group label { 
-            display: block; 
-            margin-bottom: 5px; 
-            color: #a8c6ff; 
-            font-size: 14px;
-        }
-        
-        .form-group input {
-            width: 100%; 
-            height: 45px; 
-            padding: 0 15px; 
-            background: rgba(255, 255, 255, 0.1); 
-            border: 1px solid rgba(255, 255, 255, 0.3); 
-            border-radius: 6px;
-            color: #fff; 
-            font-size: 15px;
-        }
-        
-        .form-group input:focus { 
-            outline: none; 
-            border-color: #9c6ade;
-        }
-        
-        .login-btn {
-            width: 100%; 
-            height: 45px; 
-            background: #9c6ade; 
-            color: #fff; 
-            border: none; 
-            border-radius: 6px;
-            font-size: 16px; 
-            font-weight: 600; 
-            margin-top: 20px; 
-            cursor: pointer; 
-            transition: all 0.3s ease;
-        }
-        
-        .login-btn:hover { 
-            background: #8c5acd; 
-            transform: translateY(-2px);
-        }
-
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(20px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-
-        /* ===== PLATAFORMA PRINCIPAL ===== */
-        .main-platform { 
-            display: none; 
-            height: 100vh; 
-            flex-direction: column;
-        }
-
-        /* ===== HEADER ===== */
-        header { 
-            background: var(--header-bg); 
-            color: white; 
-            padding: 1rem 2rem; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .header-left { 
-            display: flex; 
-            align-items: center; 
-            gap: 1rem; 
-        }
-        
-        .logo-platform { 
-            font-size: 1.5rem; 
-            font-weight: bold; 
-            display: flex; 
-            align-items: center; 
-            gap: 0.5rem; 
-        }
-        
-        .document-info { 
-            display: flex; 
-            flex-direction: column; 
-        }
-        
-        .document-title { 
-            font-weight: bold; 
-            font-size: 1.1rem; 
-            border: none; 
-            background: none; 
-            color: white; 
-            width: 200px;
-        }
-        
-        .document-stats { 
-            font-size: 0.8rem; 
-            opacity: 0.9; 
-        }
-
-        .header-right { 
-            display: flex; 
-            gap: 0.8rem; 
-        }
-        
-        .toolbar-btn { 
-            padding: 0.6rem 1rem; 
-            background: rgba(255, 255, 255, 0.15); 
-            color: white; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            gap: 0.5rem; 
-            font-size: 0.85rem; 
-            transition: all 0.3s ease;
-        }
-        
-        .toolbar-btn:hover { 
-            background: rgba(255, 255, 255, 0.25); 
-        }
-
-        /* ===== LAYOUT PRINCIPAL ===== */
-        .main-container { 
-            display: flex; 
-            flex: 1; 
-            overflow: hidden; 
-        }
-        
-        .sidebar { 
-            width: 250px; 
-            background: var(--sidebar-bg); 
-            color: #e0f0ff; 
-            padding: 1.5rem 1rem; 
-            display: flex; 
-            flex-direction: column; 
-        }
-        
-        .sidebar-section { 
-            margin-bottom: 1.5rem; 
-        }
-        
-        .sidebar-section h3 { 
-            margin-bottom: 0.8rem; 
-            font-size: 0.9rem; 
-            color: #a8c6ff; 
-            display: flex; 
-            align-items: center; 
-            gap: 0.5rem;
-        }
-        
-        .sidebar-btn { 
-            display: flex; 
-            align-items: center; 
-            gap: 0.7rem; 
-            padding: 0.7rem; 
-            width: 100%; 
-            background: transparent; 
-            border: none; 
-            color: #e0f0ff; 
-            text-align: left; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            margin-bottom: 0.3rem; 
-        }
-        
-        .sidebar-btn:hover { 
-            background: rgba(255, 255, 255, 0.08); 
-        }
-        
-        .sidebar-btn.active { 
-            background: var(--secondary); 
-        }
-
-        .workspace { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            background: var(--bg); 
-        }
-        
-        .tab-header { 
-            display: flex; 
-            background: var(--light); 
-            border-bottom: 1px solid #d0e0f0; 
-            padding: 0 20px;
-        }
-        
-        .tab-button { 
-            padding: 1rem 1.5rem; 
-            background: transparent; 
-            border: none; 
-            cursor: pointer; 
-            font-weight: 500; 
-            color: var(--text); 
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        
-        .tab-button.active { 
-            color: var(--secondary); 
-            font-weight: 600;
-        }
-        
-        .tab-button.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
+        /* Novos estilos para funcionalidades */
+        .video-container {
             width: 100%;
-            height: 3px;
-            background: var(--secondary);
-        }
-
-        .tab-content { 
-            flex: 1; 
-            display: none; 
-            overflow: auto; 
-            padding: 2rem;
-            background: var(--editor-bg);
+            height: 300px;
+            background: #000;
+            border-radius: 8px;
+            margin: 10px 0;
         }
         
-        .tab-content.active { 
-            display: block; 
-        }
-
-        /* ===== EDITOR DE ROTEIRO ===== */
-        .script-editor { 
-            font-family: 'Courier New', monospace; 
-            font-size: 12pt; 
-            line-height: 1.5;
-            min-height: 500px;
-            outline: none;
+        .chat-container {
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f9f9f9;
         }
         
-        .scene-heading { 
-            font-weight: bold; 
-            text-transform: uppercase; 
-            margin: 2rem 0 1rem 0;
-            color: var(--primary);
+        .message {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 5px;
+            max-width: 80%;
         }
         
-        .action, .character, .dialogue, .parenthetical { 
-            margin: 0.8rem 0;
+        .message.own {
+            background: var(--primary);
+            color: white;
+            margin-left: auto;
         }
         
-        .character { 
-            text-align: center; 
-            width: 50%; 
-            margin: 0.8rem auto; 
-            font-weight: bold; 
+        .message.other {
+            background: #e0e0e0;
+            color: black;
         }
-        
-        .dialogue { 
-            width: 65%; 
-            margin: 0 auto; 
-        }
-        
-        .parenthetical { 
-            width: 40%; 
-            margin: 0 auto; 
-            padding-left: 2rem; 
-            font-style: italic;
-        }
-        
-        .transition { 
-            text-align: right; 
-            margin-top: 1.5rem; 
-            text-transform: uppercase; 
-            font-weight: bold;
-        }
-
-        /* ===== FOOTER ===== */
-        footer { 
-            background: var(--footer-bg); 
-            color: var(--footer-text); 
-            padding: 0.8rem 2rem; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            font-size: 0.8rem;
-        }
-        
-        .footer-left, .footer-right { 
-            display: flex; 
-            gap: 1rem; 
-            align-items: center; 
-        }
-
-        /* ===== RESPONSIVIDADE ===== */
-        @media (max-width: 768px) {
-            .main-container { 
-                flex-direction: column; 
-            }
-            
-            .sidebar { 
-                width: 100%; 
-                order: 2;
-            }
-            
-            .workspace { 
-                order: 1; 
-            }
-            
-            .header-right { 
-                flex-direction: column; 
-                gap: 0.5rem; 
-            }
-            
-            .tab-header { 
-                padding: 0 10px; 
-            }
-            
-            .tab-button { 
-                padding: 0.8rem 1rem; 
-                font-size: 0.9rem; 
-            }
-        }
-
-        /* ===== UTILITÁRIOS ===== */
-        .hidden { 
-            display: none !important; 
-        }
-        
-        .text-center { 
-            text-align: center; 
-        }
-        
-        .mt-2 { 
-            margin-top: 1rem; 
-        }
-        
-        .mb-2 { 
-            margin-bottom: 1rem; 
-        }
-
     </style>
 </head>
 <body>
@@ -452,22 +76,44 @@
     <div class="opening-screen" id="openingScreen">
         <div class="logo-container">
             <div class="logo">🎬 Escaleta Hub</div>
-            <div class="tagline">Sua plataforma profissional de criação de roteiros</div>
+            <div class="tagline">Plataforma profissional gratuita para roteiristas</div>
         </div>
         
         <div class="login-form">
-            <h2>Bem-vindo, Roteirista!</h2>
-            <div class="form-group">
-                <label for="email">E-mail</label>
-                <input type="email" id="email" placeholder="seu@email.com" required>
+            <div class="form-tabs">
+                <button class="form-tab active" data-form="login">Login</button>
+                <button class="form-tab" data-form="register">Cadastro</button>
             </div>
-            <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" placeholder="Sua senha" required>
+            
+            <!-- Formulário de Login -->
+            <div id="login-form" class="auth-form active">
+                <h2>Entrar na Plataforma</h2>
+                <div class="form-group">
+                    <input type="email" id="loginEmail" placeholder="Seu e-mail" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="Sua senha" required>
+                </div>
+                <button class="login-btn" id="loginBtn">Entrar</button>
+                <div class="auth-links">
+                    <a href="#" id="forgotPassword">Esqueci a senha</a>
+                </div>
             </div>
-            <button class="login-btn" id="loginBtn">
-                <i class="fas fa-sign-in-alt"></i> Acessar Plataforma
-            </button>
+            
+            <!-- Formulário de Cadastro -->
+            <div id="register-form" class="auth-form">
+                <h2>Criar Conta Gratuita</h2>
+                <div class="form-group">
+                    <input type="text" id="registerName" placeholder="Seu nome completo" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="registerEmail" placeholder="Seu melhor e-mail" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="registerPassword" placeholder="Senha (mínimo 6 caracteres)" required>
+                </div>
+                <button class="login-btn" id="registerBtn">Criar Conta</button>
+            </div>
         </div>
     </div>
 
@@ -477,14 +123,21 @@
             <div class="header-left">
                 <div class="logo-platform"><i class="fas fa-scroll"></i> Escaleta Hub</div>
                 <div class="document-info">
-                    <input type="text" class="document-title" value="Meu Roteiro Principal">
-                    <div class="document-stats">3 cenas • 2 páginas • Modificado agora</div>
+                    <input type="text" id="documentTitle" class="document-title" value="Novo Roteiro">
+                    <div class="document-stats" id="documentStats">0 cenas • 0 páginas</div>
                 </div>
             </div>
             <div class="header-right">
                 <button class="toolbar-btn" id="saveBtn"><i class="fas fa-save"></i> Salvar</button>
-                <button class="toolbar-btn" id="exportBtn"><i class="fas fa-file-export"></i> Exportar</button>
-                <button class="toolbar-btn" id="settingsBtn"><i class="fas fa-cog"></i> Configurações</button>
+                <button class="toolbar-btn" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+                <button class="toolbar-btn" id="collabBtn"><i class="fas fa-users"></i> Colaborar</button>
+                <div class="user-menu">
+                    <span id="userName">Usuário</span>
+                    <div class="user-dropdown">
+                        <button id="profileBtn"><i class="fas fa-user"></i> Perfil</button>
+                        <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -492,116 +145,78 @@
             <!-- Sidebar -->
             <nav class="sidebar">
                 <div class="sidebar-section">
-                    <h3><i class="fas fa-film"></i> Elementos</h3>
-                    <button class="sidebar-btn active" data-tab="roteiro"><i class="fas fa-file-alt"></i> Roteiro</button>
-                    <button class="sidebar-btn" data-tab="argumento"><i class="fas fa-feather-alt"></i> Argumento</button>
-                    <button class="sidebar-btn" data-tab="rascunho"><i class="fas fa-edit"></i> Rascunho</button>
-                    <button class="sidebar-btn" data-tab="biblia"><i class="fas fa-book"></i> Bíblia</button>
-                    <button class="sidebar-btn" data-tab="escaleta"><i class="fas fa-list-ol"></i> Escaleta</button>
+                    <h3><i class="fas fa-film"></i> Meus Projetos</h3>
+                    <div id="projectsList"></div>
+                    <button class="sidebar-btn" id="newProjectBtn"><i class="fas fa-plus"></i> Novo Projeto</button>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-tools"></i> Ferramentas</h3>
+                    <button class="sidebar-btn" data-tab="editor"><i class="fas fa-edit"></i> Editor</button>
+                    <button class="sidebar-btn" data-tab="characters"><i class="fas fa-users"></i> Personagens</button>
                     <button class="sidebar-btn" data-tab="storyboard"><i class="fas fa-palette"></i> Storyboard</button>
                 </div>
                 
                 <div class="sidebar-section">
-                    <h3><i class="fas fa-cog"></i> Ferramentas</h3>
-                    <button class="sidebar-btn" id="statsBtn"><i class="fas fa-chart-bar"></i> Estatísticas</button>
-                    <button class="sidebar-btn" id="charsBtn"><i class="fas fa-users"></i> Personagens</button>
-                    <button class="sidebar-btn" id="searchBtn"><i class="fas fa-search"></i> Buscar</button>
-                </div>
-                
-                <div class="sidebar-section">
-                    <button class="sidebar-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                    <h3><i class="fas fa-users"></i> Colaboração</h3>
+                    <button class="sidebar-btn" id="videoCallBtn"><i class="fas fa-video"></i> Video Chamada</button>
+                    <button class="sidebar-btn" id="chatBtn"><i class="fas fa-comments"></i> Chat em Tempo Real</button>
+                    <button class="sidebar-btn" id="inviteBtn"><i class="fas fa-user-plus"></i> Convidar</button>
                 </div>
             </nav>
 
             <!-- Área de Trabalho -->
             <main class="workspace">
                 <div class="tab-header">
-                    <button class="tab-button active" data-tab="roteiro">Roteiro</button>
-                    <button class="tab-button" data-tab="argumento">Argumento</button>
-                    <button class="tab-button" data-tab="rascunho">Rascunho</button>
-                    <button class="tab-button" data-tab="biblia">Bíblia</button>
-                    <button class="tab-button" data-tab="escaleta">Escaleta</button>
+                    <button class="tab-button active" data-tab="editor">Editor</button>
+                    <button class="tab-button" data-tab="characters">Personagens</button>
                     <button class="tab-button" data-tab="storyboard">Storyboard</button>
+                    <button class="tab-button" data-tab="collab">Colaboração</button>
                 </div>
 
                 <div class="editor-container">
-                    <!-- Aba Roteiro -->
-                    <div id="roteiro" class="tab-content active">
-                        <div class="script-editor" contenteditable="true">
-                            <div class="scene-heading">EXT. PRAIA - DIA</div>
-                            <div class="action">O sol brilha intensamente sobre uma praia deserta. O som das ondas quebra o silêncio.</div>
-                            
-                            <div class="character">JOÃO</div>
-                            <div class="dialogue">Onde ela pode estar? Já procurei por toda parte.</div>
-                            
-                            <div class="parenthetical">(olhando para o horizonte)</div>
-                            
-                            <div class="scene-heading">INT. CABANA - CONTINUAÇÃO</div>
-                            <div class="action">Maria organiza papéis sobre uma mesa de madeira rústica.</div>
-                            
-                            <div class="character">MARIA</div>
-                            <div class="dialogue">Ele nunca vai entender. Alguns segredos devem ser mantidos.</div>
+                    <!-- Editor de Roteiro -->
+                    <div id="editor" class="tab-content active">
+                        <div class="toolbar">
+                            <button data-format="scene"><i class="fas fa-plus"></i> Nova Cena</button>
+                            <button data-format="character"><i class="fas fa-user"></i> Personagem</button>
+                            <button data-format="dialogue"><i class="fas fa-comment"></i> Diálogo</button>
+                            <button id="autoFormatBtn"><i class="fas fa-magic"></i> Auto-formatar</button>
+                        </div>
+                        <div id="scriptEditor" class="script-editor" contenteditable="true">
+                            <div class="scene-heading">EXT. LOCALIZAÇÃO - DIA</div>
+                            <div class="action">Descreva a ação da cena aqui...</div>
                         </div>
                     </div>
 
-                    <!-- Aba Argumento -->
-                    <div id="argumento" class="tab-content">
-                        <div class="tab-content-inner">
-                            <h3>Desenvolvimento do Argumento</h3>
-                            <textarea placeholder="Descreva aqui o argumento principal da sua história..." 
-                                      style="width: 100%; height: 400px; padding: 1rem; border: 1px solid #ddd; border-radius: 4px;"></textarea>
-                        </div>
+                    <!-- Gerenciador de Personagens -->
+                    <div id="characters" class="tab-content">
+                        <div class="characters-grid" id="charactersGrid"></div>
+                        <button class="btn-primary" id="addCharacterBtn"><i class="fas fa-plus"></i> Adicionar Personagem</button>
                     </div>
 
-                    <!-- Aba Rascunho -->
-                    <div id="rascunho" class="tab-content">
-                        <div class="tab-content-inner">
-                            <h3>Área de Rascunho</h3>
-                            <textarea placeholder="Escreva suas ideias, anotações e rascunhos livremente..." 
-                                      style="width: 100%; height: 400px; padding: 1rem; border: 1px solid #ddd; border-radius: 4px;"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Aba Bíblia -->
-                    <div id="biblia" class="tab-content">
-                        <div class="tab-content-inner">
-                            <h3>Bíblia do Projeto</h3>
-                            <div style="display: grid; gap: 1rem; grid-template-columns: 1fr 1fr;">
-                                <div>
-                                    <h4>Personagens</h4>
-                                    <textarea placeholder="Descreva os personagens..." style="width: 100%; height: 200px;"></textarea>
+                    <!-- Video Chamada -->
+                    <div id="collab" class="tab-content">
+                        <div class="video-chat-container">
+                            <div class="video-section">
+                                <div class="video-container">
+                                    <video id="localVideo" autoplay muted></video>
+                                    <video id="remoteVideo" autoplay></video>
                                 </div>
-                                <div>
-                                    <h4>Universo</h4>
-                                    <textarea placeholder="Descreva o universo da história..." style="width: 100%; height: 200px;"></textarea>
+                                <div class="video-controls">
+                                    <button id="startCallBtn"><i class="fas fa-video"></i> Iniciar Chamada</button>
+                                    <button id="endCallBtn"><i class="fas fa-phone-slash"></i> Encerrar</button>
+                                    <button id="toggleVideoBtn"><i class="fas fa-video-slash"></i> Video</button>
+                                    <button id="toggleAudioBtn"><i class="fas fa-microphone"></i> Áudio</button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Aba Escaleta -->
-                    <div id="escaleta" class="tab-content">
-                        <div class="tab-content-inner">
-                            <h3>Escaleta</h3>
-                            <div contenteditable="true" style="min-height: 400px; padding: 1rem; border: 1px solid #ddd; border-radius: 4px;">
-                                <p><strong>Episódio 1: O Encontro</strong></p>
-                                <p>Cena 1: Introdução dos personagens</p>
-                                <p>Cena 2: Conflito inicial</p>
-                                <p>Cena 3: Desenvolvimento</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Aba Storyboard -->
-                    <div id="storyboard" class="tab-content">
-                        <div class="tab-content-inner">
-                            <h3>Storyboard</h3>
-                            <div style="text-align: center; padding: 2rem;">
-                                <i class="fas fa-palette fa-3x" style="color: #9c6ade;"></i>
-                                <p>Área de storyboard em desenvolvimento</p>
-                                <button class="toolbar-btn" style="margin-top: 1rem;">
-                                    <i class="fas fa-plus"></i> Nova Cena
-                                </button>
+                            
+                            <div class="chat-section">
+                                <div class="chat-container" id="chatMessages"></div>
+                                <div class="chat-input">
+                                    <input type="text" id="chatInput" placeholder="Digite sua mensagem...">
+                                    <button id="sendMessageBtn"><i class="fas fa-paper-plane"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -611,157 +226,311 @@
 
         <footer>
             <div class="footer-left">
-                <div><i class="fas fa-keyboard"></i> <kbd>Ctrl+S</kbd> Salvar</div>
+                <div id="connectionStatus"><i class="fas fa-wifi"></i> Conectado</div>
                 <div id="wordCount">0 palavras</div>
             </div>
             <div class="footer-right">
-                <div id="autoSaveStatus"><i class="fas fa-sync"></i> Auto-salvo</div>
-                <div id="currentTime"></div>
+                <div id="lastSaved">Último salvamento: agora</div>
+                <div id="onlineUsers">Online: <span id="usersCount">1</span></div>
             </div>
         </footer>
     </div>
 
-    <script>
-        // Sistema de Navegação
-        document.addEventListener('DOMContentLoaded', function() {
-            // Elementos principais
-            const openingScreen = document.getElementById('openingScreen');
-            const mainPlatform = document.getElementById('mainPlatform');
-            const loginBtn = document.getElementById('loginBtn');
-            const logoutBtn = document.getElementById('logoutBtn');
+    <!-- Modal para Novo Projeto -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <h3>Novo Projeto</h3>
+            <input type="text" id="projectName" placeholder="Nome do projeto">
+            <select id="projectTemplate">
+                <option value="movie">Longa-metragem</option>
+                <option value="series">Série de TV</option>
+                <option value="short">Curta-metragem</option>
+            </select>
+            <div class="modal-actions">
+                <button id="createProjectBtn">Criar</button>
+                <button id="cancelProjectBtn">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
-            // Sistema de Login
-            loginBtn.addEventListener('click', function() {
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
+    <script>
+        // ===== CONFIGURAÇÃO FIREBASE =====
+        const firebaseConfig = {
+            // Você vai conseguir isso gratuitamente no console.firebase.google.com
+            apiKey: "sua-api-key",
+            authDomain: "seu-projeto.firebaseapp.com",
+            projectId: "seu-projeto-id",
+            storageBucket: "seu-projeto.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "seu-app-id"
+        };
+
+        // ===== SISTEMA DE AUTENTICAÇÃO =====
+        class AuthSystem {
+            constructor() {
+                this.user = null;
+                this.init();
+            }
+
+            async init() {
+                // Inicializar Firebase
+                firebase.initializeApp(firebaseConfig);
                 
-                if (email && password) {
-                    // Animação de transição
-                    openingScreen.style.opacity = '0';
-                    setTimeout(() => {
-                        openingScreen.style.display = 'none';
-                        mainPlatform.style.display = 'flex';
-                    }, 800);
+                // Observar mudanças de autenticação
+                firebase.auth().onAuthStateChanged((user) => {
+                    this.user = user;
+                    this.handleAuthChange(user);
+                });
+            }
+
+            async register(email, password, name) {
+                try {
+                    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                    await userCredential.user.updateProfile({ displayName: name });
+                    
+                    // Salvar dados adicionais no Firestore
+                    await firebase.firestore().collection('users').doc(userCredential.user.uid).set({
+                        name: name,
+                        email: email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    return { success: true, user: userCredential.user };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+
+            async login(email, password) {
+                try {
+                    const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+                    return { success: true, user: userCredential.user };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+
+            async logout() {
+                await firebase.auth().signOut();
+            }
+
+            handleAuthChange(user) {
+                if (user) {
+                    document.getElementById('openingScreen').style.display = 'none';
+                    document.getElementById('mainPlatform').style.display = 'flex';
+                    document.getElementById('userName').textContent = user.displayName || user.email;
+                    this.loadUserProjects(user.uid);
                 } else {
-                    alert('Por favor, preencha todos os campos.');
+                    document.getElementById('openingScreen').style.display = 'flex';
+                    document.getElementById('mainPlatform').style.display = 'none';
+                }
+            }
+
+            async loadUserProjects(userId) {
+                const projectsSnapshot = await firebase.firestore()
+                    .collection('projects')
+                    .where('owner', '==', userId)
+                    .get();
+                
+                const projectsList = document.getElementById('projectsList');
+                projectsList.innerHTML = '';
+                
+                projectsSnapshot.forEach(doc => {
+                    const project = doc.data();
+                    const projectElement = document.createElement('div');
+                    projectElement.className = 'project-item';
+                    projectElement.innerHTML = `
+                        <strong>${project.title}</strong>
+                        <span>${project.updatedAt?.toDate().toLocaleDateString() || 'Novo'}</span>
+                    `;
+                    projectElement.addEventListener('click', () => this.loadProject(doc.id));
+                    projectsList.appendChild(projectElement);
+                });
+            }
+        }
+
+        // ===== SISTEMA DE CHAT EM TEMPO REAL =====
+        class ChatSystem {
+            constructor() {
+                this.messages = [];
+                this.init();
+            }
+
+            init() {
+                // Configurar listener para novas mensagens
+                firebase.firestore().collection('chat')
+                    .orderBy('timestamp', 'asc')
+                    .onSnapshot(snapshot => {
+                        snapshot.docChanges().forEach(change => {
+                            if (change.type === 'added') {
+                                this.displayMessage(change.doc.data());
+                            }
+                        });
+                    });
+            }
+
+            async sendMessage(text) {
+                const user = firebase.auth().currentUser;
+                if (!user) return;
+
+                await firebase.firestore().collection('chat').add({
+                    text: text,
+                    user: user.displayName || user.email,
+                    userId: user.uid,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+
+            displayMessage(message) {
+                const chatContainer = document.getElementById('chatMessages');
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${message.userId === firebase.auth().currentUser?.uid ? 'own' : 'other'}`;
+                messageElement.innerHTML = `
+                    <strong>${message.user}:</strong> ${message.text}
+                    <small>${new Date(message.timestamp?.toDate()).toLocaleTimeString()}</small>
+                `;
+                chatContainer.appendChild(messageElement);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        // ===== SISTEMA DE VIDEOCHAMADA (WebRTC) =====
+        class VideoCallSystem {
+            constructor() {
+                this.localStream = null;
+                this.remoteStream = null;
+                this.peerConnection = null;
+            }
+
+            async startCall() {
+                try {
+                    // Obter acesso à câmera e microfone
+                    this.localStream = await navigator.mediaDevices.getUserMedia({ 
+                        video: true, 
+                        audio: true 
+                    });
+                    
+                    document.getElementById('localVideo').srcObject = this.localStream;
+                    
+                    // Configurar conexão peer-to-peer
+                    await this.setupPeerConnection();
+                    
+                } catch (error) {
+                    console.error('Erro ao iniciar chamada:', error);
+                }
+            }
+
+            async setupPeerConnection() {
+                // Configuração simplificada do WebRTC
+                // Em produção, você precisaria de um servidor de sinalização
+                this.peerConnection = new RTCPeerConnection({
+                    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+                });
+
+                this.localStream.getTracks().forEach(track => {
+                    this.peerConnection.addTrack(track, this.localStream);
+                });
+
+                this.peerConnection.ontrack = (event) => {
+                    this.remoteStream = event.streams[0];
+                    document.getElementById('remoteVideo').srcObject = this.remoteStream;
+                };
+            }
+
+            endCall() {
+                if (this.localStream) {
+                    this.localStream.getTracks().forEach(track => track.stop());
+                }
+                if (this.peerConnection) {
+                    this.peerConnection.close();
+                }
+            }
+        }
+
+        // ===== SISTEMA DE EXPORTAÇÃO PDF =====
+        class PDFExportSystem {
+            async exportToPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                const content = document.getElementById('scriptEditor').innerText;
+                
+                doc.setFontSize(16);
+                doc.text('ROTEIRO - ' + document.getElementById('documentTitle').value, 10, 10);
+                
+                doc.setFontSize(10);
+                const lines = doc.splitTextToSize(content, 180);
+                doc.text(lines, 10, 20);
+                
+                doc.save('roteiro.pdf');
+            }
+        }
+
+        // ===== INICIALIZAÇÃO DA APLICAÇÃO =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const authSystem = new AuthSystem();
+            const chatSystem = new ChatSystem();
+            const videoSystem = new VideoCallSystem();
+            const pdfSystem = new PDFExportSystem();
+
+            // Event Listeners
+            document.getElementById('registerBtn').addEventListener('click', async () => {
+                const name = document.getElementById('registerName').value;
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                
+                const result = await authSystem.register(email, password, name);
+                if (result.success) {
+                    alert('Conta criada com sucesso!');
+                } else {
+                    alert('Erro: ' + result.error);
                 }
             });
 
-            // Sistema de Logout
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function() {
-                    mainPlatform.style.display = 'none';
-                    openingScreen.style.display = 'flex';
-                    openingScreen.style.opacity = '1';
-                });
-            }
-
-            // Sistema de Abas
-            function switchTab(tabName) {
-                // Esconder todas as abas
-                document.querySelectorAll('.tab-content').forEach(tab => {
-                    tab.classList.remove('active');
-                });
+            document.getElementById('loginBtn').addEventListener('click', async () => {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
                 
-                // Mostrar aba selecionada
-                const activeTab = document.getElementById(tabName);
-                if (activeTab) {
-                    activeTab.classList.add('active');
+                const result = await authSystem.login(email, password);
+                if (!result.success) {
+                    alert('Erro: ' + result.error);
                 }
+            });
 
-                // Atualizar botões ativos
-                document.querySelectorAll('.tab-button').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                document.querySelectorAll('.sidebar-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                authSystem.logout();
+            });
 
-                // Ativar botões correspondentes
-                document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(btn => {
-                    btn.classList.add('active');
-                });
-            }
+            document.getElementById('exportPdfBtn').addEventListener('click', () => {
+                pdfSystem.exportToPDF();
+            });
 
-            // Event listeners para abas
-            document.querySelectorAll('.tab-button, .sidebar-btn[data-tab]').forEach(button => {
-                button.addEventListener('click', function() {
+            document.getElementById('startCallBtn').addEventListener('click', () => {
+                videoSystem.startCall();
+            });
+
+            document.getElementById('sendMessageBtn').addEventListener('click', () => {
+                const message = document.getElementById('chatInput').value;
+                if (message.trim()) {
+                    chatSystem.sendMessage(message);
+                    document.getElementById('chatInput').value = '';
+                }
+            });
+
+            // Sistema de abas
+            document.querySelectorAll('.tab-button, .sidebar-btn[data-tab]').forEach(btn => {
+                btn.addEventListener('click', function() {
                     const tabName = this.getAttribute('data-tab');
                     switchTab(tabName);
                 });
             });
 
-            // Sistema de Auto-salvamento
-            let autoSaveInterval = setInterval(() => {
-                const status = document.getElementById('autoSaveStatus');
-                if (status) {
-                    status.innerHTML = '<i class="fas fa-check"></i> Salvo';
-                    setTimeout(() => {
-                        status.innerHTML = '<i class="fas fa-sync"></i> Auto-salvo';
-                    }, 2000);
-                }
-            }, 30000); // Salva a cada 30 segundos
-
-            // Contador de palavras
-            function updateWordCount() {
-                const editor = document.querySelector('.script-editor');
-                if (editor) {
-                    const text = editor.innerText;
-                    const wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
-                    const wordCountElement = document.getElementById('wordCount');
-                    if (wordCountElement) {
-                        wordCountElement.textContent = wordCount + ' palavras';
-                    }
-                }
-            }
-
-            // Atualizar contador quando o editor mudar
-            const editor = document.querySelector('.script-editor');
-            if (editor) {
-                editor.addEventListener('input', updateWordCount);
-                updateWordCount(); // Contagem inicial
-            }
-
-            // Atualizar hora atual
-            function updateTime() {
-                const timeElement = document.getElementById('currentTime');
-                if (timeElement) {
-                    timeElement.textContent = new Date().toLocaleTimeString('pt-BR');
-                }
-            }
-            setInterval(updateTime, 1000);
-            updateTime();
-
-            // Sistema de salvamento com Ctrl+S
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && e.key === 's') {
-                    e.preventDefault();
-                    const status = document.getElementById('autoSaveStatus');
-                    if (status) {
-                        status.innerHTML = '<i class="fas fa-save"></i> Salvando...';
-                        setTimeout(() => {
-                            status.innerHTML = '<i class="fas fa-check"></i> Salvo';
-                        }, 500);
-                    }
-                }
-            });
-
-            // Verificar se já está logado (para desenvolvimento)
-            const isLoggedIn = localStorage.getItem('escaletaLoggedIn');
-            if (isLoggedIn) {
-                openingScreen.style.display = 'none';
-                mainPlatform.style.display = 'flex';
-            }
-
-            // Salvar estado de login
-            loginBtn.addEventListener('click', function() {
-                localStorage.setItem('escaletaLoggedIn', 'true');
-            });
-
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function() {
-                    localStorage.removeItem('escaletaLoggedIn');
-                });
+            function switchTab(tabName) {
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                
+                document.getElementById(tabName).classList.add('active');
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
             }
         });
     </script>
