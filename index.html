@@ -5,20 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escaleta Hub - Plataforma Profissional de Roteiros</title>
     
-    <!-- Firebase -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
-    <!-- PDF Generation -->
+    <!-- PDF.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
-    <!-- Video Chat (WebRTC) -->
-    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <!-- Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* SEU CSS COMPLETO AQUI (mantenha todo o estilo anterior) */
         :root {
             --primary: #2a5a78;
             --secondary: #9c6ade;
@@ -27,82 +26,354 @@
             --dark: #1a3650;
             --text: #2c3e50;
             --bg: #f8fbff;
+            --header-bg: linear-gradient(135deg, #2a5a78 0%, #1a3650 100%);
+            --sidebar-bg: #3a4f66;
+            --editor-bg: #ffffff;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: var(--text); }
-        
-        /* ... (todo o restante do CSS anterior) ... */
-        
-        /* Novos estilos para funcionalidades */
-        .video-container {
-            width: 100%;
-            height: 300px;
-            background: #000;
-            border-radius: 8px;
-            margin: 10px 0;
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         }
         
+        body { 
+            background: var(--bg); 
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* ===== TELA DE LOGIN ===== */
+        .auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .auth-btn:hover {
+            background: var(--dark);
+        }
+
+        .auth-error {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        /* ===== PLATAFORMA PRINCIPAL ===== */
+        .main-platform {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--header-bg);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .document-title {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 1.1rem;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 1.5rem 1rem;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            text-align: left;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .sidebar-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg);
+        }
+
+        .tab-header {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .tab-content {
+            flex: 1;
+            padding: 2rem;
+            display: none;
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Editor de Roteiro */
+        .script-editor {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 500px;
+        }
+
+        .scene-heading {
+            font-weight: bold;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin: 1.5rem 0 0.5rem 0;
+        }
+
+        .action {
+            margin: 0.5rem 0;
+        }
+
+        .character {
+            text-align: center;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .dialogue {
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+
+        /* Chat */
         .chat-container {
             height: 400px;
             border: 1px solid #ddd;
             border-radius: 8px;
             overflow-y: auto;
-            padding: 10px;
-            background: #f9f9f9;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
-        
+
         .message {
-            margin: 10px 0;
-            padding: 8px;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
             border-radius: 5px;
-            max-width: 80%;
         }
-        
+
         .message.own {
             background: var(--primary);
             color: white;
-            margin-left: auto;
+            margin-left: 20%;
         }
-        
+
         .message.other {
-            background: #e0e0e0;
-            color: black;
+            background: #f0f0f0;
+            margin-right: 20%;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <!-- Tela de Abertura -->
-    <div class="opening-screen" id="openingScreen">
-        <div class="logo-container">
-            <div class="logo">🎬 Escaleta Hub</div>
-            <div class="tagline">Plataforma profissional gratuita para roteiristas</div>
-        </div>
-        
-        <div class="login-form">
-            <div class="form-tabs">
-                <button class="form-tab active" data-form="login">Login</button>
-                <button class="form-tab" data-form="register">Cadastro</button>
+    <!-- Tela de Autenticação -->
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-container">
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Entrar</button>
+                <button class="auth-tab" data-tab="register">Cadastrar</button>
             </div>
-            
-            <!-- Formulário de Login -->
-            <div id="login-form" class="auth-form active">
-                <h2>Entrar na Plataforma</h2>
+
+            <!-- Login -->
+            <div class="auth-form active" id="loginForm">
+                <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--primary);">Bem-vindo de volta!</h2>
                 <div class="form-group">
                     <input type="email" id="loginEmail" placeholder="Seu e-mail" required>
                 </div>
                 <div class="form-group">
                     <input type="password" id="loginPassword" placeholder="Sua senha" required>
                 </div>
-                <button class="login-btn" id="loginBtn">Entrar</button>
-                <div class="auth-links">
-                    <a href="#" id="forgotPassword">Esqueci a senha</a>
-                </div>
+                <button class="auth-btn" id="loginBtn">Entrar na Plataforma</button>
+                <div class="auth-error" id="loginError"></div>
             </div>
-            
-            <!-- Formulário de Cadastro -->
-            <div id="register-form" class="auth-form">
-                <h2>Criar Conta Gratuita</h2>
+
+            <!-- Cadastro -->
+            <div class="auth-form" id="registerForm">
+                <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--primary);">Criar Conta</h2>
                 <div class="form-group">
                     <input type="text" id="registerName" placeholder="Seu nome completo" required>
                 </div>
@@ -112,7 +383,8 @@
                 <div class="form-group">
                     <input type="password" id="registerPassword" placeholder="Senha (mínimo 6 caracteres)" required>
                 </div>
-                <button class="login-btn" id="registerBtn">Criar Conta</button>
+                <button class="auth-btn" id="registerBtn">Criar Minha Conta</button>
+                <div class="auth-error" id="registerError"></div>
             </div>
         </div>
     </div>
@@ -121,149 +393,116 @@
     <div class="main-platform" id="mainPlatform">
         <header>
             <div class="header-left">
-                <div class="logo-platform"><i class="fas fa-scroll"></i> Escaleta Hub</div>
-                <div class="document-info">
-                    <input type="text" id="documentTitle" class="document-title" value="Novo Roteiro">
-                    <div class="document-stats" id="documentStats">0 cenas • 0 páginas</div>
-                </div>
+                <div class="logo">🎬 Escaleta Hub</div>
+                <input type="text" class="document-title" id="documentTitle" value="Meu Roteiro">
             </div>
             <div class="header-right">
-                <button class="toolbar-btn" id="saveBtn"><i class="fas fa-save"></i> Salvar</button>
-                <button class="toolbar-btn" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
-                <button class="toolbar-btn" id="collabBtn"><i class="fas fa-users"></i> Colaborar</button>
-                <div class="user-menu">
+                <button class="auth-btn" id="saveBtn" style="width: auto; padding: 8px 16px;">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+                <button class="auth-btn" id="exportBtn" style="width: auto; padding: 8px 16px;">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </button>
+                <div class="user-info">
                     <span id="userName">Usuário</span>
-                    <div class="user-dropdown">
-                        <button id="profileBtn"><i class="fas fa-user"></i> Perfil</button>
-                        <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sair</button>
-                    </div>
+                    <button class="auth-btn" id="logoutBtn" style="width: auto; padding: 8px 16px;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
                 </div>
             </div>
         </header>
 
         <div class="main-container">
-            <!-- Sidebar -->
             <nav class="sidebar">
                 <div class="sidebar-section">
                     <h3><i class="fas fa-film"></i> Meus Projetos</h3>
-                    <div id="projectsList"></div>
-                    <button class="sidebar-btn" id="newProjectBtn"><i class="fas fa-plus"></i> Novo Projeto</button>
+                    <div id="projectsList">
+                        <!-- Projetos serão carregados aqui -->
+                    </div>
+                    <button class="sidebar-btn" id="newProjectBtn">
+                        <i class="fas fa-plus"></i> Novo Projeto
+                    </button>
                 </div>
-                
+
                 <div class="sidebar-section">
                     <h3><i class="fas fa-tools"></i> Ferramentas</h3>
-                    <button class="sidebar-btn" data-tab="editor"><i class="fas fa-edit"></i> Editor</button>
-                    <button class="sidebar-btn" data-tab="characters"><i class="fas fa-users"></i> Personagens</button>
-                    <button class="sidebar-btn" data-tab="storyboard"><i class="fas fa-palette"></i> Storyboard</button>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3><i class="fas fa-users"></i> Colaboração</h3>
-                    <button class="sidebar-btn" id="videoCallBtn"><i class="fas fa-video"></i> Video Chamada</button>
-                    <button class="sidebar-btn" id="chatBtn"><i class="fas fa-comments"></i> Chat em Tempo Real</button>
-                    <button class="sidebar-btn" id="inviteBtn"><i class="fas fa-user-plus"></i> Convidar</button>
+                    <button class="sidebar-btn" data-tab="editor">
+                        <i class="fas fa-edit"></i> Editor
+                    </button>
+                    <button class="sidebar-btn" data-tab="characters">
+                        <i class="fas fa-users"></i> Personagens
+                    </button>
+                    <button class="sidebar-btn" data-tab="chat">
+                        <i class="fas fa-comments"></i> Chat
+                    </button>
                 </div>
             </nav>
 
-            <!-- Área de Trabalho -->
             <main class="workspace">
                 <div class="tab-header">
-                    <button class="tab-button active" data-tab="editor">Editor</button>
-                    <button class="tab-button" data-tab="characters">Personagens</button>
-                    <button class="tab-button" data-tab="storyboard">Storyboard</button>
-                    <button class="tab-button" data-tab="collab">Colaboração</button>
+                    <button class="tab-btn active" data-tab="editor">Editor</button>
+                    <button class="tab-btn" data-tab="characters">Personagens</button>
+                    <button class="tab-btn" data-tab="chat">Chat Colaborativo</button>
                 </div>
 
-                <div class="editor-container">
-                    <!-- Editor de Roteiro -->
-                    <div id="editor" class="tab-content active">
-                        <div class="toolbar">
-                            <button data-format="scene"><i class="fas fa-plus"></i> Nova Cena</button>
-                            <button data-format="character"><i class="fas fa-user"></i> Personagem</button>
-                            <button data-format="dialogue"><i class="fas fa-comment"></i> Diálogo</button>
-                            <button id="autoFormatBtn"><i class="fas fa-magic"></i> Auto-formatar</button>
-                        </div>
-                        <div id="scriptEditor" class="script-editor" contenteditable="true">
-                            <div class="scene-heading">EXT. LOCALIZAÇÃO - DIA</div>
-                            <div class="action">Descreva a ação da cena aqui...</div>
-                        </div>
+                <div class="tab-content active" id="editorTab">
+                    <div class="script-editor" contenteditable="true" id="scriptEditor">
+                        <div class="scene-heading">EXT. PRAIA - DIA</div>
+                        <div class="action">O sol brilha intensamente sobre uma praia deserta. O som das ondas quebra o silêncio.</div>
+                        
+                        <div class="character">JOÃO</div>
+                        <div class="dialogue">Onde ela pode estar? Já procurei por toda parte.</div>
                     </div>
+                </div>
 
-                    <!-- Gerenciador de Personagens -->
-                    <div id="characters" class="tab-content">
-                        <div class="characters-grid" id="charactersGrid"></div>
-                        <button class="btn-primary" id="addCharacterBtn"><i class="fas fa-plus"></i> Adicionar Personagem</button>
+                <div class="tab-content" id="charactersTab">
+                    <h3>Gerenciador de Personagens</h3>
+                    <div id="charactersList">
+                        <!-- Personagens serão carregados aqui -->
                     </div>
+                    <button class="auth-btn" id="addCharacterBtn" style="width: auto; margin-top: 1rem;">
+                        <i class="fas fa-plus"></i> Adicionar Personagem
+                    </button>
+                </div>
 
-                    <!-- Video Chamada -->
-                    <div id="collab" class="tab-content">
-                        <div class="video-chat-container">
-                            <div class="video-section">
-                                <div class="video-container">
-                                    <video id="localVideo" autoplay muted></video>
-                                    <video id="remoteVideo" autoplay></video>
-                                </div>
-                                <div class="video-controls">
-                                    <button id="startCallBtn"><i class="fas fa-video"></i> Iniciar Chamada</button>
-                                    <button id="endCallBtn"><i class="fas fa-phone-slash"></i> Encerrar</button>
-                                    <button id="toggleVideoBtn"><i class="fas fa-video-slash"></i> Video</button>
-                                    <button id="toggleAudioBtn"><i class="fas fa-microphone"></i> Áudio</button>
-                                </div>
-                            </div>
-                            
-                            <div class="chat-section">
-                                <div class="chat-container" id="chatMessages"></div>
-                                <div class="chat-input">
-                                    <input type="text" id="chatInput" placeholder="Digite sua mensagem...">
-                                    <button id="sendMessageBtn"><i class="fas fa-paper-plane"></i></button>
-                                </div>
-                            </div>
-                        </div>
+                <div class="tab-content" id="chatTab">
+                    <h3>Chat em Tempo Real</h3>
+                    <div class="chat-container" id="chatMessages">
+                        <!-- Mensagens aparecerão aqui -->
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Digite sua mensagem...">
+                        <button class="auth-btn" id="sendMessageBtn" style="width: auto;">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
                     </div>
                 </div>
             </main>
         </div>
-
-        <footer>
-            <div class="footer-left">
-                <div id="connectionStatus"><i class="fas fa-wifi"></i> Conectado</div>
-                <div id="wordCount">0 palavras</div>
-            </div>
-            <div class="footer-right">
-                <div id="lastSaved">Último salvamento: agora</div>
-                <div id="onlineUsers">Online: <span id="usersCount">1</span></div>
-            </div>
-        </footer>
     </div>
 
-    <!-- Modal para Novo Projeto -->
-    <div id="projectModal" class="modal">
-        <div class="modal-content">
-            <h3>Novo Projeto</h3>
-            <input type="text" id="projectName" placeholder="Nome do projeto">
-            <select id="projectTemplate">
-                <option value="movie">Longa-metragem</option>
-                <option value="series">Série de TV</option>
-                <option value="short">Curta-metragem</option>
-            </select>
-            <div class="modal-actions">
-                <button id="createProjectBtn">Criar</button>
-                <button id="cancelProjectBtn">Cancelar</button>
-            </div>
-        </div>
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
     </div>
 
     <script>
-        // ===== CONFIGURAÇÃO FIREBASE =====
+        // ===== CONFIGURAÇÃO FIREBASE - SUBSTITUA COM SUAS CREDENCIAIS =====
         const firebaseConfig = {
-            // Você vai conseguir isso gratuitamente no console.firebase.google.com
-            apiKey: "sua-api-key",
-            authDomain: "seu-projeto.firebaseapp.com",
-            projectId: "seu-projeto-id",
-            storageBucket: "seu-projeto.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "seu-app-id"
+            apiKey: "SUA_API_KEY_AQUI",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO_ID",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
         };
+
+        // ===== INICIALIZAÇÃO FIREBASE =====
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
 
         // ===== SISTEMA DE AUTENTICAÇÃO =====
         class AuthSystem {
@@ -272,77 +511,128 @@
                 this.init();
             }
 
-            async init() {
-                // Inicializar Firebase
-                firebase.initializeApp(firebaseConfig);
-                
-                // Observar mudanças de autenticação
-                firebase.auth().onAuthStateChanged((user) => {
+            init() {
+                // Observar estado de autenticação
+                auth.onAuthStateChanged((user) => {
                     this.user = user;
-                    this.handleAuthChange(user);
+                    this.handleAuthState(user);
+                });
+
+                // Event listeners
+                document.getElementById('loginBtn').addEventListener('click', () => this.login());
+                document.getElementById('registerBtn').addEventListener('click', () => this.register());
+                document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+                
+                // Tabs de autenticação
+                document.querySelectorAll('.auth-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        const tabName = e.target.getAttribute('data-tab');
+                        this.switchAuthTab(tabName);
+                    });
                 });
             }
 
-            async register(email, password, name) {
+            async login() {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                const errorElement = document.getElementById('loginError');
+
+                this.showLoading(true);
+
                 try {
-                    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
-                    await userCredential.user.updateProfile({ displayName: name });
+                    await auth.signInWithEmailAndPassword(email, password);
+                    errorElement.style.display = 'none';
+                } catch (error) {
+                    errorElement.textContent = this.getErrorMessage(error.code);
+                    errorElement.style.display = 'block';
+                }
+
+                this.showLoading(false);
+            }
+
+            async register() {
+                const name = document.getElementById('registerName').value;
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const errorElement = document.getElementById('registerError');
+
+                this.showLoading(true);
+
+                try {
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                     
-                    // Salvar dados adicionais no Firestore
-                    await firebase.firestore().collection('users').doc(userCredential.user.uid).set({
+                    // Salvar dados do usuário
+                    await db.collection('users').doc(userCredential.user.uid).set({
                         name: name,
                         email: email,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    
-                    return { success: true, user: userCredential.user };
-                } catch (error) {
-                    return { success: false, error: error.message };
-                }
-            }
 
-            async login(email, password) {
-                try {
-                    const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
-                    return { success: true, user: userCredential.user };
+                    errorElement.style.display = 'none';
                 } catch (error) {
-                    return { success: false, error: error.message };
+                    errorElement.textContent = this.getErrorMessage(error.code);
+                    errorElement.style.display = 'block';
                 }
+
+                this.showLoading(false);
             }
 
             async logout() {
-                await firebase.auth().signOut();
+                await auth.signOut();
             }
 
-            handleAuthChange(user) {
+            handleAuthState(user) {
                 if (user) {
-                    document.getElementById('openingScreen').style.display = 'none';
+                    document.getElementById('authScreen').style.display = 'none';
                     document.getElementById('mainPlatform').style.display = 'flex';
                     document.getElementById('userName').textContent = user.displayName || user.email;
-                    this.loadUserProjects(user.uid);
+                    
+                    // Carregar dados do usuário
+                    this.loadUserData(user.uid);
                 } else {
-                    document.getElementById('openingScreen').style.display = 'flex';
+                    document.getElementById('authScreen').style.display = 'flex';
                     document.getElementById('mainPlatform').style.display = 'none';
                 }
             }
 
-            async loadUserProjects(userId) {
-                const projectsSnapshot = await firebase.firestore()
-                    .collection('projects')
-                    .where('owner', '==', userId)
-                    .get();
+            switchAuthTab(tabName) {
+                document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
                 
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                document.getElementById(`${tabName}Form`).classList.add('active');
+            }
+
+            getErrorMessage(errorCode) {
+                const errors = {
+                    'auth/invalid-email': 'E-mail inválido',
+                    'auth/user-disabled': 'Usuário desativado',
+                    'auth/user-not-found': 'Usuário não encontrado',
+                    'auth/wrong-password': 'Senha incorreta',
+                    'auth/email-already-in-use': 'E-mail já está em uso',
+                    'auth/weak-password': 'Senha muito fraca (mínimo 6 caracteres)'
+                };
+                return errors[errorCode] || 'Erro desconhecido';
+            }
+
+            showLoading(show) {
+                document.getElementById('loading').style.display = show ? 'block' : 'none';
+            }
+
+            async loadUserData(userId) {
+                // Carregar projetos do usuário
+                const projectsSnapshot = await db.collection('projects')
+                    .where('ownerId', '==', userId)
+                    .get();
+
                 const projectsList = document.getElementById('projectsList');
                 projectsList.innerHTML = '';
-                
+
                 projectsSnapshot.forEach(doc => {
                     const project = doc.data();
                     const projectElement = document.createElement('div');
-                    projectElement.className = 'project-item';
-                    projectElement.innerHTML = `
-                        <strong>${project.title}</strong>
-                        <span>${project.updatedAt?.toDate().toLocaleDateString() || 'Novo'}</span>
-                    `;
+                    projectElement.className = 'sidebar-btn';
+                    projectElement.innerHTML = `<i class="fas fa-file"></i> ${project.title}`;
                     projectElement.addEventListener('click', () => this.loadProject(doc.id));
                     projectsList.appendChild(projectElement);
                 });
@@ -352,13 +642,17 @@
         // ===== SISTEMA DE CHAT EM TEMPO REAL =====
         class ChatSystem {
             constructor() {
-                this.messages = [];
                 this.init();
             }
 
             init() {
-                // Configurar listener para novas mensagens
-                firebase.firestore().collection('chat')
+                document.getElementById('sendMessageBtn').addEventListener('click', () => this.sendMessage());
+                document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+
+                // Escutar novas mensagens
+                db.collection('chat')
                     .orderBy('timestamp', 'asc')
                     .onSnapshot(snapshot => {
                         snapshot.docChanges().forEach(change => {
@@ -369,170 +663,133 @@
                     });
             }
 
-            async sendMessage(text) {
-                const user = firebase.auth().currentUser;
-                if (!user) return;
-
-                await firebase.firestore().collection('chat').add({
-                    text: text,
-                    user: user.displayName || user.email,
-                    userId: user.uid,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
+            async sendMessage() {
+                const input = document.getElementById('chatInput');
+                const message = input.value.trim();
+                
+                if (message && auth.currentUser) {
+                    await db.collection('chat').add({
+                        text: message,
+                        user: auth.currentUser.displayName || auth.currentUser.email,
+                        userId: auth.currentUser.uid,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    input.value = '';
+                }
             }
 
             displayMessage(message) {
-                const chatContainer = document.getElementById('chatMessages');
-                const messageElement = document.createElement('div');
-                messageElement.className = `message ${message.userId === firebase.auth().currentUser?.uid ? 'own' : 'other'}`;
-                messageElement.innerHTML = `
+                const container = document.getElementById('chatMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.userId === auth.currentUser?.uid ? 'own' : 'other'}`;
+                messageDiv.innerHTML = `
                     <strong>${message.user}:</strong> ${message.text}
-                    <small>${new Date(message.timestamp?.toDate()).toLocaleTimeString()}</small>
+                    <br><small>${new Date(message.timestamp?.toDate()).toLocaleTimeString()}</small>
                 `;
-                chatContainer.appendChild(messageElement);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-        }
-
-        // ===== SISTEMA DE VIDEOCHAMADA (WebRTC) =====
-        class VideoCallSystem {
-            constructor() {
-                this.localStream = null;
-                this.remoteStream = null;
-                this.peerConnection = null;
-            }
-
-            async startCall() {
-                try {
-                    // Obter acesso à câmera e microfone
-                    this.localStream = await navigator.mediaDevices.getUserMedia({ 
-                        video: true, 
-                        audio: true 
-                    });
-                    
-                    document.getElementById('localVideo').srcObject = this.localStream;
-                    
-                    // Configurar conexão peer-to-peer
-                    await this.setupPeerConnection();
-                    
-                } catch (error) {
-                    console.error('Erro ao iniciar chamada:', error);
-                }
-            }
-
-            async setupPeerConnection() {
-                // Configuração simplificada do WebRTC
-                // Em produção, você precisaria de um servidor de sinalização
-                this.peerConnection = new RTCPeerConnection({
-                    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-                });
-
-                this.localStream.getTracks().forEach(track => {
-                    this.peerConnection.addTrack(track, this.localStream);
-                });
-
-                this.peerConnection.ontrack = (event) => {
-                    this.remoteStream = event.streams[0];
-                    document.getElementById('remoteVideo').srcObject = this.remoteStream;
-                };
-            }
-
-            endCall() {
-                if (this.localStream) {
-                    this.localStream.getTracks().forEach(track => track.stop());
-                }
-                if (this.peerConnection) {
-                    this.peerConnection.close();
-                }
+                container.appendChild(messageDiv);
+                container.scrollTop = container.scrollHeight;
             }
         }
 
         // ===== SISTEMA DE EXPORTAÇÃO PDF =====
-        class PDFExportSystem {
+        class PDFSystem {
+            constructor() {
+                document.getElementById('exportBtn').addEventListener('click', () => this.exportToPDF());
+            }
+
             async exportToPDF() {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 
+                const title = document.getElementById('documentTitle').value;
                 const content = document.getElementById('scriptEditor').innerText;
                 
-                doc.setFontSize(16);
-                doc.text('ROTEIRO - ' + document.getElementById('documentTitle').value, 10, 10);
+                doc.setFontSize(20);
+                doc.text(title, 105, 15, { align: 'center' });
                 
-                doc.setFontSize(10);
+                doc.setFontSize(12);
                 const lines = doc.splitTextToSize(content, 180);
-                doc.text(lines, 10, 20);
+                doc.text(lines, 15, 30);
                 
-                doc.save('roteiro.pdf');
+                doc.save(`${title}.pdf`);
+            }
+        }
+
+        // ===== SISTEMA DE NAVEGAÇÃO =====
+        class NavigationSystem {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                // Abas principais
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const tabName = e.target.getAttribute('data-tab');
+                        this.switchTab(tabName);
+                    });
+                });
+
+                // Abas da sidebar
+                document.querySelectorAll('.sidebar-btn[data-tab]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const tabName = e.target.getAttribute('data-tab');
+                        this.switchTab(tabName);
+                    });
+                });
+            }
+
+            switchTab(tabName) {
+                // Atualizar botões
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.sidebar-btn').forEach(btn => btn.classList.remove('active'));
+                
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                
+                // Atualizar conteúdo
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.getElementById(`${tabName}Tab`).classList.add('active');
             }
         }
 
         // ===== INICIALIZAÇÃO DA APLICAÇÃO =====
-        document.addEventListener('DOMContentLoaded', function() {
-            const authSystem = new AuthSystem();
-            const chatSystem = new ChatSystem();
-            const videoSystem = new VideoCallSystem();
-            const pdfSystem = new PDFExportSystem();
+        document.addEventListener('DOMContentLoaded', () => {
+            new AuthSystem();
+            new ChatSystem();
+            new PDFSystem();
+            new NavigationSystem();
 
-            // Event Listeners
-            document.getElementById('registerBtn').addEventListener('click', async () => {
-                const name = document.getElementById('registerName').value;
-                const email = document.getElementById('registerEmail').value;
-                const password = document.getElementById('registerPassword').value;
-                
-                const result = await authSystem.register(email, password, name);
-                if (result.success) {
-                    alert('Conta criada com sucesso!');
-                } else {
-                    alert('Erro: ' + result.error);
+            // Auto-salvamento
+            setInterval(() => {
+                if (auth.currentUser) {
+                    this.saveDocument();
+                }
+            }, 30000); // Salva a cada 30 segundos
+
+            // Atalhos de teclado
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    this.saveDocument();
                 }
             });
-
-            document.getElementById('loginBtn').addEventListener('click', async () => {
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                
-                const result = await authSystem.login(email, password);
-                if (!result.success) {
-                    alert('Erro: ' + result.error);
-                }
-            });
-
-            document.getElementById('logoutBtn').addEventListener('click', () => {
-                authSystem.logout();
-            });
-
-            document.getElementById('exportPdfBtn').addEventListener('click', () => {
-                pdfSystem.exportToPDF();
-            });
-
-            document.getElementById('startCallBtn').addEventListener('click', () => {
-                videoSystem.startCall();
-            });
-
-            document.getElementById('sendMessageBtn').addEventListener('click', () => {
-                const message = document.getElementById('chatInput').value;
-                if (message.trim()) {
-                    chatSystem.sendMessage(message);
-                    document.getElementById('chatInput').value = '';
-                }
-            });
-
-            // Sistema de abas
-            document.querySelectorAll('.tab-button, .sidebar-btn[data-tab]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const tabName = this.getAttribute('data-tab');
-                    switchTab(tabName);
-                });
-            });
-
-            function switchTab(tabName) {
-                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                
-                document.getElementById(tabName).classList.add('active');
-                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-            }
         });
+
+        // Função de salvamento
+        async function saveDocument() {
+            if (!auth.currentUser) return;
+
+            const content = document.getElementById('scriptEditor').innerHTML;
+            const title = document.getElementById('documentTitle').value;
+
+            await db.collection('projects').doc('current').set({
+                title: title,
+                content: content,
+                ownerId: auth.currentUser.uid,
+                lastSaved: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
     </script>
 </body>
 </html>
