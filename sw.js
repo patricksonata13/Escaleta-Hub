@@ -1,32 +1,51 @@
-const CACHE_NAME = 'escaleta-hub-v1';
+const CACHE_NAME = 'escaleta-hub-v3';
 const urlsToCache = [
-  '/Escaleta-Hub/',
-  '/Escaleta-Hub/index.html',
-  '/Escaleta-Hub/style.css',
-  '/Escaleta-Hub/script.js',
-  '/Escaleta-Hub/manifest.json',
-  '/Escaleta-Hub/assets/icon-192.png',
-  '/Escaleta-Hub/assets/icon-512.png'
+  '/',
+  '/index.html',
+  '/style.css',
+  '/script.js',
+  '/manifest.json',
+  '/assets/icons/icon-192.png',
+  '/assets/icons/icon-512.png'
 ];
 
-self.addEventListener('install', function(event) {
+// Instalação do Service Worker
+self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(function(cache) {
+      .then((cache) => {
+        console.log('Cache aberto');
         return cache.addAll(urlsToCache);
+      })
+      .catch((error) => {
+        console.log('Falha no cache:', error);
       })
   );
 });
 
-self.addEventListener('fetch', function(event) {
+// Interceptar requisições
+self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
-      .then(function(response) {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
+      .then((response) => {
+        // Retorna do cache ou faz requisição
+        return response || fetch(event.request);
+      })
+  );
+});
+
+// Limpar caches antigos
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Deletando cache antigo:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
 });
