@@ -3,93 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Escaleta Hub - Firebase</title>
+<title>Escaleta Hub Pro</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-/* ===== VARIÁVEIS DE CORES ===== */
-:root {
-  --primary: #2a5a78;
-  --secondary: #9c6ade;
-  --accent: #41b883;
-  --bg: #f8fbff;
-  --text: #2c3e50;
-  --danger: #ff6b6b;
-}
-/* ===== RESET E ESTILOS ===== */
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif; }
-body { background: var(--bg); color: var(--text); }
-/* ===== LOGIN ===== */
-.login-screen { display:flex; justify-content:center; align-items:center; height:100vh; background: linear-gradient(135deg, var(--primary), #1a3650); }
-.login-box { background:white; padding:2rem; border-radius:10px; width:90%; max-width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.2);}
-.login-box input { width:100%; padding:10px; margin-bottom:1rem; border-radius:5px; border:1px solid #ddd;}
-.login-btn { width:100%; padding:12px; background: var(--secondary); color:white; border:none; border-radius:5px; cursor:pointer;}
-.error-message { color: var(--danger); text-align:center; margin-bottom:10px; display:none; }
-/* ===== PLATAFORMA ===== */
-.platform { display:none; flex-direction:column; height:100vh; }
-header { background: var(--primary); color:white; padding:1rem; display:flex; justify-content:space-between; align-items:center; }
-.main-container { display:flex; flex:1; overflow:hidden; }
-.sidebar { width:250px; background:#3a4f66; padding:1rem; color:#e0f0ff; }
-.sidebar button { display:block; width:100%; margin-bottom:0.5rem; background:none; border:none; color:#e0f0ff; padding:0.5rem; cursor:pointer; border-radius:5px;}
-.sidebar button.active { background: var(--secondary); }
-.workspace { flex:1; display:flex; flex-direction:column; padding:1rem; overflow:auto; }
-#scriptEditor { background:white; padding:1rem; min-height:300px; overflow:auto; font-family: 'Courier New', monospace;}
-.chat-container { margin-top:1rem; background:white; padding:1rem; border-radius:5px; height:300px; display:flex; flex-direction:column;}
-.chat-messages { flex:1; overflow:auto; margin-bottom:1rem; }
-.chat-input { display:flex; gap:0.5rem; }
-.chat-input input { flex:1; padding:8px; border-radius:5px; border:1px solid #ddd;}
-.chat-input button { padding:8px 12px; border:none; border-radius:5px; background: var(--accent); color:white; cursor:pointer;}
-</style>
-</head>
-<body>
-
-<!-- LOGIN -->
-<div id="loginScreen" class="login-screen">
-  <div class="login-box">
-    <h2>Entrar no Escaleta Hub</h2>
-    <div id="errorMessage" class="error-message"></div>
-    <input type="email" id="email" placeholder="E-mail">
-    <input type="password" id="password" placeholder="Senha">
-    <button id="loginBtn" class="login-btn">Entrar</button>
-  </div>
-</div>
-
-<!-- PLATAFORMA -->
-<div id="platform" class="platform">
-  <header>
-    <div>Escaleta Hub - <span id="userName"></span></div>
-    <button id="logoutBtn">Sair</button>
-  </header>
-  <div class="main-container">
-    <nav class="sidebar">
-      <button class="sidebar-btn active" data-tab="editor">Editor de Roteiro</button>
-      <button class="sidebar-btn" data-tab="chat">Chat</button>
-    </nav>
-    <main class="workspace">
-      <div id="editor" class="tab-content active">
-        <div id="scriptEditor" contenteditable="true"></div>
-        <button id="saveBtn">Salvar</button>
-      </div>
-      <div id="chat" class="tab-content">
-        <div class="chat-container">
-          <div id="chatMessages" class="chat-messages"></div>
-          <div class="chat-input">
-            <input type="text" id="chatInput" placeholder="Digite sua mensagem">
-            <button id="sendMessageBtn">Enviar</button>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
-</div>
-
-<!-- FIREBASE -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script type="module">
-  // Import Firebase
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+// ====== FIREBASE CONFIG ======
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-analytics.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-storage.js";
 
-  const firebaseConfig = {
+const firebaseConfig = {
     apiKey: "AIzaSyCsi6yy41s8DgT88lPRtlLKQFFYrgAgMSo",
     authDomain: "escaleta-hub.firebaseapp.com",
     projectId: "escaleta-hub",
@@ -97,115 +23,324 @@ header { background: var(--primary); color:white; padding:1rem; display:flex; ju
     messagingSenderId: "825021624145",
     appId: "1:825021624145:web:1f43b9574d041d8e206d70",
     measurementId: "G-NC9QFD3063"
-  };
+};
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth();
+const db = getFirestore();
+const dbRT = getDatabase();
+const storage = getStorage();
 
-  const loginScreen = document.getElementById('loginScreen');
-  const platform = document.getElementById('platform');
-  const userNameSpan = document.getElementById('userName');
-  const errorDiv = document.getElementById('errorMessage');
+// ====== ESCALETA HUB CLASS ======
+class EscaletaHub {
+    constructor() {
+        this.currentUser = null;
+        this.autoSaveTimer = null;
+        this.init();
+    }
 
-  const loginBtn = document.getElementById('loginBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
+    init() {
+        this.setupLogin();
+        this.setupTabs();
+        this.setupEditor();
+        this.setupChat();
+        this.setupAI();
+        this.setupStoryboard();
+        this.setupFloatingIcons();
+    }
 
-  const scriptEditor = document.getElementById('scriptEditor');
-  const saveBtn = document.getElementById('saveBtn');
+    // ===== LOGIN =====
+    setupLogin() {
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
 
-  const chatMessages = document.getElementById('chatMessages');
-  const chatInput = document.getElementById('chatInput');
-  const sendMessageBtn = document.getElementById('sendMessageBtn');
+        loginBtn.addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (!email || !password) { this.showError('Preencha e-mail e senha'); return; }
 
-  let currentUser = null;
-  const roteiroRef = doc(db, "projetos", "projeto1");
-  const chatRef = doc(db, "chats", "projeto1");
-
-  // LOGIN
-  loginBtn.addEventListener('click', async () => {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    if (!email || !password) { showError("Preencha e-mail e senha!"); return; }
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      currentUser = userCredential.user;
-      userNameSpan.textContent = currentUser.email.split('@')[0];
-      loginScreen.style.display = 'none';
-      platform.style.display = 'flex';
-      listenRoteiro();
-      listenChat();
-    } catch (e) { showError(e.message); }
-  });
-
-  logoutBtn.addEventListener('click', async () => {
-    await signOut(auth);
-    platform.style.display = 'none';
-    loginScreen.style.display = 'flex';
-    currentUser = null;
-  });
-
-  // FUNÇÕES
-  function showError(msg) { errorDiv.textContent = msg; errorDiv.style.display='block'; setTimeout(()=>errorDiv.style.display='none',5000);}
-  
-  // SALVAR ROTEIRO
-  saveBtn.addEventListener('click', async () => {
-    await setDoc(roteiroRef, { conteudo: scriptEditor.innerHTML });
-    alert("Roteiro salvo!");
-  });
-
-  // ESCUTAR ROTEIRO EM TEMPO REAL
-  function listenRoteiro() {
-    onSnapshot(roteiroRef, (docSnap) => {
-      if(docSnap.exists()){
-        scriptEditor.innerHTML = docSnap.data().conteudo || "";
-      }
-    });
-  }
-
-  // CHAT
-  sendMessageBtn.addEventListener('click', enviarMensagem);
-  chatInput.addEventListener('keypress', (e) => { if(e.key==='Enter') enviarMensagem(); });
-
-  async function enviarMensagem() {
-    const text = chatInput.value.trim();
-    if(!text) return;
-    const msg = { sender: currentUser.email.split('@')[0], text };
-    await updateDoc(chatRef, { messages: arrayUnion(msg) }).catch(async ()=>{
-      await setDoc(chatRef, { messages: [msg] });
-    });
-    chatInput.value = '';
-  }
-
-  function listenChat() {
-    onSnapshot(chatRef, (docSnap)=>{
-      if(docSnap.exists()){
-        chatMessages.innerHTML = '';
-        const msgs = docSnap.data().messages || [];
-        msgs.forEach(m=>{
-          const div = document.createElement('div');
-          div.innerHTML = `<strong>${m.sender}:</strong> ${m.text}`;
-          chatMessages.appendChild(div);
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                this.currentUser = { name: email.split('@')[0], email: email };
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('platform').style.display = 'flex';
+                document.getElementById('userName').textContent = this.currentUser.name;
+                this.connectToServer();
+                this.loadDocument();
+            } catch (error) {
+                this.showError(error.message);
+            }
         });
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-    });
-  }
 
-  // ABAS
-  const sidebarBtns = document.querySelectorAll('.sidebar-btn');
-  sidebarBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-      document.querySelectorAll('.sidebar-btn').forEach(b=>b.classList.remove('active'));
-      document.getElementById(btn.dataset.tab).classList.add('active');
-      btn.classList.add('active');
-    });
-  });
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+            document.getElementById('platform').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            this.currentUser = null;
+        });
 
+        // Se o usuário já estiver logado
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                this.currentUser = { name: user.email.split('@')[0], email: user.email };
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('platform').style.display = 'flex';
+                document.getElementById('userName').textContent = this.currentUser.name;
+                this.connectToServer();
+                this.loadDocument();
+            }
+        });
+    }
+
+    // ===== ABAS =====
+    setupTabs() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const sidebarButtons = document.querySelectorAll('.sidebar-btn');
+        const switchTab = (tabId) => {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById('currentTab').textContent = document.querySelector(`[data-tab="${tabId}"]`).textContent;
+        };
+        tabButtons.forEach(b => b.addEventListener('click', () => switchTab(b.getAttribute('data-tab'))));
+        sidebarButtons.forEach(b => b.addEventListener('click', () => switchTab(b.getAttribute('data-tab'))));
+    }
+
+    // ===== EDITOR =====
+    setupEditor() {
+        const editor = document.getElementById('scriptEditor');
+        const newSceneBtn = document.getElementById('newSceneBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const exportBtn = document.getElementById('exportBtn');
+
+        newSceneBtn.addEventListener('click', () => {
+            const div = document.createElement('div'); div.className='scene-heading';
+            div.contentEditable=true; div.textContent='INT. NOVA CENA - DIA';
+            editor.appendChild(div); div.focus(); this.updateStats();
+        });
+
+        saveBtn.addEventListener('click', () => this.saveDocument());
+        exportBtn.addEventListener('click', () => this.exportScript());
+
+        editor.addEventListener('input', () => { this.updateStats(); this.autoSave(); });
+    }
+
+    async saveDocument() {
+        if (!this.currentUser) return;
+        const content = document.getElementById('scriptEditor').innerHTML;
+        await setDoc(doc(db, "roteiros", this.currentUser.email), { content, updatedAt: new Date() });
+        document.getElementById('lastSaved').textContent = 'Modificado: ' + new Date().toLocaleTimeString();
+        this.showNotification('✅ Roteiro salvo no Firebase!');
+    }
+
+    async loadDocument() {
+        if (!this.currentUser) return;
+        const docSnap = await getDoc(doc(db, "roteiros", this.currentUser.email));
+        if (docSnap.exists()) {
+            document.getElementById('scriptEditor').innerHTML = docSnap.data().content;
+            this.updateStats();
+        }
+    }
+
+    autoSave() { clearTimeout(this.autoSaveTimer); this.autoSaveTimer = setTimeout(() => this.saveDocument(), 3000); }
+
+    exportScript() {
+        const content = document.getElementById('scriptEditor').innerText;
+        const blob = new Blob([content], { type:'text/plain' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='roteiro.txt'; a.click();
+        this.showNotification('📄 Roteiro exportado!');
+    }
+
+    updateStats() {
+        const text = document.getElementById('scriptEditor').innerText;
+        const words = text.trim()==''?0:text.trim().split(/\s+/).length;
+        const scenes = document.querySelectorAll('.scene-heading').length;
+        document.getElementById('wordCount').textContent = words+' palavras';
+        document.getElementById('sceneCount').textContent = scenes+' cenas';
+    }
+
+    // ===== CHAT =====
+    setupChat() {
+        const input = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendMessageBtn');
+        sendBtn.addEventListener('click', () => this.sendMessage());
+        input.addEventListener('keypress', e => { if(e.key==='Enter') this.sendMessage(); });
+
+        // Ouvir mensagens em tempo real
+        onChildAdded(ref(dbRT, "chat"), snapshot => {
+            const { user, message } = snapshot.val();
+            this.addMessage(user, message);
+        });
+    }
+
+    sendMessage() {
+        const msg = document.getElementById('chatInput').value.trim();
+        if (!msg || !this.currentUser) return;
+        push(ref(dbRT, "chat"), { user: this.currentUser.name, message: msg, timestamp: Date.now() });
+        document.getElementById('chatInput').value='';
+    }
+
+    addMessage(user, message) {
+        const div = document.createElement('div'); div.className='message';
+        div.innerHTML=`<strong>${user}:</strong> ${message}`;
+        const chat = document.getElementById('chatMessages'); chat.appendChild(div); chat.scrollTop = chat.scrollHeight;
+    }
+
+    // ===== IA =====
+    setupAI() {
+        document.getElementById('askAIBtn').addEventListener('click', () => {
+            const prompt = document.getElementById('aiPrompt').value.trim();
+            if(prompt) { this.generateAISuggestion(prompt); document.getElementById('aiPrompt').value=''; }
+        });
+    }
+
+    generateAISuggestion(prompt) {
+        const suggestions=["Sugiro desenvolver esse diálogo com mais emoção...",
+            "Que tal adicionar um conflito inesperado aqui?",
+            "O personagem poderia revelar um segredo nesse momento...",
+            "Sugiro uma descrição mais vívida do ambiente...",
+            "Esse é um ótimo momento para desenvolvimento de personagem..."];
+        const s = suggestions[Math.floor(Math.random()*suggestions.length)];
+        const div = document.createElement('div'); div.class
+        div.className = 'ai-suggestion';
+        div.textContent = s;
+        const container = document.getElementById('aiResponses');
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // ===== STORYBOARD =====
+    setupStoryboard() {
+        const fileInput = document.getElementById('storyboardFile');
+        const uploadBtn = document.getElementById('uploadStoryboardBtn');
+        uploadBtn.addEventListener('click', async () => {
+            if (!fileInput.files.length || !this.currentUser) return;
+            const file = fileInput.files[0];
+            const storageRef = sRef(storage, `storyboards/${this.currentUser.email}/${file.name}`);
+            await uploadBytes(storageRef, file);
+            const url = await getDownloadURL(storageRef);
+            this.addStoryboardImage(url);
+            this.showNotification('🖼️ Imagem enviada!');
+        });
+    }
+
+    addStoryboardImage(url) {
+        const container = document.getElementById('storyboardContainer');
+        const img = document.createElement('img');
+        img.src = url; img.className='storyboard-img';
+        container.appendChild(img);
+    }
+
+    // ===== FLOATING ICONS =====
+    setupFloatingIcons() {
+        document.querySelectorAll('.floating-icon').forEach(icon => {
+            icon.addEventListener('click', () => {
+                const target = icon.getAttribute('data-target');
+                document.getElementById(target).scrollIntoView({ behavior:'smooth' });
+            });
+        });
+    }
+
+    // ===== NOTIFICAÇÕES =====
+    showNotification(msg) {
+        const notif = document.createElement('div');
+        notif.className='notification';
+        notif.textContent=msg;
+        document.body.appendChild(notif);
+        setTimeout(()=>notif.remove(),3000);
+    }
+
+    showError(msg) { alert('❌ '+msg); }
+
+    // ===== CONEXÃO SOCKET OPCIONAL =====
+    connectToServer() {
+        // exemplo de conexão socket.io para colaboração futura
+        // const socket = io('http://localhost:3000');
+        // socket.emit('join', this.currentUser.name);
+    }
+}
+
+// ====== INICIALIZAÇÃO ======
+window.addEventListener('DOMContentLoaded', () => { window.EscaletaHubInstance = new EscaletaHub(); });
 </script>
-</body>
-</html>
+
+<style>
+/* ====== ESTILOS ====== */
+body{margin:0;font-family:sans-serif;}
+#platform{display:none;flex-direction:column;height:100vh;}
+#loginScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;}
+#scriptEditor{flex:1;padding:10px;border:1px solid #ccc;overflow-y:auto;background:#fefefe;}
+.tab-content{display:none;flex:1;overflow:auto;padding:10px;}
+.tab-content.active{display:block;}
+.scene-heading{font-weight:bold;margin:10px 0;}
+#chatMessages{height:150px;overflow-y:auto;border:1px solid #ccc;padding:5px;background:#fafafa;}
+.ai-suggestion{background:#e0f7fa;padding:5px;margin:5px 0;border-radius:5px;}
+.storyboard-img{width:150px;margin:5px;}
+.notification{position:fixed;top:10px;right:10px;background:#333;color:#fff;padding:10px;border-radius:5px;opacity:0.9;}
+</style>
+
+<!-- ====== HTML ESTRUTURA ====== -->
+<div id="loginScreen">
+    <h1>Escaleta Hub Login</h1>
+    <input type="email" id="email" placeholder="E-mail" />
+    <input type="password" id="password" placeholder="Senha" />
+    <button id="loginBtn">Login</button>
+</div>
+
+<div id="platform">
+    <header style="display:flex;justify-content:space-between;padding:5px;background:#222;color:#fff;">
+        <span>Escaleta Hub - <span id="userName"></span></span>
+        <button id="logoutBtn">Logout</button>
+    </header>
+
+    <div style="display:flex;flex:1;overflow:hidden;">
+        <aside style="width:200px;border-right:1px solid #ccc;">
+            <button class="sidebar-btn active" data-tab="editorTab">Editor</button>
+            <button class="sidebar-btn" data-tab="chatTab">Chat</button>
+            <button class="sidebar-btn" data-tab="aiTab">IA Assistente</button>
+            <button class="sidebar-btn" data-tab="storyboardTab">Storyboard</button>
+        </aside>
+
+        <main style="flex:1;display:flex;flex-direction:column;">
+            <!-- EDITOR -->
+            <div id="editorTab" class="tab-content active">
+                <div id="scriptEditor" contenteditable="true"></div>
+                <div style="margin:5px 0;">
+                    <button id="newSceneBtn">Nova Cena</button>
+                    <button id="saveBtn">Salvar</button>
+                    <button id="exportBtn">Exportar</button>
+                    <span id="lastSaved"></span>
+                    <div>Palavras: <span id="wordCount">0</span> | Cenas: <span id="sceneCount">0</span></div>
+                </div>
+            </div>
+
+            <!-- CHAT -->
+            <div id="chatTab" class="tab-content">
+                <div id="chatMessages"></div>
+                <input type="text" id="chatInput" placeholder="Mensagem" />
+                <button id="sendMessageBtn">Enviar</button>
+            </div>
+
+            <!-- AI -->
+            <div id="aiTab" class="tab-content">
+                <input type="text" id="aiPrompt" placeholder="Pergunte à IA..." />
+                <button id="askAIBtn">Perguntar</button>
+                <div id="aiResponses"></div>
+            </div>
+
+            <!-- STORYBOARD -->
+            <div id="storyboardTab" class="tab-content">
+                <input type="file" id="storyboardFile" />
+                <button id="uploadStoryboardBtn">Enviar</button>
+                <div id="storyboardContainer" style="display:flex;flex-wrap:wrap;"></div>
+            </div>
+        </main>
+    </div>
+</div>
+
 
 
 
