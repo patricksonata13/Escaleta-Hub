@@ -1,778 +1,211 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Escaleta Hub - Plataforma Profissional</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <style>
-    /* ===== VARIÁVEIS DE CORES ===== */
-    :root {
-      --primary: #2a5a78;
-      --secondary: #9c6ade;
-      --accent: #41b883;
-      --light: #f0f7ff;
-      --dark: #1a3650;
-      --text: #2c3e50;
-      --bg: #f8fbff;
-      --header-bg: linear-gradient(135deg, #2a5a78 0%, #1a3650 100%);
-      --sidebar-bg: #3a4f66;
-      --editor-bg: #ffffff;
-      --editor-text: #2c3e50;
-      --footer-bg: #2a5a78;
-      --footer-text: #e0f0ff;
-      --success: #41b883;
-      --warning: #ffba5a;
-      --danger: #ff6b6b;
-    }
-
-    /* ===== ESTILOS GERAIS ===== */
-    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color:var(--bg); color:var(--text); overflow-x:hidden; }
-
-    /* ===== TELA DE LOGIN ===== */
-    .login-screen {
-        position: fixed; top:0; left:0; width:100%; height:100%;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
-        display:flex; justify-content:center; align-items:center; z-index:1000;
-    }
-    .login-box {
-        background: white; padding: 2rem; border-radius: 10px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 90%; max-width: 400px;
-    }
-    .logo-container { margin-bottom: 2rem; text-align: center; }
-    .logo-container h1 { color: var(--secondary); margin-bottom: 0.5rem; }
-    .form-group { margin-bottom: 1rem; text-align: left; }
-    .form-group label { display: block; margin-bottom: 0.5rem; color: var(--dark); }
-    .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; }
-    .login-btn { width: 100%; padding: 12px; background: var(--secondary); color: white;
-        border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 1rem; }
-    .error-message { color: var(--danger); text-align: center; margin: 10px 0; display: none; }
-
-    /* ===== PLATAFORMA PRINCIPAL ===== */
-    .platform { display: none; height: 100vh; flex-direction: column; }
-    header { background: var(--header-bg); color: white; padding: 1rem 2rem;
-        display: flex; justify-content: space-between; align-items: center; }
-    .main-container { display: flex; flex: 1; overflow: hidden; }
-    .sidebar { width: 250px; background: var(--sidebar-bg); color: #e0f0ff; padding: 1rem; }
-    .sidebar-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem; width: 100%;
-        background: transparent; border: none; color: #e0f0ff; text-align: left; border-radius: 4px;
-        cursor: pointer; margin-bottom: 0.3rem; }
-    .sidebar-btn:hover { background: #4a5f76; }
-    .sidebar-btn.active { background: var(--secondary); }
-    .workspace { flex: 1; display: flex; flex-direction: column; background: var(--bg); }
-    .tab-header { display: flex; background: var(--light); border-bottom: 1px solid #d0e0f0; }
-    .tab-button { padding: 12px 20px; background: transparent; border: none; cursor: pointer;
-        color: var(--text); position: relative; }
-    .tab-button.active { color: var(--secondary); font-weight: bold; }
-    .tab-button.active::after { content: ''; position: absolute; bottom: 0; left: 0;
-        width: 100%; height: 3px; background: var(--secondary); }
-    .tab-content { flex: 1; display: none; padding: 20px; overflow: auto; }
-    .tab-content.active { display: block; }
-
-    /* ===== EDITOR DE ROTEIRO ===== */
-    .script-editor { padding: 2rem; background: var(--editor-bg); color: var(--editor-text);
-        overflow-y: auto; font-family: 'Courier New', monospace; font-size: 12pt; line-height: 1.5;
-        min-height: 500px; }
-    .scene-heading { font-weight: bold; text-transform: uppercase; margin-top: 1.5rem; color: #2a5a78; }
-    .character { text-align: center; width: 50%; margin: 0.8rem auto; font-weight: bold; }
-    .dialogue { width: 60%; margin: 0 auto; }
-    .action { margin: 0.8rem 0; }
-
-    /* ===== STORYBOARD ===== */
-    .storyboard-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 20px; padding: 15px; }
-    .storyboard-item { border: 1px solid #d0e0f0; border-radius: 8px; overflow: hidden;
-        background: white; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-    .storyboard-canvas { width: 100%; height: 150px; background: #f0f7ff;
-        display: flex; align-items: center; justify-content: center; cursor: crosshair; }
-
-    /* ===== VIDEOCHAMADA ===== */
-    .video-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
-    .video-placeholder { background: #333; border-radius: 8px; display: flex;
-        align-items: center; justify-content: center; color: white; min-height: 300px; }
-    .video-controls { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-    .video-controls button { padding: 10px 20px; border: none; border-radius: 5px;
-        cursor: pointer; background: var(--primary); color: white; }
-
-    /* ===== CHAT ===== */
-    .chat-container { display: flex; flex-direction: column; height: 500px; }
-    .chat-messages { flex: 1; border: 1px solid #d0e0f0; border-radius: 8px;
-        padding: 15px; overflow-y: auto; margin-bottom: 15px; background: white; }
-    .message { margin-bottom: 10px; padding: 8px; border-radius: 5px; background: #f0f7ff; }
-    .chat-input { display: flex; gap: 10px; }
-    .chat-input input { flex: 1; padding: 10px; border: 1px solid #d0e0f0; border-radius: 5px; }
-    .chat-input button { padding: 10px 20px; background: var(--accent); color: white;
-        border: none; border-radius: 5px; cursor: pointer; }
-
-    /* ===== IA ASSISTENTE ===== */
-    .ai-assistant { background: white; border-radius: 8px; padding: 20px; margin-top: 20px; }
-    .ai-suggestions { margin-top: 15px; }
-    .suggestion { background: #f0f7ff; padding: 10px; margin: 5px 0; border-radius: 5px;
-        cursor: pointer; border-left: 4px solid var(--accent); }
-
-    /* ===== FLUTUANTES ===== */
-    .floating-icons { position: fixed; bottom: 30px; right: 30px; display: flex;
-        flex-direction: column; gap: 15px; z-index: 999; }
-    .floating-icon { width: 60px; height: 60px; border-radius: 50%; display: flex;
-        align-items: center; justify-content: center; color: white; font-size: 24px;
-        cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-    .icon-video { background: var(--secondary); }
-    .icon-chat { background: var(--accent); }
-    .icon-ai { background: var(--primary); }
-
-    /* ===== MODAIS ===== */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
-    .modal-content { background: white; border-radius: 12px; width: 90%; max-width: 600px;
-        overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-    .modal-header { background: var(--primary); color: white; padding: 15px;
-        display: flex; justify-content: space-between; align-items: center; }
-    .modal-body { padding: 20px; max-height: 80vh; overflow-y: auto; }
-
-    footer { background: var(--footer-bg); color: var(--footer-text); padding: 0.8rem 1.5rem;
-        display: flex; justify-content: space-between; align-items: center; }
-
-    @media (max-width: 900px) {
-        .main-container { flex-direction: column; }
-        .sidebar { width: 100%; }
-        .video-container { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escaleta Hub - Firebase</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* ===== VARIÁVEIS DE CORES ===== */
+:root {
+  --primary: #2a5a78;
+  --secondary: #9c6ade;
+  --accent: #41b883;
+  --bg: #f8fbff;
+  --text: #2c3e50;
+  --danger: #ff6b6b;
+}
+/* ===== RESET E ESTILOS ===== */
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif; }
+body { background: var(--bg); color: var(--text); }
+/* ===== LOGIN ===== */
+.login-screen { display:flex; justify-content:center; align-items:center; height:100vh; background: linear-gradient(135deg, var(--primary), #1a3650); }
+.login-box { background:white; padding:2rem; border-radius:10px; width:90%; max-width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.2);}
+.login-box input { width:100%; padding:10px; margin-bottom:1rem; border-radius:5px; border:1px solid #ddd;}
+.login-btn { width:100%; padding:12px; background: var(--secondary); color:white; border:none; border-radius:5px; cursor:pointer;}
+.error-message { color: var(--danger); text-align:center; margin-bottom:10px; display:none; }
+/* ===== PLATAFORMA ===== */
+.platform { display:none; flex-direction:column; height:100vh; }
+header { background: var(--primary); color:white; padding:1rem; display:flex; justify-content:space-between; align-items:center; }
+.main-container { display:flex; flex:1; overflow:hidden; }
+.sidebar { width:250px; background:#3a4f66; padding:1rem; color:#e0f0ff; }
+.sidebar button { display:block; width:100%; margin-bottom:0.5rem; background:none; border:none; color:#e0f0ff; padding:0.5rem; cursor:pointer; border-radius:5px;}
+.sidebar button.active { background: var(--secondary); }
+.workspace { flex:1; display:flex; flex-direction:column; padding:1rem; overflow:auto; }
+#scriptEditor { background:white; padding:1rem; min-height:300px; overflow:auto; font-family: 'Courier New', monospace;}
+.chat-container { margin-top:1rem; background:white; padding:1rem; border-radius:5px; height:300px; display:flex; flex-direction:column;}
+.chat-messages { flex:1; overflow:auto; margin-bottom:1rem; }
+.chat-input { display:flex; gap:0.5rem; }
+.chat-input input { flex:1; padding:8px; border-radius:5px; border:1px solid #ddd;}
+.chat-input button { padding:8px 12px; border:none; border-radius:5px; background: var(--accent); color:white; cursor:pointer;}
+</style>
 </head>
 <body>
-    <!-- Tela de Login -->
-    <div id="loginScreen" class="login-screen">
-        <div class="login-box">
-            <div class="logo-container">
-                <h1>🎬 Escaleta Hub Pro</h1>
-                <p>Plataforma profissional para roteiristas</p>
-            </div>
-            <div class="login-form">
-                <h2>Entrar na Plataforma</h2>
-                <div class="form-group">
-                    <label for="email">E-mail:</label>
-                    <input type="email" id="email" placeholder="seu@email.com">
-                </div>
-                <div class="form-group">
-                    <label for="password">Senha:</label>
-                    <input type="password" id="password" placeholder="Sua senha">
-                </div>
-                <div id="errorMessage" class="error-message"></div>
-                <button id="loginBtn" class="login-btn">
-                    <i class="fas fa-sign-in-alt"></i> Entrar
-                </button>
-            </div>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <h2>Entrar no Escaleta Hub</h2>
+    <div id="errorMessage" class="error-message"></div>
+    <input type="email" id="email" placeholder="E-mail">
+    <input type="password" id="password" placeholder="Senha">
+    <button id="loginBtn" class="login-btn">Entrar</button>
+  </div>
+</div>
+
+<!-- PLATAFORMA -->
+<div id="platform" class="platform">
+  <header>
+    <div>Escaleta Hub - <span id="userName"></span></div>
+    <button id="logoutBtn">Sair</button>
+  </header>
+  <div class="main-container">
+    <nav class="sidebar">
+      <button class="sidebar-btn active" data-tab="editor">Editor de Roteiro</button>
+      <button class="sidebar-btn" data-tab="chat">Chat</button>
+    </nav>
+    <main class="workspace">
+      <div id="editor" class="tab-content active">
+        <div id="scriptEditor" contenteditable="true"></div>
+        <button id="saveBtn">Salvar</button>
+      </div>
+      <div id="chat" class="tab-content">
+        <div class="chat-container">
+          <div id="chatMessages" class="chat-messages"></div>
+          <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Digite sua mensagem">
+            <button id="sendMessageBtn">Enviar</button>
+          </div>
         </div>
-    </div>
+      </div>
+    </main>
+  </div>
+</div>
 
-    <!-- Plataforma Principal -->
-    <div id="platform" class="platform">
-        <header>
-            <div class="header-left">
-                <div class="logo-platform"><i class="fas fa-scroll"></i> Escaleta Hub Pro</div>
-                <div class="document-info">
-                    <input type="text" id="documentTitle" class="document-title" value="Meu Roteiro">
-                    <div class="document-stats">
-                        <span id="sceneCount">0 cenas</span> • 
-                        <span id="wordCount">0 palavras</span> •
-                        <span id="onlineUsers">1 online</span>
-                    </div>
-                </div>
-            </div>
-            <div class="header-right">
-                <button id="saveBtn" class="header-btn">
-                    <i class="fas fa-save"></i> Salvar
-                </button>
-                <button id="userBtn" class="header-btn">
-                    <i class="fas fa-user"></i> <span id="userName">Usuário</span>
-                </button>
-                <button id="logoutBtn" class="header-btn">
-                    <i class="fas fa-sign-out-alt"></i> Sair
-                </button>
-            </div>
-        </header>
+<!-- FIREBASE -->
+<script type="module">
+  // Import Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
-        <div class="main-container">
-            <!-- Menu Lateral -->
-            <nav class="sidebar">
-                <div class="sidebar-section">
-                    <h3><i class="fas fa-film"></i> Roteiro</h3>
-                    <button class="sidebar-btn active" data-tab="roteiro">
-                        <i class="fas fa-file-alt"></i> Editor
-                    </button>
-                    <button class="sidebar-btn" data-tab="storyboard">
-                        <i class="fas fa-palette"></i> Storyboard
-                    </button>
-                </div>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCsi6yy41s8DgT88lPRtlLKQFFYrgAgMSo",
+    authDomain: "escaleta-hub.firebaseapp.com",
+    projectId: "escaleta-hub",
+    storageBucket: "escaleta-hub.appspot.com",
+    messagingSenderId: "825021624145",
+    appId: "1:825021624145:web:1f43b9574d041d8e206d70",
+    measurementId: "G-NC9QFD3063"
+  };
 
-                <div class="sidebar-section">
-                    <h3><i class="fas fa-users"></i> Colaboração</h3>
-                    <button class="sidebar-btn" data-tab="video">
-                        <i class="fas fa-video"></i> Videochamada
-                    </button>
-                    <button class="sidebar-btn" data-tab="chat">
-                        <i class="fas fa-comments"></i> Chat
-                    </button>
-                </div>
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-                <div class="sidebar-section">
-                    <h3><i class="fas fa-robot"></i> IA Assistente</h3>
-                    <button class="sidebar-btn" data-tab="ai">
-                        <i class="fas fa-magic"></i> Sugestões de IA
-                    </button>
-                </div>
-            </nav>
+  const loginScreen = document.getElementById('loginScreen');
+  const platform = document.getElementById('platform');
+  const userNameSpan = document.getElementById('userName');
+  const errorDiv = document.getElementById('errorMessage');
 
-            <!-- Área de Trabalho -->
-            <main class="workspace">
-                <div class="tab-header">
-                    <button class="tab-button active" data-tab="roteiro">Editor de Roteiro</button>
-                    <button class="tab-button" data-tab="storyboard">Storyboard</button>
-                    <button class="tab-button" data-tab="video">Videochamada</button>
-                    <button class="tab-button" data-tab="chat">Chat</button>
-                    <button class="tab-button" data-tab="ai">IA Assistente</button>
-                </div>
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
 
-                <!-- Aba: Editor de Roteiro -->
-                <div id="roteiro" class="tab-content active">
-                    <div class="editor-toolbar">
-                        <button id="newSceneBtn" class="tool-btn">
-                            <i class="fas fa-plus"></i> Nova Cena
-                        </button>
-                        <button id="exportBtn" class="tool-btn">
-                            <i class="fas fa-download"></i> Exportar
-                        </button>
-                        <button id="aiSuggestBtn" class="tool-btn">
-                            <i class="fas fa-robot"></i> Sugerir com IA
-                        </button>
-                    </div>
-                    <div class="script-editor" contenteditable="true" id="scriptEditor">
-                        <div class="scene-heading">INT. CASA - DIA</div>
-                        <div class="action">
-                            Uma casa aconchegante. JOÃO está sentado no sofá, olhando pela janela.
-                        </div>
-                        <div class="character">JOÃO</div>
-                        <div class="dialogue">
-                            Onde será que ela está? Já era para ter chegado.
-                        </div>
-                    </div>
-                </div>
+  const scriptEditor = document.getElementById('scriptEditor');
+  const saveBtn = document.getElementById('saveBtn');
 
-                <!-- Aba: Storyboard -->
-                <div id="storyboard" class="tab-content">
-                    <div class="storyboard-controls">
-                        <button id="addFrameBtn" class="tool-btn">
-                            <i class="fas fa-plus"></i> Adicionar Frame
-                        </button>
-                        <button id="clearCanvasBtn" class="tool-btn">
-                            <i class="fas fa-trash"></i> Limpar
-                        </button>
-                    </div>
-                    <div class="storyboard-container" id="storyboardContainer">
-                        <!-- Frames serão adicionados dinamicamente -->
-                    </div>
-                </div>
+  const chatMessages = document.getElementById('chatMessages');
+  const chatInput = document.getElementById('chatInput');
+  const sendMessageBtn = document.getElementById('sendMessageBtn');
 
-                <!-- Aba: Videochamada -->
-                <div id="video" class="tab-content">
-                    <div class="video-container">
-                        <div class="video-placeholder" id="localVideo">
-                            <i class="fas fa-video" style="font-size: 48px;"></i>
-                            <p>Sua câmera</p>
-                        </div>
-                        <div class="video-placeholder" id="remoteVideo">
-                            <i class="fas fa-user" style="font-size: 48px;"></i>
-                            <p>Participante</p>
-                        </div>
-                    </div>
-                    <div class="video-controls">
-                        <button id="startCallBtn">
-                            <i class="fas fa-phone"></i> Iniciar Chamada
-                        </button>
-                        <button id="endCallBtn" style="background: var(--danger);">
-                            <i class="fas fa-phone-slash"></i> Encerrar
-                        </button>
-                    </div>
-                </div>
+  let currentUser = null;
+  const roteiroRef = doc(db, "projetos", "projeto1");
+  const chatRef = doc(db, "chats", "projeto1");
 
-                <!-- Aba: Chat -->
-                <div id="chat" class="tab-content">
-                    <div class="chat-container">
-                        <div class="chat-messages" id="chatMessages">
-                            <div class="message">
-                                <strong>Sistema:</strong> Bem-vindo ao chat de colaboração!
-                            </div>
-                        </div>
-                        <div class="chat-input">
-                            <input type="text" id="chatInput" placeholder="Digite sua mensagem...">
-                            <button id="sendMessageBtn">Enviar</button>
-                        </div>
-                    </div>
-                </div>
+  // LOGIN
+  loginBtn.addEventListener('click', async () => {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    if (!email || !password) { showError("Preencha e-mail e senha!"); return; }
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      currentUser = userCredential.user;
+      userNameSpan.textContent = currentUser.email.split('@')[0];
+      loginScreen.style.display = 'none';
+      platform.style.display = 'flex';
+      listenRoteiro();
+      listenChat();
+    } catch (e) { showError(e.message); }
+  });
 
-                <!-- Aba: IA Assistente -->
-                <div id="ai" class="tab-content">
-                    <div class="ai-assistant">
-                        <h3><i class="fas fa-robot"></i> Assistente de IA</h3>
-                        <p>Solicite sugestões para melhorar seu roteiro:</p>
-                        
-                        <div class="chat-input">
-                            <input type="text" id="aiPrompt" placeholder="Ex: Sugira um diálogo para...">
-                            <button id="askAIBtn">Perguntar à IA</button>
-                        </div>
-                        
-                        <div class="ai-suggestions" id="aiSuggestions">
-                            <div class="suggestion" onclick="useSuggestion(this)">
-                                💡 Sugerir desenvolvimento de personagem
-                            </div>
-                            <div class="suggestion" onclick="useSuggestion(this)">
-                                🎭 Criar diálogo emocionante
-                            </div>
-                            <div class="suggestion" onclick="useSuggestion(this)">
-                                🌅 Descrever cenário impactante
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
+  logoutBtn.addEventListener('click', async () => {
+    await signOut(auth);
+    platform.style.display = 'none';
+    loginScreen.style.display = 'flex';
+    currentUser = null;
+  });
 
-        <footer>
-            <div>
-                <span id="currentTab">Roteiro</span> | 
-                <span id="connectionStatus"><i class="fas fa-wifi"></i> Conectado</span>
-            </div>
-            <div>
-                <span id="lastSaved">Modificado: agora</span>
-            </div>
-        </footer>
+  // FUNÇÕES
+  function showError(msg) { errorDiv.textContent = msg; errorDiv.style.display='block'; setTimeout(()=>errorDiv.style.display='none',5000);}
+  
+  // SALVAR ROTEIRO
+  saveBtn.addEventListener('click', async () => {
+    await setDoc(roteiroRef, { conteudo: scriptEditor.innerHTML });
+    alert("Roteiro salvo!");
+  });
 
-        <!-- Ícones Flutuantes -->
-        <div class="floating-icons">
-            <div class="floating-icon icon-video" id="quickVideoBtn">
-                <i class="fas fa-video"></i>
-            </div>
-            <div class="floating-icon icon-chat" id="quickChatBtn">
-                <i class="fas fa-comment"></i>
-            </div>
-            <div class="floating-icon icon-ai" id="quickAIBtn">
-                <i class="fas fa-robot"></i>
-            </div>
-        </div>
-    </div>
+  // ESCUTAR ROTEIRO EM TEMPO REAL
+  function listenRoteiro() {
+    onSnapshot(roteiroRef, (docSnap) => {
+      if(docSnap.exists()){
+        scriptEditor.innerHTML = docSnap.data().conteudo || "";
+      }
+    });
+  }
 
-    <script>
-        // ===== SISTEMA PRINCIPAL =====
-        class EscaletaHub {
-            constructor() {
-                this.socket = null;
-                this.currentUser = null;
-                this.peerConnection = null;
-                this.localStream = null;
-                this.init();
-            }
+  // CHAT
+  sendMessageBtn.addEventListener('click', enviarMensagem);
+  chatInput.addEventListener('keypress', (e) => { if(e.key==='Enter') enviarMensagem(); });
 
-            init() {
-                this.setupLogin();
-                this.setupTabs();
-                this.setupEditor();
-                this.setupVideoCall();
-                this.setupChat();
-                this.setupAI();
-                this.setupStoryboard();
-                this.setupFloatingIcons();
-            }
+  async function enviarMensagem() {
+    const text = chatInput.value.trim();
+    if(!text) return;
+    const msg = { sender: currentUser.email.split('@')[0], text };
+    await updateDoc(chatRef, { messages: arrayUnion(msg) }).catch(async ()=>{
+      await setDoc(chatRef, { messages: [msg] });
+    });
+    chatInput.value = '';
+  }
 
-            // === SISTEMA DE LOGIN ===
-            setupLogin() {
-                const loginBtn = document.getElementById('loginBtn');
-                const logoutBtn = document.getElementById('logoutBtn');
-                
-                loginBtn.addEventListener('click', () => {
-                    const email = document.getElementById('email').value;
-                    const password = document.getElementById('password').value;
-                    
-                    if (!email || !password) {
-                        this.showError('Por favor, preencha e-mail e senha!');
-                        return;
-                    }
-                    
-                    // Simular login bem-sucedido
-                    this.currentUser = {
-                        email: email,
-                        name: email.split('@')[0]
-                    };
-                    
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('platform').style.display = 'flex';
-                    document.getElementById('userName').textContent = this.currentUser.name;
-                    
-                    // Conectar ao servidor (simulado)
-                    this.connectToServer();
-                    this.updateStats();
-                });
-                
-                logoutBtn.addEventListener('click', () => {
-                    document.getElementById('platform').style.display = 'none';
-                    document.getElementById('loginScreen').style.display = 'flex';
-                    this.currentUser = null;
-                });
-            }
-
-            // === SISTEMA DE ABAS ===
-            setupTabs() {
-                const tabButtons = document.querySelectorAll('.tab-button');
-                const sidebarButtons = document.querySelectorAll('.sidebar-btn');
-                
-                const switchTab = (tabId) => {
-                    // Esconder todas as abas
-                    document.querySelectorAll('.tab-content').forEach(tab => {
-                        tab.classList.remove('active');
-                    });
-                    
-                    // Mostrar aba selecionada
-                    document.getElementById(tabId).classList.add('active');
-                    
-                    // Atualizar botões
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    sidebarButtons.forEach(btn => btn.classList.remove('active'));
-                    
-                    document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
-                    document.getElementById('currentTab').textContent = 
-                        document.querySelector(`[data-tab="${tabId}"]`).textContent;
-                };
-                
-                tabButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        switchTab(button.getAttribute('data-tab'));
-                    });
-                });
-                
-                sidebarButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        switchTab(button.getAttribute('data-tab'));
-                    });
-                });
-            }
-
-            // === EDITOR DE ROTEIRO ===
-            setupEditor() {
-                const editor = document.getElementById('scriptEditor');
-                const newSceneBtn = document.getElementById('newSceneBtn');
-                const saveBtn = document.getElementById('saveBtn');
-                const exportBtn = document.getElementById('exportBtn');
-                
-                newSceneBtn.addEventListener('click', () => {
-                    const newScene = document.createElement('div');
-                    newScene.className = 'scene-heading';
-                    newScene.contentEditable = true;
-                    newScene.textContent = 'INT. NOVA CENA - DIA';
-                    editor.appendChild(newScene);
-                    newScene.focus();
-                    this.updateStats();
-                });
-                
-                saveBtn.addEventListener('click', () => {
-                    this.saveDocument();
-                });
-                
-                exportBtn.addEventListener('click', () => {
-                    this.exportScript();
-                });
-                
-                editor.addEventListener('input', () => {
-                    this.updateStats();
-                    this.autoSave();
-                });
-            }
-
-            // === VIDEOCHAMADA (WebRTC) ===
-            setupVideoCall() {
-                const startCallBtn = document.getElementById('startCallBtn');
-                const endCallBtn = document.getElementById('endCallBtn');
-                
-                startCallBtn.addEventListener('click', async () => {
-                    try {
-                        this.localStream = await navigator.mediaDevices.getUserMedia({
-                            video: true,
-                            audio: true
-                        });
-                        
-                        const localVideo = document.getElementById('localVideo');
-                        localVideo.innerHTML = '';
-                        const videoElement = document.createElement('video');
-                        videoElement.srcObject = this.localStream;
-                        videoElement.autoplay = true;
-                        videoElement.muted = true;
-                        localVideo.appendChild(videoElement);
-                        
-                        this.showNotification('Chamada iniciada!');
-                    } catch (error) {
-                        this.showError('Erro ao acessar câmera/microfone: ' + error.message);
-                    }
-                });
-                
-                endCallBtn.addEventListener('click', () => {
-                    if (this.localStream) {
-                        this.localStream.getTracks().forEach(track => track.stop());
-                        document.getElementById('localVideo').innerHTML = `
-                            <i class="fas fa-video" style="font-size: 48px;"></i>
-                            <p>Sua câmera</p>
-                        `;
-                    }
-                    this.showNotification('Chamada encerrada');
-                });
-            }
-
-            // === SISTEMA DE CHAT ===
-            setupChat() {
-                const chatInput = document.getElementById('chatInput');
-                const sendMessageBtn = document.getElementById('sendMessageBtn');
-                const chatMessages = document.getElementById('chatMessages');
-                
-                const sendMessage = () => {
-                    const message = chatInput.value.trim();
-                    if (message) {
-                        this.addMessage(this.currentUser.name, message);
-                        chatInput.value = '';
-                        
-                        // Simular resposta automática
-                        setTimeout(() => {
-                            this.addMessage('IA Assistente', 'Ótima ideia! Posso ajudar a desenvolver isso?');
-                        }, 1000);
-                    }
-                };
-                
-                sendMessageBtn.addEventListener('click', sendMessage);
-                chatInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') sendMessage();
-                });
-            }
-
-            addMessage(sender, message) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'message';
-                messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
-                document.getElementById('chatMessages').appendChild(messageDiv);
-                document.getElementById('chatMessages').scrollTop = 
-                    document.getElementById('chatMessages').scrollHeight;
-            }
-
-            // === IA ASSISTENTE ===
-            setupAI() {
-                const askAIBtn = document.getElementById('askAIBtn');
-                const aiPrompt = document.getElementById('aiPrompt');
-                
-                askAIBtn.addEventListener('click', () => {
-                    const prompt = aiPrompt.value.trim();
-                    if (prompt) {
-                        this.generateAISuggestion(prompt);
-                        aiPrompt.value = '';
-                    }
-                });
-            }
-
-            generateAISuggestion(prompt) {
-                // Simular geração de IA
-                const suggestions = [
-                    "Sugiro desenvolver esse diálogo com mais emoção...",
-                    "Que tal adicionar um conflito inesperado aqui?",
-                    "O personagem poderia revelar um segredo nesse momento...",
-                    "Sugiro uma descrição mais vívida do ambiente...",
-                    "Esse é um ótimo momento para desenvolvimento de personagem..."
-                ];
-                
-                const randomSuggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
-                
-                const suggestionDiv = document.createElement('div');
-                suggestionDiv.className = 'suggestion';
-                suggestionDiv.innerHTML = `🤖 ${randomSuggestion}`;
-                suggestionDiv.onclick = () => this.useAISuggestion(randomSuggestion);
-                
-                document.getElementById('aiSuggestions').appendChild(suggestionDiv);
-                this.showNotification('Sugestão de IA gerada!');
-            }
-
-            useAISuggestion(suggestion) {
-                const editor = document.getElementById('scriptEditor');
-                editor.innerHTML += `<div class="action">💡 ${suggestion}</div>`;
-                this.updateStats();
-            }
-
-            // === STORYBOARD ===
-            setupStoryboard() {
-                const addFrameBtn = document.getElementById('addFrameBtn');
-                const clearCanvasBtn = document.getElementById('clearCanvasBtn');
-                const container = document.getElementById('storyboardContainer');
-                
-                addFrameBtn.addEventListener('click', () => {
-                    this.addStoryboardFrame();
-                });
-                
-                clearCanvasBtn.addEventListener('click', () => {
-                    container.innerHTML = '';
-                    this.addStoryboardFrame();
-                });
-                
-                // Adicionar frame inicial
-                this.addStoryboardFrame();
-            }
-
-            addStoryboardFrame() {
-                const container = document.getElementById('storyboardContainer');
-                const frameId = `frame-${Date.now()}`;
-                
-                const frameHTML = `
-                    <div class="storyboard-item">
-                        <canvas class="storyboard-canvas" id="${frameId}" width="250" height="150"></canvas>
-                        <div class="storyboard-info">
-                            <input type="text" placeholder="Descrição da cena..." style="width:100%; padding:5px;">
-                        </div>
-                    </div>
-                `;
-                
-                container.innerHTML += frameHTML;
-                
-                // Configurar desenho no canvas
-                setTimeout(() => {
-                    this.setupCanvasDrawing(frameId);
-                }, 100);
-            }
-
-            setupCanvasDrawing(canvasId) {
-                const canvas = document.getElementById(canvasId);
-                const ctx = canvas.getContext('2d');
-                let painting = false;
-                
-                canvas.addEventListener('mousedown', (e) => {
-                    painting = true;
-                    ctx.beginPath();
-                    ctx.moveTo(e.offsetX, e.offsetY);
-                });
-                
-                canvas.addEventListener('mousemove', (e) => {
-                    if (painting) {
-                        ctx.lineTo(e.offsetX, e.offsetY);
-                        ctx.stroke();
-                    }
-                });
-                
-                canvas.addEventListener('mouseup', () => {
-                    painting = false;
-                });
-                
-                canvas.addEventListener('mouseleave', () => {
-                    painting = false;
-                });
-            }
-
-            // === ÍCONES FLUTUANTES ===
-            setupFloatingIcons() {
-                document.getElementById('quickVideoBtn').addEventListener('click', () => {
-                    this.switchTab('video');
-                });
-                
-                document.getElementById('quickChatBtn').addEventListener('click', () => {
-                    this.switchTab('chat');
-                });
-                
-                document.getElementById('quickAIBtn').addEventListener('click', () => {
-                    this.switchTab('ai');
-                });
-            }
-
-            // === FUNÇÕES UTILITÁRIAS ===
-            switchTab(tabId) {
-                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.sidebar-btn').forEach(btn => btn.classList.remove('active'));
-                
-                document.getElementById(tabId).classList.add('active');
-                document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
-            }
-
-            updateStats() {
-                const text = document.getElementById('scriptEditor').innerText;
-                const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-                const scenes = document.querySelectorAll('.scene-heading').length;
-                
-                document.getElementById('wordCount').textContent = words + ' palavras';
-                document.getElementById('sceneCount').textContent = scenes + ' cenas';
-            }
-
-            saveDocument() {
-                document.getElementById('lastSaved').textContent = 'Modificado: ' + 
-                    new Date().toLocaleTimeString();
-                this.showNotification('✅ Roteiro salvo com sucesso!');
-            }
-
-            autoSave() {
-                clearTimeout(this.autoSaveTimer);
-                this.autoSaveTimer = setTimeout(() => {
-                    this.saveDocument();
-                }, 3000);
-            }
-
-            exportScript() {
-                const content = document.getElementById('scriptEditor').innerText;
-                const blob = new Blob([content], {type: 'text/plain'});
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = 'roteiro.txt';
-                a.click();
-                this.showNotification('📄 Roteiro exportado!');
-            }
-
-            connectToServer() {
-                // Simular conexão com servidor
-                this.showNotification('🌐 Conectado ao servidor');
-                document.getElementById('connectionStatus').innerHTML = 
-                    '<i class="fas fa-wifi"></i> Conectado';
-            }
-
-            showError(message) {
-                const errorDiv = document.getElementById('errorMessage');
-                errorDiv.textContent = message;
-                errorDiv.style.display = 'block';
-                setTimeout(() => {
-                    errorDiv.style.display = 'none';
-                }, 5000);
-            }
-
-            showNotification(message) {
-                // Criar notificação flutuante
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed; top: 20px; right: 20px; 
-                    background: var(--success); color: white; 
-                    padding: 15px; border-radius: 5px; z-index: 10000;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                `;
-                notification.textContent = message;
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    notification.remove();
-                }, 3000);
-            }
-        }
-
-        // Inicializar a plataforma quando o DOM estiver carregado
-        document.addEventListener('DOMContentLoaded', () => {
-            window.escaletaHub = new EscaletaHub();
-            console.log('🎬 Escaleta Hub Pro inicializado!');
+  function listenChat() {
+    onSnapshot(chatRef, (docSnap)=>{
+      if(docSnap.exists()){
+        chatMessages.innerHTML = '';
+        const msgs = docSnap.data().messages || [];
+        msgs.forEach(m=>{
+          const div = document.createElement('div');
+          div.innerHTML = `<strong>${m.sender}:</strong> ${m.text}`;
+          chatMessages.appendChild(div);
         });
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    });
+  }
 
-        // Função global para uso em sugestões
-        function useSuggestion(element) {
-            if (window.escaletaHub) {
-                window.escaletaHub.useAISuggestion(element.textContent);
-            }
-        }
-    </script>
+  // ABAS
+  const sidebarBtns = document.querySelectorAll('.sidebar-btn');
+  sidebarBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.sidebar-btn').forEach(b=>b.classList.remove('active'));
+      document.getElementById(btn.dataset.tab).classList.add('active');
+      btn.classList.add('active');
+    });
+  });
+
+</script>
 </body>
 </html>
+
 
 
