@@ -6,9 +6,43 @@
   <title>Escaleta Hub - Plataforma de Roteiristas</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    
+    // Suas configurações do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsi6yy41s8DgT88lPRtlLKQFFYrgAgMSo",
+      authDomain: "escaleta-hub.firebaseapp.com",
+      projectId: "escaleta-hub",
+      storageBucket: "escaleta-hub.firebasestorage.app",
+      messagingSenderId: "825021624145",
+      appId: "1:825021624145:web:1f43b9574d041d8e206d70"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    // Torna as variáveis globais para o resto do código
+    window.firebaseAuth = auth;
+    window.firebaseDb = db;
+    window.firebaseFunctions = {
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      doc,
+      setDoc,
+      getDoc,
+      serverTimestamp
+    };
+    
+    console.log("✅ Firebase configurado com sucesso!");
+  </script>
   <style>
     /* ===== VARIÁVEIS DE CORES ===== */
     :root {
@@ -360,6 +394,7 @@
       line-height: 1.6;
       min-height: 500px;
       color: var(--editor-text);
+      outline: none;
     }
 
     .scene-heading {
@@ -573,42 +608,28 @@
       background: var(--primary);
     }
 
-    /* ===== MODAIS ===== */
-    .modal {
-      display: none;
+    /* ===== STATUS DE AUTOSAVE ===== */
+    .save-status {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.6);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
+      bottom: 20px;
+      left: 20px;
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-size: 14px;
+      z-index: 999;
+      transition: all 0.3s;
     }
 
-    .modal-content {
-      background: white;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 600px;
-      overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    .saving {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
     }
 
-    .modal-header {
-      background: var(--primary);
-      color: white;
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-body {
-      padding: 20px;
-      max-height: 80vh;
-      overflow-y: auto;
+    .saved {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
     }
 
     footer {
@@ -618,68 +639,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-
-    /* ===== NOVAS ABAS ===== */
-    .docs-style-container {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      background: #f8f9fa;
-    }
-
-    .docs-menu-bar {
-      display: flex;
-      align-items: center;
-      padding: 8px 16px;
-      background: white;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .docs-title-input {
-      font-size: 18px;
-      font-weight: 500;
-      border: none;
-      padding: 8px 12px;
-      margin-right: auto;
-      background: transparent;
-      color: #202124;
-      width: 300px;
-    }
-
-    .docs-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      padding: 8px 16px;
-      background: white;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .docs-editor-container {
-      flex: 1;
-      display: flex;
-      overflow: auto;
-      background: #f8f9fa;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .docs-editor {
-      width: 816px;
-      min-height: 1056px;
-      padding: 96px;
-      background: white;
-      box-shadow: 0 1px 3px 1px rgba(60, 64, 67, 0.15);
-      margin-bottom: 20px;
-    }
-
-    .docs-editor-content {
-      width: 100%;
-      min-height: 100%;
-      outline: none;
-      font-size: 12pt;
-      line-height: 1.5;
-      color: #202124;
     }
 
     /* ===== RESPONSIVIDADE ===== */
@@ -695,10 +654,6 @@
       }
       .header-right {
         flex-direction: column;
-      }
-      .docs-editor {
-        width: 100%;
-        padding: 20px;
       }
     }
   </style>
@@ -780,9 +735,6 @@
           <button class="sidebar-btn" data-tab="storyboard">
             <i class="fas fa-palette"></i> Storyboard
           </button>
-          <button class="sidebar-btn" data-tab="escaleta">
-            <i class="fas fa-list-ol"></i> Escaleta
-          </button>
         </div>
 
         <div class="sidebar-section">
@@ -818,7 +770,6 @@
         <div class="tab-header">
           <button class="tab-button active" data-tab="roteiro">Editor de Roteiro</button>
           <button class="tab-button" data-tab="storyboard">Storyboard</button>
-          <button class="tab-button" data-tab="escaleta">Escaleta</button>
           <button class="tab-button" data-tab="video">Videochamada</button>
           <button class="tab-button" data-tab="chat">Chat</button>
           <button class="tab-button" data-tab="ai">IA Assistente</button>
@@ -861,34 +812,6 @@
           </div>
           <div class="storyboard-container" id="storyboardContainer">
             <!-- Frames serão adicionados dinamicamente -->
-          </div>
-        </div>
-
-        <!-- Aba: Escaleta -->
-        <div id="escaleta" class="tab-content">
-          <div class="docs-style-container">
-            <div class="docs-menu-bar">
-              <input type="text" class="docs-title-input" value="Minha Escaleta" placeholder="Digite o título da escaleta">
-            </div>
-            
-            <div class="docs-toolbar">
-              <button class="tool-btn"><i class="fas fa-plus"></i> Nova Cena</button>
-              <button class="tool-btn"><i class="fas fa-save"></i> Salvar</button>
-            </div>
-            
-            <div class="docs-editor-container">
-              <div class="docs-editor">
-                <div class="docs-editor-content" contenteditable="true">
-                  <h1>Escaleta - Episódio 1: O Início</h1>
-                  <p><strong>Cena 1:</strong> INT. CASA DE JOÃO - DIA</p>
-                  <p>João procura por documentos importantes. Ele parece ansioso e preocupado.</p>
-                  <p><strong>Cena 2:</strong> EXT. RUA - CONTÍNUO</p>
-                  <p>Maria caminha apressadamente pela rua, segurando uma pasta.</p>
-                  <p><strong>Cena 3:</strong> INT. CASA DE JOÃO - CONTÍNUO</p>
-                  <p>João ouve a campainha tocar e se dirige à porta.</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -978,45 +901,63 @@
         <i class="fas fa-robot"></i>
       </div>
     </div>
+
+    <!-- Status de Autosave -->
+    <div id="saveStatus" class="save-status" style="display: none;">
+      <i class="fas fa-sync-alt"></i> <span id="statusText">Salvando...</span>
+    </div>
   </div>
 
   <script>
-    // ===== CONFIGURAÇÃO DO FIREBASE =====
-    const firebaseConfig = {
-      // Substitua com suas credenciais do Firebase
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_PROJETO.firebaseapp.com",
-      projectId: "SEU_PROJETO",
-      storageBucket: "SEU_PROJETO.appspot.com",
-      messagingSenderId: "SEU_SENDER_ID",
-      appId: "SEU_APP_ID"
-    };
-
-    // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
     // ===== SISTEMA PRINCIPAL =====
     class EscaletaHub {
       constructor() {
-        this.socket = null;
         this.currentUser = null;
-        this.peerConnection = null;
-        this.localStream = null;
+        this.saveTimer = null;
         this.init();
       }
 
       init() {
-        this.setupLogin();
-        this.setupTabs();
-        this.setupEditor();
-        this.setupVideoCall();
-        this.setupChat();
-        this.setupAI();
-        this.setupStoryboard();
-        this.setupFloatingIcons();
-        this.setupVisualModes();
+        // Aguardar o Firebase carregar
+        setTimeout(() => {
+          this.setupAuthListener();
+          this.setupLogin();
+          this.setupTabs();
+          this.setupEditor();
+          this.setupVideoCall();
+          this.setupChat();
+          this.setupAI();
+          this.setupStoryboard();
+          this.setupFloatingIcons();
+          this.setupVisualModes();
+        }, 1000);
+      }
+
+      // === OUVINTE DE AUTENTICAÇÃO ===
+      setupAuthListener() {
+        if (!window.firebaseAuth) {
+          console.error("Firebase não carregou corretamente");
+          return;
+        }
+
+        window.firebaseFunctions.onAuthStateChanged(window.firebaseAuth, (user) => {
+          if (user) {
+            this.currentUser = user;
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('platform').style.display = 'flex';
+            document.getElementById('userName').textContent = user.email.split('@')[0];
+            
+            // Carregar roteiro salvo
+            this.loadUserScript(user.uid);
+            this.updateStats();
+            
+            console.log("✅ Usuário logado:", user.email);
+          } else {
+            this.currentUser = null;
+            document.getElementById('platform').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+          }
+        });
       }
 
       // === SISTEMA DE LOGIN ===
@@ -1035,21 +976,11 @@
           }
           
           // Login com Firebase
-          auth.signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-              this.currentUser = userCredential.user;
-              
-              document.getElementById('loginScreen').style.display = 'none';
-              document.getElementById('platform').style.display = 'flex';
-              document.getElementById('userName').textContent = this.currentUser.email.split('@')[0];
-              
-              // Conectar ao servidor (simulado)
-              this.connectToServer();
-              this.updateStats();
-            })
-            .catch((error) => {
-              this.showError('Erro no login: ' + error.message);
-            });
+          window.firebaseFunctions.signInWithEmailAndPassword(
+            window.firebaseAuth, email, password
+          ).catch((error) => {
+            this.showError('Erro no login: ' + error.message);
+          });
         });
         
         showRegister.addEventListener('click', (e) => {
@@ -1058,23 +989,9 @@
         });
         
         logoutBtn.addEventListener('click', () => {
-          auth.signOut().then(() => {
-            document.getElementById('platform').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'flex';
-            this.currentUser = null;
+          window.firebaseFunctions.signOut(window.firebaseAuth).catch((error) => {
+            console.error("Erro no logout:", error);
           });
-        });
-
-        // Observar estado de autenticação
-        auth.onAuthStateChanged((user) => {
-          if (user) {
-            this.currentUser = user;
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('platform').style.display = 'flex';
-            document.getElementById('userName').textContent = user.email.split('@')[0];
-            this.connectToServer();
-            this.updateStats();
-          }
         });
       }
 
@@ -1117,20 +1034,13 @@
           }
           
           // Registrar usuário no Firebase
-          auth.createUserWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-              this.showNotification('Conta criada com sucesso!');
-              setTimeout(() => {
-                document.getElementById('email').value = email;
-                document.getElementById('password').value = password;
-                document.querySelector('.login-form h2').textContent = 'Entrar na Plataforma';
-                loginForm.innerHTML = document.querySelector('.login-form').innerHTML;
-                this.setupLogin();
-              }, 2000);
-            })
-            .catch((error) => {
-              this.showError('Erro no registro: ' + error.message, document.getElementById('registerError'));
-            });
+          window.firebaseFunctions.createUserWithEmailAndPassword(
+            window.firebaseAuth, email, password
+          ).then(() => {
+            this.showNotification('Conta criada com sucesso!');
+          }).catch((error) => {
+            this.showError('Erro no registro: ' + error.message, document.getElementById('registerError'));
+          });
         });
         
         document.getElementById('backToLogin').addEventListener('click', (e) => {
@@ -1139,14 +1049,18 @@
         });
       }
 
-      // === AUTOSAVE DO ROTEIRO COM FIREBASE ===
+      // === AUTOSAVE DO ROTEIRO ===
       async loadUserScript(uid) {
-        const docRef = db.collection("scripts").doc(uid);
-        const docSnap = await docRef.get();
-        if (docSnap.exists) {
-          document.getElementById('scriptEditor').innerHTML = docSnap.data().content;
-        } else {
-          document.getElementById('scriptEditor').innerHTML = ""; // Novo usuário
+        try {
+          const docRef = window.firebaseFunctions.doc(window.firebaseDb, "scripts", uid);
+          const docSnap = await window.firebaseFunctions.getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            document.getElementById('scriptEditor').innerHTML = docSnap.data().content;
+            this.showSaveStatus('Último roteiro carregado', 'saved');
+          }
+        } catch (error) {
+          console.error("Erro ao carregar roteiro:", error);
         }
       }
 
@@ -1159,14 +1073,37 @@
       }
 
       saveScript = this.debounce(async (uid, content) => {
-        const docRef = db.collection("scripts").doc(uid);
-        await docRef.set({ 
-          content, 
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
-        });
-        console.log("Roteiro salvo automaticamente");
-        document.getElementById('lastSaved').textContent = 'Modificado: agora';
-      }, 1000); // salva 1s após a última digitação
+        this.showSaveStatus('Salvando...', 'saving');
+        
+        try {
+          const docRef = window.firebaseFunctions.doc(window.firebaseDb, "scripts", uid);
+          await window.firebaseFunctions.setDoc(docRef, { 
+            content: content,
+            updatedAt: window.firebaseFunctions.serverTimestamp()
+          });
+          
+          this.showSaveStatus('Salvo automaticamente', 'saved');
+          document.getElementById('lastSaved').textContent = 'Modificado: agora';
+        } catch (error) {
+          this.showSaveStatus('Erro ao salvar', 'saving');
+          console.error("Erro ao salvar:", error);
+        }
+      }, 1000);
+
+      showSaveStatus(text, type) {
+        const status = document.getElementById('saveStatus');
+        const statusText = document.getElementById('statusText');
+        
+        statusText.textContent = text;
+        status.className = `save-status ${type}`;
+        status.style.display = 'block';
+        
+        if (type === 'saved') {
+          setTimeout(() => {
+            status.style.display = 'none';
+          }, 3000);
+        }
+      }
 
       // === SISTEMA DE ABAS ===
       setupTabs() {
@@ -1174,15 +1111,12 @@
         const sidebarButtons = document.querySelectorAll('.sidebar-btn');
         
         const switchTab = (tabId) => {
-          // Esconder todas as abas
           document.querySelectorAll('.tab-content').forEach(tab => {
             tab.classList.remove('active');
           });
           
-          // Mostrar aba selecionada
           document.getElementById(tabId).classList.add('active');
           
-          // Atualizar botões
           tabButtons.forEach(btn => btn.classList.remove('active'));
           sidebarButtons.forEach(btn => btn.classList.remove('active'));
           
@@ -1214,6 +1148,7 @@
         const scriptEditor = document.getElementById('scriptEditor');
         const sceneCount = document.getElementById('sceneCount');
         const wordCount = document.getElementById('wordCount');
+        const newSceneBtn = document.getElementById('newSceneBtn');
 
         const updateStats = () => {
           const text = scriptEditor.innerText;
@@ -1223,141 +1158,130 @@
           wordCount.textContent = `${words} palavras`;
         };
 
-        scriptEditor.addEventListener('input', updateStats);
+        // Nova cena
+        newSceneBtn.addEventListener('click', () => {
+          const newScene = document.createElement('div');
+          newScene.className = 'scene-heading';
+          newScene.contentEditable = true;
+          newScene.textContent = 'INT. NOVA CENA - DIA';
+          scriptEditor.appendChild(newScene);
+          newScene.focus();
+          updateStats();
+        });
 
-        // Inicializa o autosave para o usuário logado
-        auth.onAuthStateChanged(user => {
-          if (user) {
-            this.loadUserScript(user.uid);
-            scriptEditor.addEventListener('input', () => {
-              this.saveScript(user.uid, scriptEditor.innerHTML);
-              updateStats();
-            });
+        // Configurar autosave quando o usuário estiver logado
+        scriptEditor.addEventListener('input', () => {
+          updateStats();
+          if (this.currentUser) {
+            this.saveScript(this.currentUser.uid, scriptEditor.innerHTML);
           }
         });
 
         updateStats();
       }
 
-      // === VIDEOCHAMADA SIMULADA ===
+      // === OUTRAS FUNCIONALIDADES ===
       setupVideoCall() {
-        const startBtn = document.getElementById('startCallBtn');
-        const endBtn = document.getElementById('endCallBtn');
-
-        startBtn.addEventListener('click', () => {
-          alert("Chamada iniciada (simulação).");
-        });
-
-        endBtn.addEventListener('click', () => {
-          alert("Chamada encerrada (simulação).");
+        document.getElementById('startCallBtn').addEventListener('click', () => {
+          this.showNotification('Chamada iniciada (simulação)');
         });
       }
 
-      // === CHAT SIMULADO ===
       setupChat() {
-        const chatInput = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendMessageBtn');
-        const chatMessages = document.getElementById('chatMessages');
-
-        sendBtn.addEventListener('click', () => {
-          const msg = chatInput.value.trim();
+        document.getElementById('sendMessageBtn').addEventListener('click', () => {
+          const msg = document.getElementById('chatInput').value.trim();
           if (!msg) return;
+          
           const div = document.createElement('div');
           div.classList.add('message');
           div.innerHTML = `<strong>${this.currentUser ? this.currentUser.email.split('@')[0] : 'Usuário'}:</strong> ${msg}`;
-          chatMessages.appendChild(div);
-          chatInput.value = '';
-          chatMessages.scrollTop = chatMessages.scrollHeight;
+          document.getElementById('chatMessages').appendChild(div);
+          document.getElementById('chatInput').value = '';
         });
       }
 
-      // === ASSISTENTE DE IA SIMULADO ===
       setupAI() {
-        const aiInput = document.getElementById('aiPrompt');
-        const aiBtn = document.getElementById('askAIBtn');
-        const suggestions = document.getElementById('aiSuggestions');
-
-        aiBtn.addEventListener('click', () => {
-          const query = aiInput.value.trim();
+        document.getElementById('askAIBtn').addEventListener('click', () => {
+          const query = document.getElementById('aiPrompt').value.trim();
           if (!query) return;
-          const div = document.createElement('div');
-          div.classList.add('suggestion');
-          div.textContent = `💡 IA sugere: "${query} (exemplo de sugestão)"`;
-          div.onclick = () => this.useSuggestion(div);
-          suggestions.prepend(div);
-          aiInput.value = '';
+          
+          this.showNotification(`Sugestão de IA para: "${query}" (funcionalidade simulada)`);
         });
       }
 
-      useSuggestion(el) {
-        const scriptEditor = document.getElementById('scriptEditor');
-        scriptEditor.innerHTML += `\n${el.textContent}`;
-      }
-
-      // === STORYBOARD SIMULADO ===
       setupStoryboard() {
-        const addFrameBtn = document.getElementById('addFrameBtn');
-        const clearCanvasBtn = document.getElementById('clearCanvasBtn');
-        const container = document.getElementById('storyboardContainer');
-
-        addFrameBtn.addEventListener('click', () => {
+        document.getElementById('addFrameBtn').addEventListener('click', () => {
           const frame = document.createElement('div');
           frame.classList.add('storyboard-item');
-          frame.innerHTML = '<div class="storyboard-canvas">Novo Frame</div>';
-          container.appendChild(frame);
-        });
-
-        clearCanvasBtn.addEventListener('click', () => {
-          container.innerHTML = '';
+          frame.innerHTML = `
+            <div class="storyboard-canvas">Clique para desenhar</div>
+            <div style="padding: 10px;">
+              <p><strong>Cena ${document.querySelectorAll('.storyboard-item').length + 1}</strong></p>
+              <textarea placeholder="Descrição..." style="width:100%; margin-top:5px; padding:5px;"></textarea>
+            </div>
+          `;
+          document.getElementById('storyboardContainer').appendChild(frame);
         });
       }
 
-      // === ÍCONES FLUTUANTES ===
       setupFloatingIcons() {
         document.getElementById('quickVideoBtn').addEventListener('click', () => {
-          alert('Abrir videochamada (simulação)');
+          this.showNotification('Videochamada rápida (simulação)');
         });
+        
         document.getElementById('quickChatBtn').addEventListener('click', () => {
-          alert('Abrir chat (simulação)');
-        });
-        document.getElementById('quickAIBtn').addEventListener('click', () => {
-          alert('Abrir assistente de IA (simulação)');
+          this.showNotification('Chat rápido (simulação)');
         });
       }
 
-      // === MODOS VISUAIS ===
       setupVisualModes() {
-        const body = document.body;
         document.getElementById('nightModeBtn').addEventListener('click', () => {
-          body.classList.toggle('dark-mode');
+          document.body.classList.toggle('dark-mode');
+          document.body.classList.remove('focus-mode');
         });
+        
         document.getElementById('focusModeBtn').addEventListener('click', () => {
-          body.classList.toggle('focus-mode');
+          document.body.classList.toggle('focus-mode');
+          document.body.classList.remove('dark-mode');
         });
-      }
-
-      // === ESTATÍSTICAS INICIAIS ===
-      updateStats() {
-        document.getElementById('sceneCount').textContent = '0 cenas';
-        document.getElementById('wordCount').textContent = '0 palavras';
-      }
-
-      // === CONEXÃO SIMULADA AO SERVIDOR ===
-      connectToServer() {
-        console.log("Conectado ao servidor (simulação)");
       }
 
       showError(msg, target = document.getElementById('errorMessage')) {
         target.style.display = 'block';
         target.textContent = msg;
-        setTimeout(() => { target.style.display = 'none'; }, 3000);
+        setTimeout(() => { target.style.display = 'none'; }, 5000);
       }
 
       showNotification(msg) {
-        alert(msg);
+        // Criar notificação simples
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: var(--secondary);
+          color: white;
+          padding: 15px 20px;
+          border-radius: 5px;
+          z-index: 10000;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        `;
+        notification.textContent = msg;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
       }
     }
 
+    // Função global para sugestões de IA
+    window.useSuggestion = function(el) {
+      const suggestion = el.textContent;
+      document.getElementById('scriptEditor').innerHTML += `<div class="action">${suggestion}</div>`;
+    };
+
+    // Inicializar quando a página carregar
     window.addEventListener('DOMContentLoaded', () => {
       new EscaletaHub();
     });
