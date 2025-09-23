@@ -3,62 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Escaleta Hub - Plataforma de Roteiristas</title>
+<title>Escaleta Hub - Plataforma Completa</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-/* ===== VARIÁVEIS DE CORES ===== */
 :root {
-  --primary: #2a5a78;
-  --secondary: #9c6ade;
-  --accent: #41b883;
-  --light: #f0f7ff;
-  --dark: #1a3650;
-  --text: #2c3e50;
-  --bg: #f8fbff;
+  --primary:#2a5a78; --secondary:#9c6ade; --accent:#41b883; --light:#f0f7ff; --dark:#1a3650;
+  --text:#2c3e50; --bg:#f8fbff; --header-bg:linear-gradient(135deg,#2a5a78 0%,#1a3650 100%);
+  --sidebar-bg:#3a4f66; --editor-bg:#ffffff; --editor-text:#2c3e50; --footer-bg:#2a5a78; --footer-text:#e0f0ff;
 }
-/* ===== ESTILOS GERAIS ===== */
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
 body{background-color:var(--bg);color:var(--text);overflow-x:hidden;}
-button{cursor:pointer;}
-/* ===== ABERTURA ===== */
-.opening-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(to bottom, rgba(42, 90, 120, 0.8) 0%, rgba(26, 54, 80, 0.9) 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:1000;transition:opacity 1s ease-out;}
+.opening-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(to bottom,rgba(42,90,120,0.8),rgba(26,54,80,0.9));display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:1000;transition:opacity 1s;}
 .logo-container{margin-bottom:40px;text-align:center;}
 .logo{font-size:48px;font-weight:bold;color:#9c6ade;text-transform:uppercase;letter-spacing:5px;margin-bottom:10px;}
 .tagline{font-size:18px;color:#d0e4ff;margin-top:10px;}
-.login-form{background-color: rgba(26, 54, 80, 0.85); padding:40px; border-radius:8px; width:100%; max-width:450px;}
+.login-form{background-color:rgba(26,54,80,0.85);padding:40px;border-radius:8px;width:100%;max-width:450px;}
 .login-form h2{margin-bottom:28px;font-size:32px;font-weight:500;text-align:center;color:white;}
 .form-group{margin-bottom:16px;}
 .form-group label{display:block;margin-bottom:8px;font-size:14px;color:#a8c6ff;}
 .form-group input{width:100%;height:50px;padding:0 16px;background:#2a5a78;border:1px solid #3a6a90;border-radius:4px;color:#fff;font-size:16px;}
 .form-group input:focus{background:#3a6a90;outline:none;border-color:#9c6ade;}
-.login-btn{width:100%;height:50px;background:#9c6ade;color:#fff;border:none;border-radius:4px;font-size:16px;font-weight:bold;margin-top:24px;}
+.login-btn{width:100%;height:50px;background:#9c6ade;color:#fff;border:none;border-radius:4px;font-size:16px;font-weight:bold;margin-top:24px;cursor:pointer;transition:background 0.2s;}
 .login-btn:hover{background:#8c5acd;}
 .error-message{color:#ff6b6b;margin-top:10px;text-align:center;display:none;}
 .success-message{color:#41b883;margin-top:10px;text-align:center;display:none;}
-/* ===== PLATAFORMA PRINCIPAL ===== */
 .main-platform{display:none;height:100vh;flex-direction:column;}
 .main-container{display:flex;flex:1;overflow:hidden;}
-header{background:var(--primary);color:white;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;}
-.header-left{display:flex;align-items:center;gap:1rem;}
-.logo-platform{font-size:2rem;font-weight:bold;display:flex;align-items:center;gap:0.5rem;}
-.document-title{border:none;background:none;color:white;width:200px;}
-.header-right{display:flex;gap:1rem;}
-.toolbar-btn{padding:0.5rem 1rem;background:#3a4f66;color:white;border:none;border-radius:4px;display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;}
-.toolbar-btn:hover{background:#2a3f56;}
-.sidebar{width:250px;background:#3a4f66;color:#e0f0ff;padding:1rem;display:flex;flex-direction:column;}
+header{background:var(--header-bg);color:white;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+.sidebar{width:250px;background:var(--sidebar-bg);color:#e0f0ff;padding:1rem;display:flex;flex-direction:column;}
 .sidebar-section{margin-bottom:1.5rem;}
-.sidebar-section h3{margin-bottom:0.8rem;font-size:1rem;color:#a8c6ff;}
-.sidebar-btn{display:flex;align-items:center;gap:0.5rem;padding:0.7rem;width:100%;background:transparent;border:none;color:#e0f0ff;text-align:left;border-radius:4px;margin-bottom:0.3rem;font-weight:bold;}
+.sidebar-section h3{margin-bottom:0.8rem;font-size:1rem;color:#a8c6ff;display:flex;align-items:center;gap:0.5rem;}
+.sidebar-btn{display:flex;align-items:center;gap:0.5rem;padding:0.7rem;width:100%;background:transparent;border:none;color:#e0f0ff;text-align:left;border-radius:4px;cursor:pointer;transition:background 0.2s;margin-bottom:0.3rem;font-weight:bold;}
 .sidebar-btn:hover{background:#4a5f76;}
 .sidebar-btn.active{background:#9c6ade;}
 .workspace{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
-.tab-header{display:flex;background:#f0f7ff;border-bottom:1px solid #d0e0f0;padding:0 20px;}
+.tab-header{display:flex;background:var(--light);border-bottom:1px solid #d0e0f0;padding:0 20px;}
 .tab-button{padding:12px 20px;background:transparent;border:none;cursor:pointer;font-weight:500;color:var(--text);position:relative;}
 .tab-button.active{color:var(--secondary);font-weight:bold;}
 .tab-button.active::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:3px;background:var(--secondary);}
 .tab-content{flex:1;display:none;overflow:auto;padding:20px;}
 .tab-content.active{display:block;}
-.script-editor{flex:1;padding:2rem;background:white;color:var(--text);overflow-y:auto;font-family:'Courier New', monospace;font-size:12pt;line-height:1.5;}
+.editor-container{flex:1;display:flex;overflow:hidden;}
+.script-editor{flex:1;padding:2rem;background:var(--editor-bg);color:var(--editor-text);overflow-y:auto;font-family:'Courier New',monospace;font-size:12pt;line-height:1.5;}
 .scene-heading{font-weight:bold;text-transform:uppercase;margin-top:1.5rem;color:#2a5a78;cursor:pointer;}
 .action,.character,.dialogue,.parenthetical,.transition{margin:0.8rem 0;cursor:pointer;}
 .character{text-align:center;width:50%;margin:0.8rem auto;font-weight:bold;}
@@ -67,11 +53,15 @@ header{background:var(--primary);color:white;padding:1rem 2rem;display:flex;just
 .transition{text-align:right;margin-top:1rem;text-transform:uppercase;font-weight:bold;}
 .storyboard-container{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;padding:15px;}
 .storyboard-item{border:1px solid #d0e0f0;border-radius:8px;overflow:hidden;background:white;box-shadow:0 2px 6px rgba(0,0,0,0.05);}
-.storyboard-canvas{width:100%;height:150px;background:#f0f7ff;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.storyboard-canvas{width:100%;height:150px;background:#f0f7ff;display:flex;align-items:center;justify-content:center;cursor:crosshair;}
+footer{background:var(--footer-bg);color:var(--footer-text);padding:0.8rem 1.5rem;display:flex;justify-content:space-between;align-items:center;font-size:0.9rem;}
+.export-btn{margin:10px 0;padding:10px 15px;background:var(--secondary);color:white;border:none;border-radius:4px;cursor:pointer;}
+.export-btn:hover{background:#8c5acd;}
+@media(max-width:900px){.main-container{flex-direction:column;}.sidebar{width:100%;order:2;}.editor-container{flex-direction:column;}}
 </style>
 </head>
 <body>
-<!-- TELA DE ABERTURA -->
+
 <div class="opening-screen" id="openingScreen">
   <div class="logo-container">
     <div class="logo">ESCALETA HUB</div>
@@ -93,115 +83,147 @@ header{background:var(--primary);color:white;padding:1rem 2rem;display:flex;just
   </div>
 </div>
 
-<!-- PLATAFORMA PRINCIPAL -->
 <div class="main-platform" id="mainPlatform">
   <header>
-    <div class="header-left">
-      <div class="logo-platform"><i class="fas fa-scroll"></i> Escaleta Hub</div>
-      <input type="text" class="document-title" value="Roteiro Sem Título">
-    </div>
-    <div class="header-right">
-      <button class="toolbar-btn" id="save-btn"><i class="fas fa-save"></i> Salvar</button>
-      <button class="toolbar-btn" id="export-btn"><i class="fas fa-file-export"></i> Exportar</button>
-    </div>
+    <div class="header-left"><div class="logo-platform"><i class="fas fa-scroll"></i> Escaleta Hub</div></div>
+    <button id="logoutBtn">Sair</button>
   </header>
   <div class="main-container">
-    <div class="sidebar">
-      <button class="sidebar-btn active" data-tab="roteiro-tab">Roteiro</button>
-      <button class="sidebar-btn" data-tab="storyboard-tab">Storyboard</button>
-      <button class="sidebar-btn" id="logoutBtn">Sair</button>
-    </div>
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3><i class="fas fa-book"></i> Roteiro</h3>
+        <button class="sidebar-btn active" data-tab="scriptTab">Editor</button>
+        <button class="sidebar-btn" data-tab="storyboardTab">Storyboard</button>
+      </div>
+      <div class="sidebar-section">
+        <h3><i class="fas fa-file-alt"></i> Outros</h3>
+        <button class="sidebar-btn" data-tab="argumentTab">Argumento</button>
+        <button class="sidebar-btn" data-tab="bibleTab">Bíblia</button>
+        <button class="sidebar-btn" data-tab="draftTab">Rascunho</button>
+      </div>
+    </aside>
     <div class="workspace">
       <div class="tab-header">
-        <button class="tab-button active" data-tab="roteiro-tab">Roteiro</button>
-        <button class="tab-button" data-tab="storyboard-tab">Storyboard</button>
+        <button class="tab-button active" data-tab="scriptTab">Editor</button>
+        <button class="tab-button" data-tab="storyboardTab">Storyboard</button>
       </div>
-      <!-- ABA ROTEIRO -->
-      <div id="roteiro-tab" class="tab-content active">
-        <div class="script-editor" contenteditable="true" id="script-editor">
-          <div class="scene-heading">INT. CASA - DIA</div>
-          <div class="action">Um personagem está em casa lendo.</div>
-          <div class="character">JOÃO</div>
-          <div class="dialogue">O que será que vai acontecer hoje?</div>
+      <div class="tab-content active" id="scriptTab">
+        <div class="editor-container">
+          <div class="script-editor" contenteditable="true" id="scriptEditor">
+            <div class="scene-heading">CENA 1 - INTERIOR - DIA</div>
+            <div class="action">Descrição da ação...</div>
+            <div class="character">NOME DO PERSONAGEM</div>
+            <div class="dialogue">Diálogo aqui...</div>
+          </div>
         </div>
+        <button class="export-btn" id="exportScriptBtn">Exportar Roteiro (.txt)</button>
       </div>
-      <!-- ABA STORYBOARD -->
-      <div id="storyboard-tab" class="tab-content">
+      <div class="tab-content" id="storyboardTab">
         <div class="storyboard-container" id="storyboardContainer">
           <div class="storyboard-item">
-            <div class="storyboard-canvas">Clique para desenhar</div>
+            <canvas class="storyboard-canvas" width="250" height="150"></canvas>
           </div>
           <div class="storyboard-item">
-            <div class="storyboard-canvas">Clique para desenhar</div>
+            <canvas class="storyboard-canvas" width="250" height="150"></canvas>
           </div>
         </div>
       </div>
+      <div class="tab-content" id="argumentTab">Argumento...</div>
+      <div class="tab-content" id="bibleTab">Bíblia do roteiro...</div>
+      <div class="tab-content" id="draftTab">Rascunho...</div>
     </div>
   </div>
+  <footer>Escaleta Hub &copy; 2025 | Desenvolvido por Patrick Sonata</footer>
 </div>
 
 <script>
-// LOGIN SIMPLES
-const loginBtn = document.getElementById('loginBtn');
-loginBtn.addEventListener('click', () => {
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  const errorMsg = document.getElementById('error-message');
-  const successMsg = document.getElementById('success-message');
-
-  if(email && password){
-    document.getElementById('openingScreen').style.display = 'none';
-    document.getElementById('mainPlatform').style.display = 'flex';
+// Login fake
+const loginBtn = document.getElementById("loginBtn");
+const openingScreen = document.getElementById("openingScreen");
+const mainPlatform = document.getElementById("mainPlatform");
+const errorMsg = document.getElementById("error-message");
+const successMsg = document.getElementById("success-message");
+loginBtn.addEventListener("click",()=>{
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
+  if(email && pass){
+    successMsg.style.display="block";
+    errorMsg.style.display="none";
+    setTimeout(()=>{
+      openingScreen.style.opacity="0";
+      setTimeout(()=>{
+        openingScreen.style.display="none";
+        mainPlatform.style.display="flex";
+      },500);
+    },600);
   }else{
-    errorMsg.style.display = 'block';
-    errorMsg.textContent = 'Preencha todos os campos!';
-    setTimeout(()=>errorMsg.style.display='none',3000);
+    errorMsg.style.display="block";
+    errorMsg.textContent="Preencha todos os campos!";
   }
 });
 
-// TABS FUNCIONANDO
-const tabs = document.querySelectorAll('.tab-button, .sidebar-btn[data-tab]');
-const tabContents = document.querySelectorAll('.tab-content');
-tabs.forEach(tab => {
-  tab.addEventListener('click', ()=>{
-    const target = tab.dataset.tab;
-    if(target){
-      tabContents.forEach(tc=>tc.classList.remove('active'));
-      document.getElementById(target).classList.add('active');
-      tabs.forEach(t=>t.classList.remove('active'));
-      tab.classList.add('active');
-    }
+document.getElementById("logoutBtn").addEventListener("click",()=>{
+  mainPlatform.style.display="none";
+  openingScreen.style.display="flex";
+  openingScreen.style.opacity="1";
+});
+
+// Tabs
+const sidebarBtns = document.querySelectorAll(".sidebar-btn");
+const tabButtons = document.querySelectorAll(".tab-button");
+const tabContents = document.querySelectorAll(".tab-content");
+sidebarBtns.forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const target = btn.dataset.tab;
+    sidebarBtns.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    tabContents.forEach(c=>c.classList.remove("active"));
+    document.getElementById(target).classList.add("active");
+    tabButtons.forEach(tb=>{
+      if(tb.dataset.tab===target) tb.classList.add("active");
+      else tb.classList.remove("active");
+    });
+  });
+});
+tabButtons.forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const target = btn.dataset.tab;
+    tabButtons.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    tabContents.forEach(c=>c.classList.remove("active"));
+    document.getElementById(target).classList.add("active");
   });
 });
 
-// SIDEBAR LOGOUT
-document.getElementById('logoutBtn').addEventListener('click',()=>{
-  document.getElementById('mainPlatform').style.display='none';
-  document.getElementById('openingScreen').style.display='flex';
-  document.getElementById('email').value='';
-  document.getElementById('password').value='';
+// Storyboard drawing
+const canvases = document.querySelectorAll(".storyboard-canvas");
+canvases.forEach(canvas=>{
+  const ctx = canvas.getContext("2d");
+  let painting = false;
+  canvas.addEventListener("mousedown",(e)=>{painting=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);});
+  canvas.addEventListener("mousemove",(e)=>{if(painting){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}});
+  canvas.addEventListener("mouseup",()=>{painting=false;});
+  canvas.addEventListener("mouseleave",()=>{painting=false;});
 });
 
-// STORYBOARD CLICÁVEL
-document.querySelectorAll('.storyboard-canvas').forEach(canvas=>{
-  canvas.addEventListener('click',()=>{
-    const text = prompt('Escreva o que deseja no quadro do storyboard:');
-    if(text) canvas.textContent = text;
-  });
-});
+// Dark mode automático
+const hour = new Date().getHours();
+if(hour>=18||hour<6){
+  document.body.style.backgroundColor="#1a1a1a";
+  document.body.style.color="#f0f0f0";
+}
 
-// SALVAR/EXPORTAR (simples)
-document.getElementById('save-btn').addEventListener('click',()=>{
-  alert('Roteiro salvo localmente!');
-});
-document.getElementById('export-btn').addEventListener('click',()=>{
-  const content = document.getElementById('script-editor').innerText;
-  const blob = new Blob([content], {type:'text/plain'});
-  const a = document.createElement('a');
+// Export script
+document.getElementById("exportScriptBtn").addEventListener("click",()=>{
+  const content = document.getElementById("scriptEditor").innerText;
+  const blob = new Blob([content],{type:"text/plain"});
+  const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = 'roteiro.txt';
+  a.download = "roteiro.txt";
   a.click();
 });
 </script>
+
 </body>
 </html>
+
