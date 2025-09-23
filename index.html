@@ -1,154 +1,207 @@
-
-Navigation Menu
-patricksonata13
-Escaleta-Hub
-
-Type / to search
-Code
-Issues
-Pull requests
-Actions
-Projects
-1
-Wiki
-Security
-1
-Insights
-Settings
-Escaleta-Hub
-/
-index.html
-in
-main
-
-Edit
-
-Preview
-Indent mode
-
-Spaces
-Indent size
-
-2
-Line wrap mode
-
-No wrap
-Editing index.html file contents
-1158
-1159
-1160
-1161
-1162
-1163
-1164
-1165
-1166
-1167
-1168
-1169
-1170
-1171
-1172
-1173
-1174
-1175
-1176
-1177
-1178
-1179
-1180
-1181
-1182
-1183
-1184
-1185
-1186
-1187
-1188
-1189
-1190
-1191
-1192
-1193
-1194
-1195
-1196
-1197
-1198
-1199
-1200
-1201
-1202
-1203
-1204
-1205
-1206
-1207
-1208
-1209
-1210
-1211
-1212
-1213
-1214
-1215
 <!DOCTYPE html>
-                    timeout = setTimeout(later, wait);
-                };
-            }
-            
-            // Storyboard drawing
-            const canvases = document.querySelectorAll('.storyboard-canvas');
-            canvases.forEach(canvas => {
-                canvas.addEventListener('click', function() {
-                    const drawingCanvas = document.createElement('canvas');
-                    drawingCanvas.width = this.offsetWidth;
-                    drawingCanvas.height = this.offsetHeight;
-                    drawingCanvas.style.width = '100%';
-                    drawingCanvas.style.height = '100%';
-                    drawingCanvas.style.cursor = 'crosshair';
-                    
-                    this.innerHTML = '';
-                    this.appendChild(drawingCanvas);
-                    
-                    const ctx = drawingCanvas.getContext('2d');
-                    ctx.lineWidth = 2;
-                    ctx.lineCap = 'round';
-                    ctx.strokeStyle = '#2c3e50';
-                    
-                    let drawing = false;
-                    
-                    drawingCanvas.addEventListener('mousedown', startDrawing);
-                    drawingCanvas.addEventListener('mousemove', draw);
-                    drawingCanvas.addEventListener('mouseup', stopDrawing);
-                    drawingCanvas.addEventListener('mouseleave', stopDrawing);
-                    
-                    function startDrawing(e) {
-                        drawing = true;
-                        const rect = drawingCanvas.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
-                        ctx.beginPath();
-                        ctx.moveTo(x, y);
-                    }
-                    
-                    function draw(e) {
-                        if (!drawing) return;
-                        const rect = drawingCanvas.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
-                        ctx.lineTo(x, y);
-                        ctx.stroke();
-                    }
-                    
-                    function stopDrawing() {
-                        drawing = false;
-                    }
-                });
-            });
-        });
-    </script>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escaleta Hub - Plataforma de Roteiristas</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* ===== VARIÁVEIS DE CORES ===== */
+:root {
+  --primary: #2a5a78;
+  --secondary: #9c6ade;
+  --accent: #41b883;
+  --light: #f0f7ff;
+  --dark: #1a3650;
+  --text: #2c3e50;
+  --bg: #f8fbff;
+}
+/* ===== ESTILOS GERAIS ===== */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{background-color:var(--bg);color:var(--text);overflow-x:hidden;}
+button{cursor:pointer;}
+/* ===== ABERTURA ===== */
+.opening-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(to bottom, rgba(42, 90, 120, 0.8) 0%, rgba(26, 54, 80, 0.9) 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:1000;transition:opacity 1s ease-out;}
+.logo-container{margin-bottom:40px;text-align:center;}
+.logo{font-size:48px;font-weight:bold;color:#9c6ade;text-transform:uppercase;letter-spacing:5px;margin-bottom:10px;}
+.tagline{font-size:18px;color:#d0e4ff;margin-top:10px;}
+.login-form{background-color: rgba(26, 54, 80, 0.85); padding:40px; border-radius:8px; width:100%; max-width:450px;}
+.login-form h2{margin-bottom:28px;font-size:32px;font-weight:500;text-align:center;color:white;}
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;margin-bottom:8px;font-size:14px;color:#a8c6ff;}
+.form-group input{width:100%;height:50px;padding:0 16px;background:#2a5a78;border:1px solid #3a6a90;border-radius:4px;color:#fff;font-size:16px;}
+.form-group input:focus{background:#3a6a90;outline:none;border-color:#9c6ade;}
+.login-btn{width:100%;height:50px;background:#9c6ade;color:#fff;border:none;border-radius:4px;font-size:16px;font-weight:bold;margin-top:24px;}
+.login-btn:hover{background:#8c5acd;}
+.error-message{color:#ff6b6b;margin-top:10px;text-align:center;display:none;}
+.success-message{color:#41b883;margin-top:10px;text-align:center;display:none;}
+/* ===== PLATAFORMA PRINCIPAL ===== */
+.main-platform{display:none;height:100vh;flex-direction:column;}
+.main-container{display:flex;flex:1;overflow:hidden;}
+header{background:var(--primary);color:white;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;}
+.header-left{display:flex;align-items:center;gap:1rem;}
+.logo-platform{font-size:2rem;font-weight:bold;display:flex;align-items:center;gap:0.5rem;}
+.document-title{border:none;background:none;color:white;width:200px;}
+.header-right{display:flex;gap:1rem;}
+.toolbar-btn{padding:0.5rem 1rem;background:#3a4f66;color:white;border:none;border-radius:4px;display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;}
+.toolbar-btn:hover{background:#2a3f56;}
+.sidebar{width:250px;background:#3a4f66;color:#e0f0ff;padding:1rem;display:flex;flex-direction:column;}
+.sidebar-section{margin-bottom:1.5rem;}
+.sidebar-section h3{margin-bottom:0.8rem;font-size:1rem;color:#a8c6ff;}
+.sidebar-btn{display:flex;align-items:center;gap:0.5rem;padding:0.7rem;width:100%;background:transparent;border:none;color:#e0f0ff;text-align:left;border-radius:4px;margin-bottom:0.3rem;font-weight:bold;}
+.sidebar-btn:hover{background:#4a5f76;}
+.sidebar-btn.active{background:#9c6ade;}
+.workspace{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.tab-header{display:flex;background:#f0f7ff;border-bottom:1px solid #d0e0f0;padding:0 20px;}
+.tab-button{padding:12px 20px;background:transparent;border:none;cursor:pointer;font-weight:500;color:var(--text);position:relative;}
+.tab-button.active{color:var(--secondary);font-weight:bold;}
+.tab-button.active::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:3px;background:var(--secondary);}
+.tab-content{flex:1;display:none;overflow:auto;padding:20px;}
+.tab-content.active{display:block;}
+.script-editor{flex:1;padding:2rem;background:white;color:var(--text);overflow-y:auto;font-family:'Courier New', monospace;font-size:12pt;line-height:1.5;}
+.scene-heading{font-weight:bold;text-transform:uppercase;margin-top:1.5rem;color:#2a5a78;cursor:pointer;}
+.action,.character,.dialogue,.parenthetical,.transition{margin:0.8rem 0;cursor:pointer;}
+.character{text-align:center;width:50%;margin:0.8rem auto;font-weight:bold;}
+.dialogue{width:60%;margin:0 auto;}
+.parenthetical{width:50%;margin:0 auto;padding-left:2rem;}
+.transition{text-align:right;margin-top:1rem;text-transform:uppercase;font-weight:bold;}
+.storyboard-container{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;padding:15px;}
+.storyboard-item{border:1px solid #d0e0f0;border-radius:8px;overflow:hidden;background:white;box-shadow:0 2px 6px rgba(0,0,0,0.05);}
+.storyboard-canvas{width:100%;height:150px;background:#f0f7ff;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+</style>
+</head>
+<body>
+<!-- TELA DE ABERTURA -->
+<div class="opening-screen" id="openingScreen">
+  <div class="logo-container">
+    <div class="logo">ESCALETA HUB</div>
+    <div class="tagline">Sua plataforma profissional de criação de roteiros</div>
+  </div>
+  <div class="login-form" id="loginForm">
+    <h2>Olá, Roteirista!</h2>
+    <div class="form-group">
+      <label for="email">E-mail</label>
+      <input type="email" id="email" placeholder="seu@email.com">
+    </div>
+    <div class="form-group">
+      <label for="password">Senha</label>
+      <input type="password" id="password" placeholder="Sua senha">
+    </div>
+    <div class="error-message" id="error-message"></div>
+    <div class="success-message" id="success-message"></div>
+    <button class="login-btn" id="loginBtn">Entrar</button>
+  </div>
+</div>
+
+<!-- PLATAFORMA PRINCIPAL -->
+<div class="main-platform" id="mainPlatform">
+  <header>
+    <div class="header-left">
+      <div class="logo-platform"><i class="fas fa-scroll"></i> Escaleta Hub</div>
+      <input type="text" class="document-title" value="Roteiro Sem Título">
+    </div>
+    <div class="header-right">
+      <button class="toolbar-btn" id="save-btn"><i class="fas fa-save"></i> Salvar</button>
+      <button class="toolbar-btn" id="export-btn"><i class="fas fa-file-export"></i> Exportar</button>
+    </div>
+  </header>
+  <div class="main-container">
+    <div class="sidebar">
+      <button class="sidebar-btn active" data-tab="roteiro-tab">Roteiro</button>
+      <button class="sidebar-btn" data-tab="storyboard-tab">Storyboard</button>
+      <button class="sidebar-btn" id="logoutBtn">Sair</button>
+    </div>
+    <div class="workspace">
+      <div class="tab-header">
+        <button class="tab-button active" data-tab="roteiro-tab">Roteiro</button>
+        <button class="tab-button" data-tab="storyboard-tab">Storyboard</button>
+      </div>
+      <!-- ABA ROTEIRO -->
+      <div id="roteiro-tab" class="tab-content active">
+        <div class="script-editor" contenteditable="true" id="script-editor">
+          <div class="scene-heading">INT. CASA - DIA</div>
+          <div class="action">Um personagem está em casa lendo.</div>
+          <div class="character">JOÃO</div>
+          <div class="dialogue">O que será que vai acontecer hoje?</div>
+        </div>
+      </div>
+      <!-- ABA STORYBOARD -->
+      <div id="storyboard-tab" class="tab-content">
+        <div class="storyboard-container" id="storyboardContainer">
+          <div class="storyboard-item">
+            <div class="storyboard-canvas">Clique para desenhar</div>
+          </div>
+          <div class="storyboard-item">
+            <div class="storyboard-canvas">Clique para desenhar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// LOGIN SIMPLES
+const loginBtn = document.getElementById('loginBtn');
+loginBtn.addEventListener('click', () => {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const errorMsg = document.getElementById('error-message');
+  const successMsg = document.getElementById('success-message');
+
+  if(email && password){
+    document.getElementById('openingScreen').style.display = 'none';
+    document.getElementById('mainPlatform').style.display = 'flex';
+  }else{
+    errorMsg.style.display = 'block';
+    errorMsg.textContent = 'Preencha todos os campos!';
+    setTimeout(()=>errorMsg.style.display='none',3000);
+  }
+});
+
+// TABS FUNCIONANDO
+const tabs = document.querySelectorAll('.tab-button, .sidebar-btn[data-tab]');
+const tabContents = document.querySelectorAll('.tab-content');
+tabs.forEach(tab => {
+  tab.addEventListener('click', ()=>{
+    const target = tab.dataset.tab;
+    if(target){
+      tabContents.forEach(tc=>tc.classList.remove('active'));
+      document.getElementById(target).classList.add('active');
+      tabs.forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+    }
+  });
+});
+
+// SIDEBAR LOGOUT
+document.getElementById('logoutBtn').addEventListener('click',()=>{
+  document.getElementById('mainPlatform').style.display='none';
+  document.getElementById('openingScreen').style.display='flex';
+  document.getElementById('email').value='';
+  document.getElementById('password').value='';
+});
+
+// STORYBOARD CLICÁVEL
+document.querySelectorAll('.storyboard-canvas').forEach(canvas=>{
+  canvas.addEventListener('click',()=>{
+    const text = prompt('Escreva o que deseja no quadro do storyboard:');
+    if(text) canvas.textContent = text;
+  });
+});
+
+// SALVAR/EXPORTAR (simples)
+document.getElementById('save-btn').addEventListener('click',()=>{
+  alert('Roteiro salvo localmente!');
+});
+document.getElementById('export-btn').addEventListener('click',()=>{
+  const content = document.getElementById('script-editor').innerText;
+  const blob = new Blob([content], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'roteiro.txt';
+  a.click();
+});
+</script>
 </body>
 </html>
-
-Use Control + Shift + m to toggle the tab key moving focus. Alternatively, use esc then tab to move to the next interactive element on the page.
