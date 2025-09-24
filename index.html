@@ -1,3 +1,8 @@
+# 1. Certifique-se que está no diretório correto
+cd ~/escaleta-hub/public
+
+# 2. Crie o arquivo HTML completo
+cat > index.html << 'EOF'
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -5,31 +10,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Escaleta Hub - Plataforma de Roteiristas</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <!-- Firebase SDK -->
   <script type="module">
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
     
-    // Suas configurações do Firebase
+    // Your web app's Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyCsi6yy41s8DgT88lPRtlLKQFFYrgAgMSo",
       authDomain: "escaleta-hub.firebaseapp.com",
       projectId: "escaleta-hub",
       storageBucket: "escaleta-hub.firebasestorage.app",
       messagingSenderId: "825021624145",
-      appId: "1:825021624145:web:1f43b9574d041d8e206d70"
+      appId: "1:825021624145:web:1f43b9574d041d8e206d70",
+      measurementId: "G-NC9QFD3063"
     };
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const auth = getAuth(app);
     const db = getFirestore(app);
     
     // Torna as variáveis globais para o resto do código
+    window.firebaseApp = app;
     window.firebaseAuth = auth;
     window.firebaseDb = db;
+    window.firebaseAnalytics = analytics;
     window.firebaseFunctions = {
       createUserWithEmailAndPassword,
       signInWithEmailAndPassword,
@@ -43,47 +54,17 @@
     
     console.log("✅ Firebase configurado com sucesso!");
   </script>
+
   <style>
     /* ===== VARIÁVEIS DE CORES ===== */
     :root {
-      --primary: #1a3650; /* Azul escuro */
-      --secondary: #ff7b25; /* Laranja */
-      --accent: #41b883; /* Verde */
+      --primary: #1a3650;
+      --secondary: #ff7b25;
+      --accent: #41b883;
       --light: #f0f7ff;
       --dark: #0f1f2f;
       --text: #2c3e50;
       --bg: #f8fbff;
-      --success: #41b883;
-      --warning: #ffba5a;
-      --danger: #ff6b6b;
-      --header-bg: linear-gradient(135deg, #1a3650 0%, #0f1f2f 100%);
-      --sidebar-bg: #1a3650;
-      --editor-bg: #ffffff;
-      --editor-text: #000000;
-      --footer-bg: #1a3650;
-      --footer-text: #ecf0f1;
-    }
-
-    body.dark-mode {
-      --text: #ecf0f1;
-      --bg: #1a2a3a;
-      --header-bg: linear-gradient(135deg, #1a3650 0%, #0f1f2f 100%);
-      --sidebar-bg: #0f1f2f;
-      --editor-bg: #1e2a38;
-      --editor-text: #ecf0f1;
-      --footer-bg: #0f1f2f;
-      --footer-text: #bdc3c7;
-    }
-
-    body.focus-mode {
-      --text: #41b883;
-      --bg: #14212e;
-      --header-bg: linear-gradient(135deg, #1a5a4a 0%, #0f2f25 100%);
-      --sidebar-bg: #0f2f25;
-      --editor-bg: #0a1a15;
-      --editor-text: #41b883;
-      --footer-bg: #0f2f25;
-      --footer-text: #41b883;
     }
 
     /* ===== ESTILOS GERAIS ===== */
@@ -98,7 +79,6 @@
       background-color: var(--bg);
       color: var(--text);
       overflow-x: hidden;
-      transition: all 0.3s ease;
     }
 
     /* ===== TELA DE LOGIN ===== */
@@ -125,19 +105,10 @@
       text-align: center;
     }
 
-    .logo-container {
-      margin-bottom: 2rem;
-    }
-
     .logo-container h1 {
       color: var(--secondary);
       margin-bottom: 0.5rem;
       font-size: 2.5rem;
-    }
-
-    .login-form h2 {
-      margin-bottom: 1.5rem;
-      color: var(--dark);
     }
 
     .form-group {
@@ -160,11 +131,6 @@
       font-size: 16px;
     }
 
-    .form-group input:focus {
-      outline: none;
-      border-color: var(--secondary);
-    }
-
     .login-btn {
       width: 100%;
       padding: 12px;
@@ -176,29 +142,13 @@
       font-weight: bold;
       cursor: pointer;
       margin-top: 1rem;
-      transition: background 0.3s;
-    }
-
-    .login-btn:hover {
-      background: #e06a1a;
     }
 
     .error-message {
-      color: var(--danger);
+      color: #ff6b6b;
       text-align: center;
       margin: 10px 0;
       display: none;
-    }
-
-    .register-link {
-      text-align: center;
-      margin-top: 1rem;
-      color: #666;
-    }
-
-    .register-link a {
-      color: var(--secondary);
-      text-decoration: none;
     }
 
     /* ===== PLATAFORMA PRINCIPAL ===== */
@@ -208,9 +158,8 @@
       flex-direction: column;
     }
 
-    /* ===== CABEÇALHO ===== */
     header {
-      background: var(--header-bg);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
       color: white;
       padding: 1rem 2rem;
       display: flex;
@@ -218,443 +167,27 @@
       align-items: center;
     }
 
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .logo-platform {
-      font-size: 1.5rem;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .document-info {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .document-title {
-      font-weight: bold;
-      font-size: 1.2rem;
-      border: none;
-      background: rgba(255,255,255,0.2);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 4px;
-      width: 200px;
-    }
-
-    .document-stats {
-      font-size: 0.9rem;
-      opacity: 0.9;
-    }
-
-    .header-right {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .header-btn {
-      background: rgba(255,255,255,0.2);
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .header-btn:hover {
-      background: rgba(255,255,255,0.3);
-    }
-
-    /* ===== LAYOUT PRINCIPAL ===== */
-    .main-container {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    /* ===== MENU LATERAL ===== */
-    .sidebar {
-      width: 250px;
-      background: var(--sidebar-bg);
-      color: white;
-      padding: 1rem;
-    }
-
-    .sidebar-section {
-      margin-bottom: 2rem;
-    }
-
-    .sidebar-section h3 {
-      margin-bottom: 1rem;
-      color: #a8c6ff;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .sidebar-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.8rem;
-      width: 100%;
-      background: transparent;
-      border: none;
-      color: white;
-      text-align: left;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-bottom: 0.3rem;
-    }
-
-    .sidebar-btn:hover {
-      background: rgba(255,255,255,0.1);
-    }
-
-    .sidebar-btn.active {
-      background: var(--secondary);
-    }
-
-    /* ===== ÁREA DE TRABALHO ===== */
-    .workspace {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: var(--light);
-    }
-
-    .tab-header {
-      display: flex;
-      background: var(--light);
-      border-bottom: 1px solid #d0e0f0;
-      padding: 0 20px;
-    }
-
-    .tab-button {
-      padding: 12px 20px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      color: var(--text);
-    }
-
-    .tab-button.active {
-      color: var(--secondary);
-      font-weight: bold;
-      border-bottom: 3px solid var(--secondary);
-    }
-
-    .tab-content {
-      flex: 1;
-      display: none;
-      padding: 20px;
-      overflow: auto;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* ===== EDITOR DE ROTEIRO ===== */
-    .editor-toolbar {
-      background: white;
-      padding: 1rem;
-      border-bottom: 1px solid #ddd;
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .tool-btn {
-      padding: 8px 15px;
-      background: var(--light);
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
     .script-editor {
       flex: 1;
       padding: 2rem;
-      background: var(--editor-bg);
+      background: white;
       font-family: 'Courier New', monospace;
       font-size: 12pt;
       line-height: 1.6;
       min-height: 500px;
-      color: var(--editor-text);
+      border: none;
       outline: none;
     }
 
-    .scene-heading {
-      font-weight: bold;
-      text-transform: uppercase;
-      margin: 1.5rem 0 0.5rem 0;
-      color: var(--primary);
-    }
-
-    .character {
-      text-align: center;
-      width: 50%;
-      margin: 1rem auto;
-      font-weight: bold;
-    }
-
-    .dialogue {
-      width: 60%;
-      margin: 0.5rem auto;
-    }
-
-    .action {
-      margin: 0.5rem 0;
-    }
-
-    /* ===== STORYBOARD ===== */
-    .storyboard-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-      padding: 15px;
-    }
-
-    .storyboard-item {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      overflow: hidden;
-      background: white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      transition: transform 0.3s;
-    }
-
-    .storyboard-item:hover {
-      transform: translateY(-5px);
-    }
-
-    .storyboard-canvas {
-      width: 100%;
-      height: 150px;
-      background: #f0f7ff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: crosshair;
-    }
-
-    /* ===== VIDEOCHAMADA ===== */
-    .video-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      padding: 20px;
-    }
-
-    .video-placeholder {
-      background: #333;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      min-height: 300px;
-    }
-
-    .video-controls {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    .video-controls button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      background: var(--primary);
-      color: white;
-      transition: background 0.3s;
-    }
-
-    .video-controls button:hover {
-      background: var(--accent);
-    }
-
-    /* ===== CHAT ===== */
-    .chat-container {
-      display: flex;
-      flex-direction: column;
-      height: 500px;
-    }
-
-    .chat-messages {
-      flex: 1;
-      border: 1px solid #d0e0f0;
-      border-radius: 8px;
-      padding: 15px;
-      overflow-y: auto;
-      margin-bottom: 15px;
-      background: white;
-    }
-
-    .message {
-      margin-bottom: 10px;
-      padding: 8px;
-      border-radius: 5px;
-      background: #f8f9fa;
-    }
-
-    .chat-input {
-      display: flex;
-      gap: 10px;
-    }
-
-    .chat-input input {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #d0e0f0;
-      border-radius: 5px;
-    }
-
-    .chat-input button {
-      padding: 10px 20px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .chat-input button:hover {
-      background: #219653;
-    }
-
-    /* ===== IA ASSISTENTE ===== */
-    .ai-assistant {
-      background: white;
-      border-radius: 8px;
-      padding: 20px;
-      margin-top: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    .ai-suggestions {
-      margin-top: 15px;
-    }
-
-    .suggestion {
-      background: #f8f9fa;
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 5px;
-      cursor: pointer;
-      border-left: 4px solid var(--accent);
-      transition: background 0.3s;
-    }
-
-    .suggestion:hover {
-      background: #e8f4f1;
-    }
-
-    /* ===== FLUTUANTES ===== */
-    .floating-icons {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      z-index: 999;
-    }
-
-    .floating-icon {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 24px;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      transition: all 0.3s;
-    }
-
-    .floating-icon:hover {
-      transform: scale(1.1);
-    }
-
-    .icon-video {
-      background: var(--secondary);
-    }
-
-    .icon-chat {
-      background: var(--accent);
-    }
-
-    .icon-ai {
-      background: var(--primary);
-    }
-
-    /* ===== STATUS DE AUTOSAVE ===== */
     .save-status {
       position: fixed;
       bottom: 20px;
       left: 20px;
       padding: 10px 15px;
       border-radius: 5px;
-      font-size: 14px;
-      z-index: 999;
-      transition: all 0.3s;
-    }
-
-    .saving {
-      background: #fff3cd;
-      color: #856404;
-      border: 1px solid #ffeaa7;
-    }
-
-    .saved {
       background: #d4edda;
       color: #155724;
       border: 1px solid #c3e6cb;
-    }
-
-    footer {
-      background: var(--footer-bg);
-      color: var(--footer-text);
-      padding: 0.8rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* ===== RESPONSIVIDADE ===== */
-    @media (max-width: 900px) {
-      .main-container {
-        flex-direction: column;
-      }
-      .sidebar {
-        width: 100%;
-      }
-      .video-container {
-        grid-template-columns: 1fr;
-      }
-      .header-right {
-        flex-direction: column;
-      }
     }
   </style>
 </head>
@@ -686,8 +219,8 @@
           <i class="fas fa-sign-in-alt"></i> Entrar na Plataforma
         </button>
 
-        <p class="register-link">
-          Não tem conta? <a href="#" id="showRegister">Cadastre-se aqui</a>
+        <p style="text-align: center; margin-top: 1rem; color: #666;">
+          Não tem conta? <a href="#" id="showRegister" style="color: var(--secondary);">Cadastre-se aqui</a>
         </p>
       </div>
     </div>
@@ -696,216 +229,68 @@
   <!-- Plataforma Principal -->
   <div id="platform" class="platform">
     <header>
-      <div class="header-left">
-        <div class="logo-platform"><i class="fas fa-scroll"></i> Escaleta Hub</div>
-        <div class="document-info">
-          <input type="text" id="documentTitle" class="document-title" value="Meu Roteiro">
-          <div class="document-stats">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <div style="font-size: 1.5rem; font-weight: bold;">
+          <i class="fas fa-scroll"></i> Escaleta Hub
+        </div>
+        <div>
+          <input type="text" id="documentTitle" value="Meu Roteiro" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 10px; border-radius: 4px;">
+          <div style="font-size: 0.9rem;">
             <span id="sceneCount">0 cenas</span> • 
-            <span id="wordCount">0 palavras</span> •
-            <span id="onlineUsers">1 online</span>
+            <span id="wordCount">0 palavras</span>
           </div>
         </div>
       </div>
 
-      <div class="header-right">
-        <button id="saveBtn" class="header-btn">
+      <div style="display: flex; gap: 0.5rem;">
+        <button id="saveBtn" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">
           <i class="fas fa-save"></i> Salvar
         </button>
-        <button id="exportBtn" class="header-btn">
-          <i class="fas fa-download"></i> Exportar
-        </button>
-        <button id="userBtn" class="header-btn">
-          <i class="fas fa-user"></i> <span id="userName">Usuário</span>
-        </button>
-        <button id="logoutBtn" class="header-btn">
+        <button id="logoutBtn" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">
           <i class="fas fa-sign-out-alt"></i> Sair
         </button>
       </div>
     </header>
 
-    <div class="main-container">
+    <div style="display: flex; flex: 1; overflow: hidden;">
       <!-- Menu Lateral -->
-      <nav class="sidebar">
-        <div class="sidebar-section">
+      <nav style="width: 250px; background: var(--dark); color: white; padding: 1rem;">
+        <div style="margin-bottom: 2rem;">
           <h3><i class="fas fa-film"></i> Roteiro</h3>
-          <button class="sidebar-btn active" data-tab="roteiro">
+          <button style="display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem; width: 100%; background: var(--secondary); border: none; color: white; text-align: left; border-radius: 5px; cursor: pointer;">
             <i class="fas fa-file-alt"></i> Editor
           </button>
-          <button class="sidebar-btn" data-tab="storyboard">
-            <i class="fas fa-palette"></i> Storyboard
-          </button>
         </div>
-
-        <div class="sidebar-section">
-          <h3><i class="fas fa-users"></i> Colaboração</h3>
-          <button class="sidebar-btn" data-tab="video">
-            <i class="fas fa-video"></i> Videochamada
-          </button>
-          <button class="sidebar-btn" data-tab="chat">
-            <i class="fas fa-comments"></i> Chat
-          </button>
-        </div>
-
-        <div class="sidebar-section">
-          <h3><i class="fas fa-robot"></i> IA Assistente</h3>
-          <button class="sidebar-btn" data-tab="ai">
-            <i class="fas fa-magic"></i> Sugestões de IA
-          </button>
-        </div>
-
-        <div class="sidebar-section">
+        
+        <div style="margin-bottom: 2rem;">
           <h3><i class="fas fa-cog"></i> Ferramentas</h3>
-          <button class="sidebar-btn" id="nightModeBtn">
+          <button id="nightModeBtn" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem; width: 100%; background: transparent; border: none; color: white; text-align: left; border-radius: 5px; cursor: pointer;">
             <i class="fas fa-moon"></i> Modo Noturno
-          </button>
-          <button class="sidebar-btn" id="focusModeBtn">
-            <i class="fas fa-eye"></i> Modo Foco
           </button>
         </div>
       </nav>
 
-      <!-- Área de Trabalho -->
-      <main class="workspace">
-        <div class="tab-header">
-          <button class="tab-button active" data-tab="roteiro">Editor de Roteiro</button>
-          <button class="tab-button" data-tab="storyboard">Storyboard</button>
-          <button class="tab-button" data-tab="video">Videochamada</button>
-          <button class="tab-button" data-tab="chat">Chat</button>
-          <button class="tab-button" data-tab="ai">IA Assistente</button>
+      <!-- Editor -->
+      <main style="flex: 1; display: flex; flex-direction: column;">
+        <div style="background: white; padding: 1rem; border-bottom: 1px solid #ddd;">
+          <button id="newSceneBtn" style="padding: 8px 15px; background: var(--light); border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+            <i class="fas fa-plus"></i> Nova Cena
+          </button>
         </div>
-
-        <!-- Aba: Editor de Roteiro -->
-        <div id="roteiro" class="tab-content active">
-          <div class="editor-toolbar">
-            <button id="newSceneBtn" class="tool-btn">
-              <i class="fas fa-plus"></i> Nova Cena
-            </button>
-            <button id="exportBtn" class="tool-btn">
-              <i class="fas fa-download"></i> Exportar
-            </button>
-            <button id="aiSuggestBtn" class="tool-btn">
-              <i class="fas fa-robot"></i> Sugerir com IA
-            </button>
-          </div>
-          <div class="script-editor" contenteditable="true" id="scriptEditor">
-            <div class="scene-heading">INT. CASA - DIA</div>
-            <div class="action">
-              Uma casa aconchegante. JOÃO está sentado no sofá, olhando pela janela.
-            </div>
-            <div class="character">JOÃO</div>
-            <div class="dialogue">
-              Onde será que ela está? Já era para ter chegado.
-            </div>
-          </div>
-        </div>
-
-        <!-- Aba: Storyboard -->
-        <div id="storyboard" class="tab-content">
-          <div class="storyboard-controls">
-            <button id="addFrameBtn" class="tool-btn">
-              <i class="fas fa-plus"></i> Adicionar Frame
-            </button>
-            <button id="clearCanvasBtn" class="tool-btn">
-              <i class="fas fa-trash"></i> Limpar
-            </button>
-          </div>
-          <div class="storyboard-container" id="storyboardContainer">
-            <!-- Frames serão adicionados dinamicamente -->
-          </div>
-        </div>
-
-        <!-- Aba: Videochamada -->
-        <div id="video" class="tab-content">
-          <div class="video-container">
-            <div class="video-placeholder" id="localVideo">
-              <i class="fas fa-video" style="font-size: 48px;"></i>
-              <p>Sua câmera</p>
-            </div>
-            <div class="video-placeholder" id="remoteVideo">
-              <i class="fas fa-user" style="font-size: 48px;"></i>
-              <p>Participante</p>
-            </div>
-          </div>
-          <div class="video-controls">
-            <button id="startCallBtn">
-              <i class="fas fa-phone"></i> Iniciar Chamada
-            </button>
-            <button id="endCallBtn" style="background: var(--danger);">
-              <i class="fas fa-phone-slash"></i> Encerrar
-            </button>
-          </div>
-        </div>
-
-        <!-- Aba: Chat -->
-        <div id="chat" class="tab-content">
-          <div class="chat-container">
-            <div class="chat-messages" id="chatMessages">
-              <div class="message">
-                <strong>Sistema:</strong> Bem-vindo ao chat de colaboração!
-              </div>
-            </div>
-            <div class="chat-input">
-              <input type="text" id="chatInput" placeholder="Digite sua mensagem...">
-              <button id="sendMessageBtn">Enviar</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Aba: IA Assistente -->
-        <div id="ai" class="tab-content">
-          <div class="ai-assistant">
-            <h3><i class="fas fa-robot"></i> Assistente de IA</h3>
-            <p>Solicite sugestões para melhorar seu roteiro:</p>
-            
-            <div class="chat-input">
-              <input type="text" id="aiPrompt" placeholder="Ex: Sugira um diálogo para...">
-              <button id="askAIBtn">Perguntar à IA</button>
-            </div>
-            
-            <div class="ai-suggestions" id="aiSuggestions">
-              <div class="suggestion" onclick="useSuggestion(this)">
-                💡 Sugerir desenvolvimento de personagem
-              </div>
-              <div class="suggestion" onclick="useSuggestion(this)">
-                🎭 Criar diálogo emocionante
-              </div>
-              <div class="suggestion" onclick="useSuggestion(this)">
-                🌅 Descrever cenário impactante
-              </div>
-            </div>
-          </div>
+        
+        <div class="script-editor" contenteditable="true" id="scriptEditor">
+          <div style="font-weight: bold; text-transform: uppercase; margin: 1.5rem 0 0.5rem 0; color: var(--primary);">INT. CASA - DIA</div>
+          <div style="margin: 0.5rem 0;">Uma casa aconchegante. JOÃO está sentado no sofá, olhando pela janela.</div>
+          <div style="text-align: center; width: 50%; margin: 1rem auto; font-weight: bold;">JOÃO</div>
+          <div style="width: 60%; margin: 0.5rem auto;">Onde será que ela está? Já era para ter chegado.</div>
         </div>
       </main>
     </div>
+  </div>
 
-    <footer>
-      <div>
-        <span id="currentTab">Roteiro</span> | 
-        <span id="connectionStatus"><i class="fas fa-wifi"></i> Conectado</span>
-      </div>
-      <div>
-        <span id="lastSaved">Modificado: agora</span>
-      </div>
-    </footer>
-
-    <!-- Ícones Flutuantes -->
-    <div class="floating-icons">
-      <div class="floating-icon icon-video" id="quickVideoBtn">
-        <i class="fas fa-video"></i>
-      </div>
-      <div class="floating-icon icon-chat" id="quickChatBtn">
-        <i class="fas fa-comment"></i>
-      </div>
-      <div class="floating-icon icon-ai" id="quickAIBtn">
-        <i class="fas fa-robot"></i>
-      </div>
-    </div>
-
-    <!-- Status de Autosave -->
-    <div id="saveStatus" class="save-status" style="display: none;">
-      <i class="fas fa-sync-alt"></i> <span id="statusText">Salvando...</span>
-    </div>
+  <!-- Status de Autosave -->
+  <div id="saveStatus" class="save-status" style="display: none;">
+    <i class="fas fa-check"></i> <span id="statusText">Salvo</span>
   </div>
 
   <script>
@@ -922,18 +307,13 @@
         setTimeout(() => {
           this.setupAuthListener();
           this.setupLogin();
-          this.setupTabs();
           this.setupEditor();
-          this.setupVideoCall();
-          this.setupChat();
-          this.setupAI();
-          this.setupStoryboard();
-          this.setupFloatingIcons();
           this.setupVisualModes();
+          console.log("🎬 Escaleta Hub inicializado!");
         }, 1000);
       }
 
-      // === OUVINTE DE AUTENTICAÇÃO ===
+      // === SISTEMA DE AUTENTICAÇÃO ===
       setupAuthListener() {
         if (!window.firebaseAuth) {
           console.error("Firebase não carregou corretamente");
@@ -945,12 +325,8 @@
             this.currentUser = user;
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('platform').style.display = 'flex';
-            document.getElementById('userName').textContent = user.email.split('@')[0];
-            
-            // Carregar roteiro salvo
             this.loadUserScript(user.uid);
             this.updateStats();
-            
             console.log("✅ Usuário logado:", user.email);
           } else {
             this.currentUser = null;
@@ -960,13 +336,8 @@
         });
       }
 
-      // === SISTEMA DE LOGIN ===
       setupLogin() {
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const showRegister = document.getElementById('showRegister');
-        
-        loginBtn.addEventListener('click', () => {
+        document.getElementById('loginBtn').addEventListener('click', () => {
           const email = document.getElementById('email').value;
           const password = document.getElementById('password').value;
           
@@ -975,81 +346,47 @@
             return;
           }
           
-          // Login com Firebase
           window.firebaseFunctions.signInWithEmailAndPassword(
             window.firebaseAuth, email, password
           ).catch((error) => {
             this.showError('Erro no login: ' + error.message);
           });
         });
-        
-        showRegister.addEventListener('click', (e) => {
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+          window.firebaseFunctions.signOut(window.firebaseAuth);
+        });
+
+        document.getElementById('showRegister').addEventListener('click', (e) => {
           e.preventDefault();
           this.showRegisterForm();
-        });
-        
-        logoutBtn.addEventListener('click', () => {
-          window.firebaseFunctions.signOut(window.firebaseAuth).catch((error) => {
-            console.error("Erro no logout:", error);
-          });
         });
       }
 
       showRegisterForm() {
-        const loginForm = document.querySelector('.login-form');
-        loginForm.innerHTML = `
-          <h2>Criar Nova Conta</h2>
-          <div class="form-group">
-            <label for="registerName">Nome Completo</label>
-            <input type="text" id="registerName" placeholder="Seu nome completo">
-          </div>
-          <div class="form-group">
-            <label for="registerEmail">E-mail</label>
-            <input type="email" id="registerEmail" placeholder="seu@email.com">
-          </div>
-          <div class="form-group">
-            <label for="registerPassword">Senha</label>
-            <input type="password" id="registerPassword" placeholder="Mínimo 6 caracteres">
-          </div>
-          <div class="error-message" id="registerError"></div>
-          <button class="login-btn" id="registerBtn">Criar Conta</button>
-          <p class="register-link">
-            Já tem conta? <a href="#" id="backToLogin">Fazer Login</a>
-          </p>
-        `;
+        const email = prompt("Digite seu e-mail para cadastro:");
+        const password = prompt("Digite uma senha (mínimo 6 caracteres):");
         
-        document.getElementById('registerBtn').addEventListener('click', () => {
-          const name = document.getElementById('registerName').value;
-          const email = document.getElementById('registerEmail').value;
-          const password = document.getElementById('registerPassword').value;
-          
-          if (!name || !email || !password) {
-            this.showError('Por favor, preencha todos os campos.', document.getElementById('registerError'));
-            return;
-          }
-          
-          if (password.length < 6) {
-            this.showError('A senha deve ter pelo menos 6 caracteres.', document.getElementById('registerError'));
-            return;
-          }
-          
-          // Registrar usuário no Firebase
-          window.firebaseFunctions.createUserWithEmailAndPassword(
-            window.firebaseAuth, email, password
-          ).then(() => {
-            this.showNotification('Conta criada com sucesso!');
-          }).catch((error) => {
-            this.showError('Erro no registro: ' + error.message, document.getElementById('registerError'));
-          });
-        });
-        
-        document.getElementById('backToLogin').addEventListener('click', (e) => {
-          e.preventDefault();
-          location.reload();
+        if (!email || !password) {
+          alert("Cadastro cancelado.");
+          return;
+        }
+
+        if (password.length < 6) {
+          alert("A senha deve ter pelo menos 6 caracteres.");
+          return;
+        }
+
+        window.firebaseFunctions.createUserWithEmailAndPassword(
+          window.firebaseAuth, email, password
+        ).then(() => {
+          alert("Conta criada com sucesso! Faça login.");
+        }).catch((error) => {
+          alert("Erro no cadastro: " + error.message);
         });
       }
 
-      // === AUTOSAVE DO ROTEIRO ===
+      // === SISTEMA DE AUTOSAVE ===
       async loadUserScript(uid) {
         try {
           const docRef = window.firebaseFunctions.doc(window.firebaseDb, "scripts", uid);
@@ -1057,7 +394,7 @@
           
           if (docSnap.exists()) {
             document.getElementById('scriptEditor').innerHTML = docSnap.data().content;
-            this.showSaveStatus('Último roteiro carregado', 'saved');
+            this.showSaveStatus('Último roteiro carregado', 'success');
           }
         } catch (error) {
           console.error("Erro ao carregar roteiro:", error);
@@ -1079,207 +416,112 @@
           const docRef = window.firebaseFunctions.doc(window.firebaseDb, "scripts", uid);
           await window.firebaseFunctions.setDoc(docRef, { 
             content: content,
-            updatedAt: window.firebaseFunctions.serverTimestamp()
+            updatedAt: window.firebaseFunctions.serverTimestamp(),
+            title: document.getElementById('documentTitle').value
           });
           
-          this.showSaveStatus('Salvo automaticamente', 'saved');
-          document.getElementById('lastSaved').textContent = 'Modificado: agora';
+          this.showSaveStatus('Salvo automaticamente', 'success');
         } catch (error) {
-          this.showSaveStatus('Erro ao salvar', 'saving');
+          this.showSaveStatus('Erro ao salvar', 'error');
           console.error("Erro ao salvar:", error);
         }
-      }, 1000);
+      }, 2000);
 
       showSaveStatus(text, type) {
         const status = document.getElementById('saveStatus');
         const statusText = document.getElementById('statusText');
         
         statusText.textContent = text;
-        status.className = `save-status ${type}`;
         status.style.display = 'block';
         
-        if (type === 'saved') {
+        if (type === 'success') {
+          status.style.background = '#d4edda';
+          status.style.color = '#155724';
+          status.style.borderColor = '#c3e6cb';
+        } else if (type === 'saving') {
+          status.style.background = '#fff3cd';
+          status.style.color = '#856404';
+          status.style.borderColor = '#ffeaa7';
+        } else {
+          status.style.background = '#f8d7da';
+          status.style.color = '#721c24';
+          status.style.borderColor = '#f5c6cb';
+        }
+        
+        if (type === 'success') {
           setTimeout(() => {
             status.style.display = 'none';
           }, 3000);
         }
       }
 
-      // === SISTEMA DE ABAS ===
-      setupTabs() {
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const sidebarButtons = document.querySelectorAll('.sidebar-btn');
-        
-        const switchTab = (tabId) => {
-          document.querySelectorAll('.tab-content').forEach(tab => {
-            tab.classList.remove('active');
-          });
-          
-          document.getElementById(tabId).classList.add('active');
-          
-          tabButtons.forEach(btn => btn.classList.remove('active'));
-          sidebarButtons.forEach(btn => btn.classList.remove('active'));
-          
-          document.querySelectorAll(`[data-tab="${tabId}"]`).forEach(btn => {
-            btn.classList.add('active');
-          });
-          
-          document.getElementById('currentTab').textContent = 
-            document.querySelector(`[data-tab="${tabId}"]`).textContent;
-        };
-        
-        tabButtons.forEach(button => {
-          button.addEventListener('click', () => {
-            switchTab(button.getAttribute('data-tab'));
-          });
-        });
-        
-        sidebarButtons.forEach(button => {
-          if (button.dataset.tab) {
-            button.addEventListener('click', () => {
-              switchTab(button.dataset.tab);
-            });
-          }
-        });
-      }
-
       // === EDITOR DE ROTEIRO ===
       setupEditor() {
-        const scriptEditor = document.getElementById('scriptEditor');
-        const sceneCount = document.getElementById('sceneCount');
-        const wordCount = document.getElementById('wordCount');
+        const editor = document.getElementById('scriptEditor');
         const newSceneBtn = document.getElementById('newSceneBtn');
+        const saveBtn = document.getElementById('saveBtn');
 
-        const updateStats = () => {
-          const text = scriptEditor.innerText;
-          const scenes = (text.match(/INT\.|EXT\./g) || []).length;
-          const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
-          sceneCount.textContent = `${scenes} cenas`;
-          wordCount.textContent = `${words} palavras`;
-        };
-
-        // Nova cena
         newSceneBtn.addEventListener('click', () => {
           const newScene = document.createElement('div');
-          newScene.className = 'scene-heading';
+          newScene.style.fontWeight = 'bold';
+          newScene.style.textTransform = 'uppercase';
+          newScene.style.margin = '1.5rem 0 0.5rem 0';
+          newScene.style.color = 'var(--primary)';
           newScene.contentEditable = true;
           newScene.textContent = 'INT. NOVA CENA - DIA';
-          scriptEditor.appendChild(newScene);
+          editor.appendChild(newScene);
           newScene.focus();
-          updateStats();
         });
 
-        // Configurar autosave quando o usuário estiver logado
-        scriptEditor.addEventListener('input', () => {
-          updateStats();
+        saveBtn.addEventListener('click', () => {
           if (this.currentUser) {
-            this.saveScript(this.currentUser.uid, scriptEditor.innerHTML);
+            this.saveScript(this.currentUser.uid, editor.innerHTML);
           }
         });
 
-        updateStats();
+        editor.addEventListener('input', () => {
+          this.updateStats();
+          if (this.currentUser) {
+            this.saveScript(this.currentUser.uid, editor.innerHTML);
+          }
+        });
+
+        this.updateStats();
       }
 
-      // === OUTRAS FUNCIONALIDADES ===
-      setupVideoCall() {
-        document.getElementById('startCallBtn').addEventListener('click', () => {
-          this.showNotification('Chamada iniciada (simulação)');
-        });
-      }
-
-      setupChat() {
-        document.getElementById('sendMessageBtn').addEventListener('click', () => {
-          const msg = document.getElementById('chatInput').value.trim();
-          if (!msg) return;
-          
-          const div = document.createElement('div');
-          div.classList.add('message');
-          div.innerHTML = `<strong>${this.currentUser ? this.currentUser.email.split('@')[0] : 'Usuário'}:</strong> ${msg}`;
-          document.getElementById('chatMessages').appendChild(div);
-          document.getElementById('chatInput').value = '';
-        });
-      }
-
-      setupAI() {
-        document.getElementById('askAIBtn').addEventListener('click', () => {
-          const query = document.getElementById('aiPrompt').value.trim();
-          if (!query) return;
-          
-          this.showNotification(`Sugestão de IA para: "${query}" (funcionalidade simulada)`);
-        });
-      }
-
-      setupStoryboard() {
-        document.getElementById('addFrameBtn').addEventListener('click', () => {
-          const frame = document.createElement('div');
-          frame.classList.add('storyboard-item');
-          frame.innerHTML = `
-            <div class="storyboard-canvas">Clique para desenhar</div>
-            <div style="padding: 10px;">
-              <p><strong>Cena ${document.querySelectorAll('.storyboard-item').length + 1}</strong></p>
-              <textarea placeholder="Descrição..." style="width:100%; margin-top:5px; padding:5px;"></textarea>
-            </div>
-          `;
-          document.getElementById('storyboardContainer').appendChild(frame);
-        });
-      }
-
-      setupFloatingIcons() {
-        document.getElementById('quickVideoBtn').addEventListener('click', () => {
-          this.showNotification('Videochamada rápida (simulação)');
-        });
+      updateStats() {
+        const text = document.getElementById('scriptEditor').innerText;
+        const scenes = (text.match(/INT\.|EXT\./g) || []).length;
+        const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
         
-        document.getElementById('quickChatBtn').addEventListener('click', () => {
-          this.showNotification('Chat rápido (simulação)');
-        });
+        document.getElementById('sceneCount').textContent = scenes + ' cenas';
+        document.getElementById('wordCount').textContent = words + ' palavras';
       }
 
+      // === MODO NOTURNO ===
       setupVisualModes() {
         document.getElementById('nightModeBtn').addEventListener('click', () => {
-          document.body.classList.toggle('dark-mode');
-          document.body.classList.remove('focus-mode');
-        });
-        
-        document.getElementById('focusModeBtn').addEventListener('click', () => {
-          document.body.classList.toggle('focus-mode');
-          document.body.classList.remove('dark-mode');
+          document.body.classList.toggle('night-mode');
+          
+          if (document.body.classList.contains('night-mode')) {
+            document.body.style.backgroundColor = '#1a1a1a';
+            document.body.style.color = 'white';
+          } else {
+            document.body.style.backgroundColor = '';
+            document.body.style.color = '';
+          }
         });
       }
 
-      showError(msg, target = document.getElementById('errorMessage')) {
-        target.style.display = 'block';
-        target.textContent = msg;
-        setTimeout(() => { target.style.display = 'none'; }, 5000);
-      }
-
-      showNotification(msg) {
-        // Criar notificação simples
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          background: var(--secondary);
-          color: white;
-          padding: 15px 20px;
-          border-radius: 5px;
-          z-index: 10000;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        `;
-        notification.textContent = msg;
-        document.body.appendChild(notification);
-        
+      showError(msg) {
+        const errorElement = document.getElementById('errorMessage');
+        errorElement.textContent = msg;
+        errorElement.style.display = 'block';
         setTimeout(() => {
-          notification.remove();
-        }, 3000);
+          errorElement.style.display = 'none';
+        }, 5000);
       }
     }
-
-    // Função global para sugestões de IA
-    window.useSuggestion = function(el) {
-      const suggestion = el.textContent;
-      document.getElementById('scriptEditor').innerHTML += `<div class="action">${suggestion}</div>`;
-    };
 
     // Inicializar quando a página carregar
     window.addEventListener('DOMContentLoaded', () => {
@@ -1288,7 +530,7 @@
   </script>
 </body>
 </html>
-
+EOF
 
 
 
